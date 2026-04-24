@@ -1,157 +1,157 @@
-\section{Nettverkslaget -- Oversikt (4.1)}
+\section{The Network Layer -- Overview (4.1)}
 %=============================================================================
 
-\subsection{Nettverkslagets rolle}
+\subsection{The Role of the Network Layer}
 
-\begin{keybox}[Nettverkslaget -- oversikt]
-Nettverkslaget transporterer \textbf{segmenter} fra sendende vert til mottakende vert.
+\begin{keybox}[The Network Layer -- overview]
+The network layer transports \textbf{segments} from the sending host to the receiving host.
 \begin{itemize}[noitemsep]
-    \item Sendersiden: kapsler inn segmenter i \textbf{datagrammer} (pakker)
-    \item Mottakersiden: leverer segmenter til transportlaget
-    \item Nettverkslagsprotokoller finnes i \emph{alle} verter og rutere
-    \item Ruteren unders\o ker header-felt i alle IP-datagrammer som passerer gjennom den
+    \item Sender side: encapsulates segments into \textbf{datagrams} (packets)
+    \item Receiver side: delivers segments to the transport layer
+    \item Network layer protocols exist in \emph{all} hosts and routers
+    \item The router examines header fields in all IP datagrams that pass through it
 \end{itemize}
 \end{keybox}
 
 \subsection{Forwarding vs. Routing}
 
-\begin{exambox}[Eksamensrelevant: Forwarding vs. Routing (V2025, V2023)]
-\textbf{Forwarding} og \textbf{routing} er to sentrale begreper som ofte forveksles p\aa\ eksamen:
+\begin{exambox}[Exam-relevant: Forwarding vs. Routing (V2025, V2023)]
+\textbf{Forwarding} and \textbf{routing} are two central concepts that are often confused on the exam:
 \begin{itemize}[noitemsep]
-    \item \textbf{Forwarding (videresending):} Flytte pakker fra ruterens inngangsport til riktig utgangsport. Dette er en \emph{lokal} handling i \emph{hver enkelt ruter} (dataplanet).
-    \item \textbf{Routing (ruting):} Bestemme ruten pakker skal ta fra kilde til destinasjon. Dette er en \emph{global}, \emph{nettverksomfattende} prosess (kontrollplanet).
+    \item \textbf{Forwarding:} Moving packets from the router's input port to the correct output port. This is a \emph{local} action in \emph{each individual router} (data plane).
+    \item \textbf{Routing:} Determining the route packets should take from source to destination. This is a \emph{global}, \emph{network-wide} process (control plane).
 \end{itemize}
 
 \medskip
-\textbf{Analogi:} Forwarding = ta riktig avkj\o ring i et veikryss. Routing = planlegge hele reiseruten fra Oslo til Trondheim.
+\textbf{Analogy:} Forwarding = taking the correct exit at an intersection. Routing = planning the entire travel route from Oslo to Trondheim.
 
 \medskip
-\textbf{Fra eksamen V2025:} ``What is the difference between forwarding and routing?''
+\textbf{From exam V2025:} ``What is the difference between forwarding and routing?''
 \begin{itemize}[noitemsep]
     \item Forwarding: move packets from router's input to appropriate router output (local action, data plane)
     \item Routing: determine route taken by packets from source to destination (global action, control plane)
 \end{itemize}
 \end{exambox}
 
-\subsection{Dataplanet vs. Kontrollplanet}
+\subsection{The Data Plane vs. The Control Plane}
 
-\begin{keybox}[To plan i nettverkslaget]
+\begin{keybox}[Two planes in the network layer]
 \begin{itemize}[noitemsep]
-    \item \textbf{Dataplanet:}
+    \item \textbf{Data plane:}
     \begin{itemize}[noitemsep]
-        \item Lokal, per-ruter funksjon
-        \item Bestemmer hvordan datagrammer som ankommer inngangsport videresendes til utgangsport
-        \item Forwarding-funksjon -- opererer i \textbf{nanosekunders} tidsramme (hardware)
+        \item Local, per-router function
+        \item Determines how datagrams arriving at the input port are forwarded to the output port
+        \item Forwarding function -- operates on a \textbf{nanosecond} timescale (hardware)
     \end{itemize}
-    \item \textbf{Kontrollplanet:}
+    \item \textbf{Control plane:}
     \begin{itemize}[noitemsep]
-        \item Nettverksomfattende logikk
-        \item Bestemmer hvordan datagrammer rutes mellom rutere langs ende-til-ende-stier
-        \item Opererer i \textbf{millisekunders} tidsramme (software)
-        \item To tilnerminger: tradisjonelle rutingsalgoritmer (per-ruter) eller SDN (Software-Defined Networking)
+        \item Network-wide logic
+        \item Determines how datagrams are routed between routers along end-to-end paths
+        \item Operates on a \textbf{millisecond} timescale (software)
+        \item Two approaches: traditional routing algorithms (per-router) or SDN (Software-Defined Networking)
     \end{itemize}
 \end{itemize}
 \end{keybox}
 
-\subsection{Per-ruter kontrollplan vs. SDN}
+\subsection{Per-router Control Plane vs. SDN}
 
-\begin{keybox}[To kontrollplan-tilnerminger]
-\textbf{Tradisjonelt (per-ruter kontrollplan):}
+\begin{keybox}[Two control plane approaches]
+\textbf{Traditional (per-router control plane):}
 \begin{itemize}[noitemsep]
-    \item Hver ruter har sin egen rutingsalgoritme
-    \item Rutere kommuniserer seg imellom for \aa\ bygge forwarding-tabeller
-    \item Rutingsalgoritmen kj\o rer i \emph{hver} ruter
+    \item Each router has its own routing algorithm
+    \item Routers communicate with each other to build forwarding tables
+    \item The routing algorithm runs in \emph{each} router
 \end{itemize}
 
 \textbf{SDN (Software-Defined Networking):}
 \begin{itemize}[noitemsep]
-    \item En ekstern (fjern) kontroller beregner og distribuerer forwarding-tabeller
-    \item Rutere/svitsjer f\aa r sine flow-tabeller fra den sentrale kontrolleren
-    \item Separerer kontrollplanet fra dataplanet fysisk
+    \item An external (remote) controller computes and distributes forwarding tables
+    \item Routers/switches receive their flow tables from the central controller
+    \item Physically separates the control plane from the data plane
 \end{itemize}
 \end{keybox}
 
-\subsection{Nettverkstjenestemodellen}
+\subsection{The Network Service Model}
 
-\begin{keybox}[Best Effort-tjeneste]
-Internettets nettverkslag tilbyr kun \textbf{best effort}-tjeneste:
+\begin{keybox}[Best Effort service]
+The Internet's network layer offers only \textbf{best effort} service:
 \begin{itemize}[noitemsep]
-    \item \textbf{Ingen} garanti for b\aa ndbredde
-    \item \textbf{Ingen} garanti mot pakketap
-    \item \textbf{Ingen} garanti for rekkef\o lge
-    \item \textbf{Ingen} garanti for forsinkelse (timing)
-    \item \textbf{Ingen} garanti for minimal forsinkelse mellom pakker (jitter)
+    \item \textbf{No} guarantee for bandwidth
+    \item \textbf{No} guarantee against packet loss
+    \item \textbf{No} guarantee for ordering
+    \item \textbf{No} guarantee for delay (timing)
+    \item \textbf{No} guarantee for minimal delay between packets (jitter)
 \end{itemize}
 \end{keybox}
 
-\begin{warnbox}[Sammenligning med andre nettverksarkitekturer]
-Andre nettverksarkitekturer (som ATM) tilb\o d sterkere garantier:
+\begin{warnbox}[Comparison with other network architectures]
+Other network architectures (such as ATM) offered stronger guarantees:
 \begin{itemize}[noitemsep]
-    \item \textbf{ATM CBR} (Constant Bit Rate): garantert b\aa ndbredde, rekkef\o lge, timing, ingen tap
-    \item \textbf{ATM ABR} (Available Bit Rate): garantert minimumsb\aa ndbredde, ingen tap
+    \item \textbf{ATM CBR} (Constant Bit Rate): guaranteed bandwidth, ordering, timing, no loss
+    \item \textbf{ATM ABR} (Available Bit Rate): guaranteed minimum bandwidth, no loss
 \end{itemize}
-Internettets ``best effort'' har likevel vunnet fordi enkelheten tillater innovasjon i ytterkantene.
+The Internet's ``best effort'' has nevertheless won because its simplicity allows innovation at the edges.
 \end{warnbox}
 
 %=============================================================================
-\section{Hva er inne i en ruter? (4.2)}
+\section{What is Inside a Router? (4.2)}
 %=============================================================================
 
-\subsection{Ruterarkitektur -- oversikt}
+\subsection{Router Architecture -- Overview}
 
-\begin{keybox}[Generisk ruterarkitektur]
-En ruter best\aa r av fire hovedkomponenter:
+\begin{keybox}[Generic router architecture]
+A router consists of four main components:
 \begin{enumerate}[noitemsep]
-    \item \textbf{Inngangsporter (Input ports):} Fysisk mottak, linklags-protokoll, oppslag i forwarding-tabell, k\o
-    \item \textbf{Svitsjefabrikk (Switching fabric):} Kobler inngangsporter til utgangsporter
-    \item \textbf{Utgangsporter (Output ports):} Buffring, k\o disiplin, linklags-protokoll, fysisk sending
-    \item \textbf{Rutingprosessor:} Kj\o rer rutingsprotokoller, administrasjon (kontrollplanet)
+    \item \textbf{Input ports:} Physical reception, link layer protocol, lookup in forwarding table, queue
+    \item \textbf{Switching fabric:} Connects input ports to output ports
+    \item \textbf{Output ports:} Buffering, queue discipline, link layer protocol, physical transmission
+    \item \textbf{Routing processor:} Runs routing protocols, management (control plane)
 \end{enumerate}
 
 \medskip
-\textbf{Viktig skille:}
+\textbf{Important distinction:}
 \begin{itemize}[noitemsep]
-    \item Kontrollplanet (rutingprosessor): software, millisekunder
-    \item Dataplanet (inngangsporter, svitsjefabrikk, utgangsporter): hardware, nanosekunder
+    \item Control plane (routing processor): software, milliseconds
+    \item Data plane (input ports, switching fabric, output ports): hardware, nanoseconds
 \end{itemize}
 \end{keybox}
 
-\subsection{Inngangsport-funksjoner}
+\subsection{Input Port Functions}
 
-\begin{keybox}[Inngangsportens tre steg]
+\begin{keybox}[The three steps of the input port]
 \begin{enumerate}[noitemsep]
-    \item \textbf{Linjeterminering:} Fysisk lag -- bit-niv\aa\ mottak
-    \item \textbf{Linklags-protokoll:} F.eks. Ethernet (motta ramme)
-    \item \textbf{Oppslag og forwarding:} Bruk header-verdier til \aa\ sl\aa\ opp utgangsport i forwarding-tabellen (``match plus action'')
+    \item \textbf{Line termination:} Physical layer -- bit-level reception
+    \item \textbf{Link layer protocol:} E.g. Ethernet (receive frame)
+    \item \textbf{Lookup and forwarding:} Use header values to look up the output port in the forwarding table (``match plus action'')
 \end{enumerate}
 
 \medskip
-\textbf{Desentralisert svitsjing:}
+\textbf{Decentralized switching:}
 \begin{itemize}[noitemsep]
-    \item Forwarding-tabellen er kopiert til inngangsportens minne
-    \item M\aa l: fullf\o re input-port-prosessering med \textbf{linjehastighet} (line speed)
-    \item \textbf{Input port queuing:} Oppst\aa r n\aa r datagrammer ankommer raskere enn switching-hastigheten
+    \item The forwarding table is copied to the input port's memory
+    \item Goal: complete input port processing at \textbf{line speed}
+    \item \textbf{Input port queuing:} Occurs when datagrams arrive faster than the switching speed
 \end{itemize}
 \end{keybox}
 
-\subsubsection{Destinasjonsbasert vs. generalisert forwarding}
+\subsubsection{Destination-based vs. Generalized Forwarding}
 \begin{itemize}[noitemsep]
-    \item \textbf{Destinasjonsbasert forwarding:} Videresending basert kun p\aa\ destinasjons-IP-adresse (tradisjonelt)
-    \item \textbf{Generalisert forwarding:} Videresending basert p\aa\ et vilk\aa rlig sett av header-verdier (SDN/OpenFlow)
+    \item \textbf{Destination-based forwarding:} Forwarding based only on the destination IP address (traditional)
+    \item \textbf{Generalized forwarding:} Forwarding based on an arbitrary set of header values (SDN/OpenFlow)
 \end{itemize}
 
 \subsection{Longest Prefix Match}
 
-\begin{exambox}[Eksamensrelevant: Longest Prefix Match (V2023 Q4)]
-\textbf{Longest prefix match:} N\aa r man sl\aa r opp i forwarding-tabellen for en gitt destinasjonsadresse, bruk den oppf\o ringen med \emph{lengste} adresseprefikset som matcher destinasjonsadressen.
+\begin{exambox}[Exam-relevant: Longest Prefix Match (V2023 Q4)]
+\textbf{Longest prefix match:} When looking up in the forwarding table for a given destination address, use the entry with the \emph{longest} address prefix that matches the destination address.
 
 \medskip
-\textbf{Eksempel fra forelesning:}
+\textbf{Example from lecture:}
 
 \begin{center}
 \begin{tabular}{lc}
 \toprule
-\textbf{Destinasjonsadresseomr\aa de} & \textbf{Link Interface} \\
+\textbf{Destination address range} & \textbf{Link Interface} \\
 \midrule
 \texttt{11001000 00010111 00010***} & 0 \\
 \texttt{11001000 00010111 00011000} & 1 \\
@@ -161,145 +161,145 @@ otherwise & 3 \\
 \end{tabular}
 \end{center}
 
-For adressen \texttt{11001000 00010111 00011000 10101010}:
+For the address \texttt{11001000 00010111 00011000 10101010}:
 \begin{itemize}[noitemsep]
-    \item Matcher b\aa de interface 1 (full match p\aa\ 24 bit) og interface 2 (21 bit)
-    \item Velger interface \textbf{1} fordi den har lengst prefiks-match
+    \item Matches both interface 1 (full match on 24 bits) and interface 2 (21 bits)
+    \item Selects interface \textbf{1} because it has the longest prefix match
 \end{itemize}
 
 \medskip
-\textbf{Fra eksamen V2023 (Q4):} Oppgaven ga en forwarding-tabell med 5 CIDR-oppf\o ringer og spurte hvilken utgangsport 5 ulike IP-adresser ville bli videresendt til. L\o sningen krever bin\ae r konvertering og longest prefix match.
+\textbf{From exam V2023 (Q4):} The problem gave a forwarding table with 5 CIDR entries and asked which output port 5 different IP addresses would be forwarded to. The solution requires binary conversion and longest prefix match.
 
 \medskip
-\textbf{Implementering:} Ofte implementert med \textbf{TCAM} (Ternary Content Addressable Memory) -- gir oppslag i \emph{en} klokkesyklus, uavhengig av tabellst\o rrelse.
+\textbf{Implementation:} Often implemented with \textbf{TCAM} (Ternary Content Addressable Memory) -- provides lookup in \emph{one} clock cycle, regardless of table size.
 \end{exambox}
 
-\subsection{Svitsjefabrikk (Switching Fabric)}
+\subsection{Switching Fabric}
 
-\begin{keybox}[Tre typer svitsjefabrikk]
-Svitsjefabrikken overforer pakker fra inngangsport til riktig utgangsport.
+\begin{keybox}[Three types of switching fabric]
+The switching fabric transfers packets from the input port to the correct output port.
 
-\textbf{Switching rate:} Hastigheten pakker kan overfores fra inngang til utgang.
+\textbf{Switching rate:} The speed at which packets can be transferred from input to output.
 \begin{itemize}[noitemsep]
-    \item Ofte m\aa lt som multippel av inngangs-/utgangs-linjehastighet
-    \item Med $N$ inngangsporter: \o nskelig med switching rate $= N \times R$ (linjehastighet)
+    \item Often measured as a multiple of the input/output line speed
+    \item With $N$ input ports: desirable switching rate $= N \times R$ (line speed)
 \end{itemize}
 
-\textbf{Tre hovedtyper:}
+\textbf{Three main types:}
 \begin{enumerate}[noitemsep]
-    \item \textbf{Via minne:} F\o rste generasjon. Pakke kopieres til systemminne via CPU. Begrenset av minneb\aa ndbredde (2 busskryssinger per datagram).
-    \item \textbf{Via buss:} Datagram fra inngangsportens minne til utgangsportens minne via en delt buss. \emph{Bus contention} -- hastighet begrenset av bussb\aa ndbredde. F.eks. Cisco 5600: 32 Gbps.
-    \item \textbf{Via kryssbarnett (interconnection network):} Crossbar, Clos-nettverk. Kan overf\o re flere pakker parallelt. Fragmenterer datagrammer til celler, svitsjer cellene, reassemblerer. Skalerer med parallelle switching ``planes'' (f.eks. Cisco CRS: 100s Tbps).
+    \item \textbf{Via memory:} First generation. Packet is copied to system memory via CPU. Limited by memory bandwidth (2 bus crossings per datagram).
+    \item \textbf{Via bus:} Datagram from input port memory to output port memory via a shared bus. \emph{Bus contention} -- speed limited by bus bandwidth. E.g. Cisco 5600: 32 Gbps.
+    \item \textbf{Via interconnection network:} Crossbar, Clos network. Can transfer multiple packets in parallel. Fragments datagrams into cells, switches the cells, reassembles. Scales with parallel switching ``planes'' (e.g. Cisco CRS: 100s Tbps).
 \end{enumerate}
 \end{keybox}
 
-\subsection{K\o er og forsinkelser i ruteren}
+\subsection{Queues and Delays in the Router}
 
 \subsubsection{Input port queuing}
 
-\begin{keybox}[HOL-blokkering]
-Hvis svitsjefabrikken er langsommere enn summen av inngangsportene, oppst\aa r k\o er ved inngangsportene.
+\begin{keybox}[HOL blocking]
+If the switching fabric is slower than the sum of the input ports, queues form at the input ports.
 \begin{itemize}[noitemsep]
-    \item K\o forsinkelse og pakketap p\aa\ grunn av buffer-overflow
-    \item \textbf{Head-of-the-Line (HOL) blocking:} Et datagram fremst i k\o en blokkerer andre datagrammer i samme k\o\ fra \aa\ komme videre, selv om deres utgangsport er ledig
+    \item Queue delay and packet loss due to buffer overflow
+    \item \textbf{Head-of-the-Line (HOL) blocking:} A datagram at the front of the queue blocks other datagrams in the same queue from advancing, even if their output port is free
 \end{itemize}
 \end{keybox}
 
 \subsubsection{Output port queuing}
 
-\begin{keybox}[Utgangsportkoing -- viktig!]
-Buffring kreves n\aa r datagrammer ankommer fra svitsjefabrikken raskere enn linjeoverforingshastigheten.
+\begin{keybox}[Output port queuing -- important!]
+Buffering is required when datagrams arrive from the switching fabric faster than the line transmission speed.
 \begin{itemize}[noitemsep]
-    \item K\o forsinkelse og pakketap ved buffer-overflow
-    \item \textbf{Drop policy:} Hvilke pakker kastes n\aa r bufferen er full?
-    \item \textbf{Scheduling discipline:} Velger blant k\o ede datagrammer for sending
+    \item Queue delay and packet loss due to buffer overflow
+    \item \textbf{Drop policy:} Which packets are dropped when the buffer is full?
+    \item \textbf{Scheduling discipline:} Selects among queued datagrams for transmission
 \end{itemize}
 \end{keybox}
 
-\subsubsection{Bufferdimensjonering}
+\subsubsection{Buffer Sizing}
 
-\begin{formulabox}[Tommelregel for bufferstorrelse]
+\begin{formulabox}[Rule of thumb for buffer size]
 \textbf{RFC 3439:}
 \[
 B = RTT \times C
 \]
-der $RTT \approx 250$ ms (typisk) og $C$ = linkkapasitet.
+where $RTT \approx 250$ ms (typical) and $C$ = link capacity.
 
 \medskip
-F.eks. $C = 10$ Gbps $\Rightarrow$ buffer $= 2{,}5$ Gbit.
+E.g. $C = 10$ Gbps $\Rightarrow$ buffer $= 2{,}5$ Gbit.
 
 \medskip
-\textbf{Nyere anbefaling:} Med $N$ samtidige flyter:
+\textbf{More recent recommendation:} With $N$ concurrent flows:
 \[
 B = \frac{RTT \times C}{\sqrt{N}}
 \]
 
-\textbf{OBS:} For mye buffring kan ogs\aa\ v\ae re problematisk -- gir lange RTT-er (``bufferbloat''), d\aa rlig ytelse for sanntidsapplikasjoner, og tr\aa\ TCP-respons.
+\textbf{Note:} Too much buffering can also be problematic -- causes long RTTs (``bufferbloat''), poor performance for real-time applications, and sluggish TCP response.
 \end{formulabox}
 
 \subsection{Buffer Management}
 
-\begin{keybox}[Buffer management -- drop og marking]
-\textbf{Drop-politikk} (n\aa r bufferen er full):
+\begin{keybox}[Buffer management -- drop and marking]
+\textbf{Drop policy} (when the buffer is full):
 \begin{itemize}[noitemsep]
-    \item \textbf{Tail drop:} Kast ankommende pakke (enkleste)
-    \item \textbf{Priority drop:} Kast basert p\aa\ prioritet
+    \item \textbf{Tail drop:} Drop the arriving packet (simplest)
+    \item \textbf{Priority drop:} Drop based on priority
 \end{itemize}
 
-\textbf{Marking} (signal om metning):
+\textbf{Marking} (congestion signal):
 \begin{itemize}[noitemsep]
     \item ECN (Explicit Congestion Notification)
     \item RED (Random Early Detection)
 \end{itemize}
 \end{keybox}
 
-\subsection{Pakkeplanlegging (Scheduling)}
+\subsection{Packet Scheduling}
 
-\begin{exambox}[Eksamensrelevant: Kodisipliner (V2023 Q1.3.5)]
-Fire vanlige scheduling-metoder:
+\begin{exambox}[Exam-relevant: Queue disciplines (V2023 Q1.3.5)]
+Four common scheduling methods:
 
 \begin{enumerate}[noitemsep]
-    \item \textbf{FCFS / FIFO:} F\o rst inn, f\o rst ut. Enkleste metode.
-    \item \textbf{Priority scheduling:} Trafikk klassifiseres, k\o es etter klasse. Send alltid fra h\o yeste prioritetsk\o\ f\o rst. FCFS innenfor hver klasse.
-    \item \textbf{Round Robin (RR):} Trafikk klassifiseres. Serveren syklisk skanner klassek\o ene, sender \emph{en} pakke fra hver klasse om gangen.
-    \item \textbf{Weighted Fair Queuing (WFQ):} Generalisert Round Robin. Hver klasse $i$ har vekt $w_i$, og f\aa r andel:
+    \item \textbf{FCFS / FIFO:} First in, first out. Simplest method.
+    \item \textbf{Priority scheduling:} Traffic is classified, queued by class. Always send from the highest priority queue first. FCFS within each class.
+    \item \textbf{Round Robin (RR):} Traffic is classified. The server cyclically scans the class queues, sending \emph{one} packet from each class at a time.
+    \item \textbf{Weighted Fair Queuing (WFQ):} Generalized Round Robin. Each class $i$ has weight $w_i$, and receives a share of:
     \[
     \frac{w_i}{\sum_j w_j}
     \]
-    Gir minimum b\aa ndbreddegaranti per trafikkklasse.
+    Provides a minimum bandwidth guarantee per traffic class.
 \end{enumerate}
 
 \medskip
-\textbf{Fra eksamen V2023 (Q1.3.5):} ``A FIFO queue holds $k$ packets when a new packet arrives. Considering queuing delay only, how many packets must be transmitted before the newly arrived packet can be transmitted?''
+\textbf{From exam V2023 (Q1.3.5):} ``A FIFO queue holds $k$ packets when a new packet arrives. Considering queuing delay only, how many packets must be transmitted before the newly arrived packet can be transmitted?''
 
-Svar: $k$ pakker (alternativ c). Den nye pakken m\aa\ vente til alle $k$ pakkene foran i k\o en er sendt.
+Answer: $k$ packets (alternative c). The new packet must wait until all $k$ packets ahead in the queue have been sent.
 \end{exambox}
 
 %=============================================================================
 \section{Internet Protocol (IP) (4.3)}
 %=============================================================================
 
-\subsection{IPv4-datagramformat}
+\subsection{IPv4 Datagram Format}
 
-\begin{keybox}[IPv4-datagrammets header]
-IPv4-headeren er normalt \textbf{20 bytes} (uten opsjoner):
+\begin{keybox}[The IPv4 datagram header]
+The IPv4 header is normally \textbf{20 bytes} (without options):
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-\textbf{Felt} & \textbf{Beskrivelse} \\
+\textbf{Field} & \textbf{Description} \\
 \midrule
-Version (4 bit) & IP-versjon (4 for IPv4) \\
-Header length (4 bit) & Headerl\ae ngde i 32-bits ord \\
-Type of service (8 bit) & Differensiert tjeneste (DSCP, ECN) \\
-Total length (16 bit) & Total datagramlengde i bytes \\
-Identifier, flags, offset & Brukes for fragmentering/reassemblering \\
-TTL (8 bit) & Time to live -- maks antall hopp \\
-Upper layer protocol (8 bit) & Protokoll i payload (6=TCP, 17=UDP) \\
-Header checksum (16 bit) & Kontrollsum for headeren \\
-Source IP (32 bit) & Avsenders IP-adresse \\
-Destination IP (32 bit) & Mottakers IP-adresse \\
-Options (variabel) & Tidsstempel, record route, etc. \\
+Version (4 bit) & IP version (4 for IPv4) \\
+Header length (4 bit) & Header length in 32-bit words \\
+Type of service (8 bit) & Differentiated service (DSCP, ECN) \\
+Total length (16 bit) & Total datagram length in bytes \\
+Identifier, flags, offset & Used for fragmentation/reassembly \\
+TTL (8 bit) & Time to live -- max number of hops \\
+Upper layer protocol (8 bit) & Protocol in payload (6=TCP, 17=UDP) \\
+Header checksum (16 bit) & Checksum for the header \\
+Source IP (32 bit) & Sender's IP address \\
+Destination IP (32 bit) & Receiver's IP address \\
+Options (variable) & Timestamp, record route, etc. \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -308,374 +308,374 @@ Options (variabel) & Tidsstempel, record route, etc. \\
 \begin{formulabox}[Overhead]
 \textbf{Minimum overhead} for TCP over IP:
 \[
-\text{Overhead} = \underbrace{20 \text{ bytes}}_{\text{IP-header}} + \underbrace{20 \text{ bytes}}_{\text{TCP-header}} = 40 \text{ bytes}
+\text{Overhead} = \underbrace{20 \text{ bytes}}_{\text{IP header}} + \underbrace{20 \text{ bytes}}_{\text{TCP header}} = 40 \text{ bytes}
 \]
-Dette betyr at sm\aa\ applikasjonsdata f\aa r stor relativ overhead.
+This means that small application data incurs a large relative overhead.
 \end{formulabox}
 
-\subsection{IP-adressering}
+\subsection{IP Addressing}
 
-\begin{keybox}[IP-adresser -- grunnleggende]
+\begin{keybox}[IP addresses -- basics]
 \begin{itemize}[noitemsep]
-    \item En IP-adresse er \textbf{32 bit} = 4 bytes, skrevet i ``dotted decimal''-notasjon
-    \item Eksempel: \texttt{223.1.1.1} = \texttt{11011111 00000001 00000001 00000001}
-    \item IP-adresser tilh\o rer \textbf{grensesnitt} (interfaces), ikke verter
-    \item En ruter har typisk flere grensesnitt, og dermed flere IP-adresser
-    \item En vert har normalt ett eller to grensesnitt (kabel og/eller WiFi)
+    \item An IP address is \textbf{32 bits} = 4 bytes, written in ``dotted decimal'' notation
+    \item Example: \texttt{223.1.1.1} = \texttt{11011111 00000001 00000001 00000001}
+    \item IP addresses belong to \textbf{interfaces}, not hosts
+    \item A router typically has multiple interfaces, and thus multiple IP addresses
+    \item A host normally has one or two interfaces (wired and/or WiFi)
 \end{itemize}
 \end{keybox}
 
-\subsection{Subnett}
+\subsection{Subnets}
 
-\begin{exambox}[Eksamensrelevant: Subnett og CIDR (V2025, V2023)]
-\textbf{Subnett:} En gruppe enheter som kan n\aa\ hverandre uten \aa\ g\aa\ gjennom en ruter.
+\begin{exambox}[Exam-relevant: Subnets and CIDR (V2025, V2023)]
+\textbf{Subnet:} A group of devices that can reach each other without going through a router.
 
 \textbf{CIDR} (Classless InterDomain Routing):
 \begin{itemize}[noitemsep]
-    \item Adresseformat: \texttt{a.b.c.d/x}, der \texttt{x} er antall bit i nettverksdelen (subnettprefikset)
-    \item De f\o rste \texttt{x} bitene = nettverksdel (subnet part)
-    \item De resterende $32 - x$ bitene = vertsdel (host part)
+    \item Address format: \texttt{a.b.c.d/x}, where \texttt{x} is the number of bits in the network part (subnet prefix)
+    \item The first \texttt{x} bits = network part (subnet part)
+    \item The remaining $32 - x$ bits = host part
 \end{itemize}
 
 \medskip
-\textbf{Beregning av antall adresser og verter:}
+\textbf{Calculating the number of addresses and hosts:}
 \begin{itemize}[noitemsep]
-    \item Totalt antall adresser i et subnett: $2^{32-x}$
-    \item \textbf{Brukbare vertsadresser:} $2^{32-x} - 2$ (trekk fra nettverksadresse og kringkastingsadresse)
+    \item Total number of addresses in a subnet: $2^{32-x}$
+    \item \textbf{Usable host addresses:} $2^{32-x} - 2$ (subtract network address and broadcast address)
 \end{itemize}
 
 \medskip
-\textbf{Kringkastingsadresse (broadcast):} Alle vertsbiter satt til 1.
+\textbf{Broadcast address:} All host bits set to 1.
 
 \medskip
-\textbf{Fra eksamen V2025:}
+\textbf{From exam V2025:}
 \begin{itemize}[noitemsep]
-    \item ``En organisasjon f\aa r tildelt adresseblokken \texttt{208.27.1.0/22} og deler den i 12 subnett. Hvor mange brukbare vertsadresser?''
-    \item L\o sning: /22 gir $2^{10} = 1024$ adresser. 12 subnett krever $\lceil\log_2 12\rceil = 4$ bit, s\aa\ hvert subnett f\aa r $2^{10-4} = 2^6 = 64$ adresser, dvs. $64 - 2 = \textbf{62}$ brukbare vertsadresser.
-    \item ``Hva er kringkastingsadressen for \texttt{172.18.16.0/21}?''
-    \item L\o sning: /21 betyr 21 nettverksbiter, 11 vertsbiter. Sett alle vertsbiter til 1: \texttt{172.18.23.255}
+    \item ``An organization is assigned the address block \texttt{208.27.1.0/22} and divides it into 12 subnets. How many usable host addresses?''
+    \item Solution: /22 gives $2^{10} = 1024$ addresses. 12 subnets require $\lceil\log_2 12\rceil = 4$ bits, so each subnet gets $2^{10-4} = 2^6 = 64$ addresses, i.e. $64 - 2 = \textbf{62}$ usable host addresses.
+    \item ``What is the broadcast address for \texttt{172.18.16.0/21}?''
+    \item Solution: /21 means 21 network bits, 11 host bits. Set all host bits to 1: \texttt{172.18.23.255}
 \end{itemize}
 \end{exambox}
 
-\begin{warnbox}[Slik beregner du kringkastingsadressen]
-\textbf{Steg for steg:}
+\begin{warnbox}[How to calculate the broadcast address]
+\textbf{Step by step:}
 \begin{enumerate}[noitemsep]
-    \item Skriv nettverksadressen bin\ae rt
-    \item Identifiser vertsdelen (de siste $32 - x$ bitene)
-    \item Sett \emph{alle} vertsbiter til 1
-    \item Konverter tilbake til desimal
+    \item Write the network address in binary
+    \item Identify the host part (the last $32 - x$ bits)
+    \item Set \emph{all} host bits to 1
+    \item Convert back to decimal
 \end{enumerate}
 
-\textbf{Eksempel:} \texttt{172.18.16.0/21}
+\textbf{Example:} \texttt{172.18.16.0/21}
 \begin{itemize}[noitemsep]
-    \item Bin\ae rt: \texttt{10101100.00010010.000\textbf{10000.00000000}}
-    \item Vertsdel (11 bit): de siste 11 bitene
-    \item Sett til 1: \texttt{10101100.00010010.000\textbf{10111.11111111}}
-    \item Desimal: \texttt{172.18.23.255}
+    \item Binary: \texttt{10101100.00010010.000\textbf{10000.00000000}}
+    \item Host part (11 bits): the last 11 bits
+    \item Set to 1: \texttt{10101100.00010010.000\textbf{10111.11111111}}
+    \item Decimal: \texttt{172.18.23.255}
 \end{itemize}
 \end{warnbox}
 
-\subsection{IP-adresser: bin\ae r konvertering}
+\subsection{IP Addresses: Binary Conversion}
 
-\begin{exambox}[Eksamensrelevant: Binær konvertering (V2023 Q1.3.1)]
-\textbf{Fra eksamen V2023:} ``What is \texttt{193.32.216.9} in binary?''
+\begin{exambox}[Exam-relevant: Binary conversion (V2023 Q1.3.1)]
+\textbf{From exam V2023:} ``What is \texttt{193.32.216.9} in binary?''
 
-L\o sning: Konverter hvert oktett separat:
+Solution: Convert each octet separately:
 \begin{itemize}[noitemsep]
     \item $193 = 128 + 64 + 1 = $ \texttt{11000001}
     \item $32 = $ \texttt{00100000}
     \item $216 = 128 + 64 + 16 + 8 = $ \texttt{11011000}
     \item $9 = 8 + 1 = $ \texttt{00001001}
 \end{itemize}
-Svar: \texttt{11000001.00100000.11011000.00001001}
+Answer: \texttt{11000001.00100000.11011000.00001001}
 \end{exambox}
 
-\subsection{Subnettildeling fra CIDR-blokk}
+\subsection{Subnet Allocation from a CIDR Block}
 
-\begin{exambox}[Eksamensrelevant: Subnettildeling (V2023 Q1.3.2)]
-\textbf{Fra eksamen V2023:} ``An organization is granted the address block \texttt{193.32.216.0/22}. Which of the following addresses belong to this block?''
+\begin{exambox}[Exam-relevant: Subnet allocation (V2023 Q1.3.2)]
+\textbf{From exam V2023:} ``An organization is granted the address block \texttt{193.32.216.0/22}. Which of the following addresses belong to this block?''
 
-\textbf{L\o sningsmetode:}
+\textbf{Solution method:}
 \begin{enumerate}[noitemsep]
-    \item Bestem nettverksdelen: de f\o rste 22 bitene
-    \item Alle adresser med samme 22-bit prefiks tilh\o rer blokken
-    \item Adresseomr\aa det er \texttt{193.32.216.0} -- \texttt{193.32.219.255}
+    \item Determine the network part: the first 22 bits
+    \item All addresses with the same 22-bit prefix belong to the block
+    \item The address range is \texttt{193.32.216.0} -- \texttt{193.32.219.255}
 \end{enumerate}
 \end{exambox}
 
-\subsection{Hierarkisk adressering og ruteaggregering}
+\subsection{Hierarchical Addressing and Route Aggregation}
 
-\begin{keybox}[Ruteaggregering]
-\textbf{Hierarkisk adressering} muliggj\o r effektiv annonsering av ruteinformasjon:
+\begin{keybox}[Route aggregation]
+\textbf{Hierarchical addressing} enables efficient announcement of routing information:
 \begin{itemize}[noitemsep]
-    \item En ISP f\aa r tildelt en stor adresseblokk (f.eks. \texttt{200.23.16.0/20})
-    \item ISP-en deler blokken i mindre deler til organisasjoner (f.eks. 8 blokker \`a\ /23)
-    \item Overfor resten av Internett annonserer ISP-en kun \emph{en} samlet rute (\texttt{200.23.16.0/20})
-    \item Dette reduserer st\o rrelsen p\aa\ rutingtabeller dramatisk
+    \item An ISP is assigned a large address block (e.g. \texttt{200.23.16.0/20})
+    \item The ISP divides the block into smaller parts for organizations (e.g. 8 blocks of /23)
+    \item To the rest of the Internet, the ISP announces only \emph{one} aggregated route (\texttt{200.23.16.0/20})
+    \item This dramatically reduces the size of routing tables
 \end{itemize}
 
-\textbf{Mer spesifikke ruter:} Hvis en organisasjon bytter ISP, kan den nye ISP-en annonsere en mer spesifikk rute (f.eks. /23). P\aa\ grunn av longest prefix match vil trafikken g\aa\ til riktig ISP.
+\textbf{More specific routes:} If an organization switches ISPs, the new ISP can announce a more specific route (e.g. /23). Due to longest prefix match, traffic will go to the correct ISP.
 \end{keybox}
 
-\subsection{Hvordan f\aa r en vert sin IP-adresse?}
+\subsection{How Does a Host Get Its IP Address?}
 
-\begin{keybox}[To metoder]
+\begin{keybox}[Two methods]
 \begin{itemize}[noitemsep]
-    \item \textbf{Manuell konfigurasjon:} Systemadministrator konfigurerer adressen direkte
-    \item \textbf{DHCP (Dynamic Host Configuration Protocol):} Automatisk tildeling fra server
+    \item \textbf{Manual configuration:} A system administrator configures the address directly
+    \item \textbf{DHCP (Dynamic Host Configuration Protocol):} Automatic assignment from a server
 \end{itemize}
 \end{keybox}
 
 \subsection{DHCP -- Dynamic Host Configuration Protocol}
 
-\begin{exambox}[Eksamensrelevant: DHCP (V2025, V2023)]
-DHCP er en ``plug-and-play''-protokoll som lar en vert automatisk f\aa\ en IP-adresse.
+\begin{exambox}[Exam-relevant: DHCP (V2025, V2023)]
+DHCP is a ``plug-and-play'' protocol that lets a host automatically obtain an IP address.
 
-\textbf{DHCP bruker UDP:} Klient p\aa\ port 68, server p\aa\ port 67.
+\textbf{DHCP uses UDP:} Client on port 68, server on port 67.
 
-\textbf{Fire-stegs prosess (DORA):}
+\textbf{Four-step process (DORA):}
 \begin{enumerate}[noitemsep]
-    \item \textbf{DHCP Discover:} Klienten sender broadcast (\texttt{255.255.255.255}) for \aa\ finne DHCP-servere.
+    \item \textbf{DHCP Discover:} The client sends a broadcast (\texttt{255.255.255.255}) to find DHCP servers.
     \begin{itemize}[noitemsep]
         \item SIP=\texttt{0.0.0.0}, DIP=\texttt{255.255.255.255}
         \item Ethernet DA=\texttt{FF:FF:FF:FF:FF:FF}
     \end{itemize}
 
-    \item \textbf{DHCP Offer:} Server(e) svarer med tilbudt IP-adresse, subnettmaske, DNS, ruter, lease-tid.
+    \item \textbf{DHCP Offer:} Server(s) respond with an offered IP address, subnet mask, DNS, router, lease time.
 
-    \item \textbf{DHCP Request:} Klienten velger et tilbud og broadcaster en foresp\o rsel med server-ID.
+    \item \textbf{DHCP Request:} The client selects an offer and broadcasts a request with the server ID.
     \begin{itemize}[noitemsep]
-        \item SIP=\texttt{0.0.0.0} (fortsatt), DIP=\texttt{255.255.255.255} (broadcast)
-        \item Inneholder \texttt{DHCP Server Identifier} for valgt server
-        \item Broadcast sikrer at andre servere vet at de \emph{ikke} ble valgt
+        \item SIP=\texttt{0.0.0.0} (still), DIP=\texttt{255.255.255.255} (broadcast)
+        \item Contains \texttt{DHCP Server Identifier} for the chosen server
+        \item Broadcast ensures that other servers know they were \emph{not} selected
     \end{itemize}
 
-    \item \textbf{DHCP ACK:} Valgt server bekrefter tildelingen med alle konfigurasjonsparametere.
+    \item \textbf{DHCP ACK:} The chosen server confirms the assignment with all configuration parameters.
 \end{enumerate}
 
 \medskip
-\textbf{DHCP gir mer enn bare IP-adresse:}
+\textbf{DHCP provides more than just an IP address:}
 \begin{itemize}[noitemsep]
-    \item Adresse til f\o rstehopp-ruter (default gateway)
-    \item Navn og IP-adresse til DNS-server
-    \item Nettverksmaske (subnettmaske)
+    \item Address of the first-hop router (default gateway)
+    \item Name and IP address of the DNS server
+    \item Network mask (subnet mask)
 \end{itemize}
 
 \medskip
-\textbf{Protokollstabel:} DHCP-melding kapsles inn i UDP $\rightarrow$ IP $\rightarrow$ Ethernet.
+\textbf{Protocol stack:} DHCP message is encapsulated in UDP $\rightarrow$ IP $\rightarrow$ Ethernet.
 
 \medskip
-\textbf{Fra eksamen V2023 (Q1.3.3):} ``Which of these are related to DHCP?''
+\textbf{From exam V2023 (Q1.3.3):} ``Which of these are related to DHCP?''
 \begin{itemize}[noitemsep]
-    \item a) Provides an IP address to a host -- \textbf{korrekt}
-    \item b) Uses UDP -- \textbf{korrekt}
-    \item d) Address of default gateway is provided -- \textbf{korrekt}
+    \item a) Provides an IP address to a host -- \textbf{correct}
+    \item b) Uses UDP -- \textbf{correct}
+    \item d) Address of default gateway is provided -- \textbf{correct}
 \end{itemize}
 \end{exambox}
 
 \subsection{NAT -- Network Address Translation}
 
-\begin{keybox}[NAT -- oversikt]
-NAT lar flere enheter i et lokalt nettverk dele \emph{en} offentlig IP-adresse.
+\begin{keybox}[NAT -- overview]
+NAT allows multiple devices in a local network to share \emph{one} public IP address.
 
-\textbf{Hvordan det fungerer:}
+\textbf{How it works:}
 \begin{itemize}[noitemsep]
-    \item Alle datagrammer som forlater lokalnettet f\aa r \emph{samme} kilde-IP (NAT-ruterens offentlige adresse), men \emph{ulike} kildeportnumre
-    \item NAT-ruteren har en \textbf{oversettingstabell} (NAT translation table) som mapper: \\
-    (kilde-IP, kildeport) $\leftrightarrow$ (NAT-IP, NAT-port)
-    \item Innkommende pakker oversettes tilbake ved hjelp av tabellen
+    \item All datagrams leaving the local network get the \emph{same} source IP (the NAT router's public address), but \emph{different} source port numbers
+    \item The NAT router has a \textbf{translation table} (NAT translation table) that maps: \\
+    (source IP, source port) $\leftrightarrow$ (NAT IP, NAT port)
+    \item Incoming packets are translated back using the table
 \end{itemize}
 
-\textbf{Private adresseomr\aa der} (RFC 1918):
+\textbf{Private address ranges} (RFC 1918):
 \begin{itemize}[noitemsep]
-    \item \texttt{10.0.0.0/8} -- 16.7 mill. adresser
-    \item \texttt{172.16.0.0/12} -- ca. 1 mill. adresser
-    \item \texttt{192.168.0.0/16} -- 65\,536 adresser
+    \item \texttt{10.0.0.0/8} -- 16.7 million addresses
+    \item \texttt{172.16.0.0/12} -- approx. 1 million addresses
+    \item \texttt{192.168.0.0/16} -- 65\,536 addresses
 \end{itemize}
 
-\textbf{16-bit portnumre} gir mulighet for ca. 65\,000 samtidige forbindelser med en enkelt IP-adresse.
+\textbf{16-bit port numbers} allow for approximately 65\,000 simultaneous connections with a single IP address.
 \end{keybox}
 
-\begin{exambox}[Eksamensrelevant: NAT og private adresser (V2025)]
-\textbf{Fra eksamen V2025 (sant/usant):}
+\begin{exambox}[Exam-relevant: NAT and private addresses (V2025)]
+\textbf{From exam V2025 (true/false):}
 \begin{itemize}[noitemsep]
-    \item ``IP-adresser er alltid globalt unike'' -- \textbf{USANT}. Private adresser (10.x.x.x, 172.16.x.x, 192.168.x.x) gjenbrukes i mange nettverk, og er kun unike innenfor sitt lokalnett. NAT er grunnen til at dette fungerer.
+    \item ``IP addresses are always globally unique'' -- \textbf{FALSE}. Private addresses (10.x.x.x, 172.16.x.x, 192.168.x.x) are reused in many networks, and are only unique within their local network. NAT is the reason this works.
 \end{itemize}
 \end{exambox}
 
-\begin{warnbox}[NAT-kontrovers]
-NAT er kontroversielt fordi:
+\begin{warnbox}[NAT controversy]
+NAT is controversial because:
 \begin{itemize}[noitemsep]
-    \item Rutere skal kun operere opp til lag 3 -- NAT manipulerer portnumre (lag 4)
-    \item Bryter ende-til-ende-prinsippet
-    \item Gj\o r det vanskelig for eksterne verter \aa\ initialisere kontakt med enheter bak NAT
-    \item IPv6 var ment \aa\ gj\o re NAT un\o dvendig (nok adresser til alle)
+    \item Routers should only operate up to layer 3 -- NAT manipulates port numbers (layer 4)
+    \item Violates the end-to-end principle
+    \item Makes it difficult for external hosts to initiate contact with devices behind NAT
+    \item IPv6 was intended to make NAT unnecessary (enough addresses for everyone)
 \end{itemize}
 \end{warnbox}
 
 \subsection{IPv6}
 
-\begin{keybox}[IPv6 -- hovedforskjeller fra IPv4]
-\textbf{Motivasjon:} IPv4-adresserommet (32 bit = ca. 4.3 mrd.) er oppbrukt. ICANN tildelte siste blokk i 2011.
+\begin{keybox}[IPv6 -- main differences from IPv4]
+\textbf{Motivation:} The IPv4 address space (32 bits = approx. 4.3 billion) is exhausted. ICANN allocated the last block in 2011.
 
-\textbf{IPv6-datagramformat:}
+\textbf{IPv6 datagram format:}
 \begin{itemize}[noitemsep]
-    \item \textbf{128-bit} adresser (vs. 32-bit i IPv4)
-    \item Fast headerstorrelse p\aa\ \textbf{40 bytes} (vs. variabel i IPv4)
-    \item \textbf{Ingen fragmentering} av rutere -- kun endesystemer kan fragmentere
-    \item \textbf{Ingen header checksum} -- raskere prosessering
-    \item \textbf{Nytt felt: Flow Label} -- identifiserer pakker i samme flyt for spesialbehandling
-    \item \texttt{Next Header}-felt erstatter b\aa de ``Protocol'' og ``Options'' fra IPv4
-    \item ICMPv6: ny versjon av ICMP med tilleggsmeldingstyper
+    \item \textbf{128-bit} addresses (vs. 32-bit in IPv4)
+    \item Fixed header size of \textbf{40 bytes} (vs. variable in IPv4)
+    \item \textbf{No fragmentation} by routers -- only end systems can fragment
+    \item \textbf{No header checksum} -- faster processing
+    \item \textbf{New field: Flow Label} -- identifies packets in the same flow for special treatment
+    \item \texttt{Next Header} field replaces both ``Protocol'' and ``Options'' from IPv4
+    \item ICMPv6: new version of ICMP with additional message types
 \end{itemize}
 \end{keybox}
 
-\begin{exambox}[Eksamensrelevant: IPv4 vs. IPv6 (V2023 Q1.3.4)]
-\textbf{Fra eksamen V2023:} ``Which of these are correct about IPv4/IPv6?''
+\begin{exambox}[Exam-relevant: IPv4 vs. IPv6 (V2023 Q1.3.4)]
+\textbf{From exam V2023:} ``Which of these are correct about IPv4/IPv6?''
 \begin{itemize}[noitemsep]
-    \item a) IPv6 has a larger address space -- \textbf{korrekt} (128 vs. 32 bit)
-    \item b) IPv6 has a fixed-length header -- \textbf{korrekt} (40 bytes)
-    \item d) IPv6 does not allow fragmentation by routers -- \textbf{korrekt}
-    \item e) IPv6 removes the header checksum field -- \textbf{korrekt}
+    \item a) IPv6 has a larger address space -- \textbf{correct} (128 vs. 32 bit)
+    \item b) IPv6 has a fixed-length header -- \textbf{correct} (40 bytes)
+    \item d) IPv6 does not allow fragmentation by routers -- \textbf{correct}
+    \item e) IPv6 removes the header checksum field -- \textbf{correct}
 \end{itemize}
 
-\textbf{Fra eksamen V2025 (sant/usant):}
+\textbf{From exam V2025 (true/false):}
 \begin{itemize}[noitemsep]
-    \item ``IP guarantees that a packet will be delivered in order'' -- \textbf{USANT}. IP er ``best effort'' og gir ingen garanti for rekkef\o lge. Det er TCPs jobb.
+    \item ``IP guarantees that a packet will be delivered in order'' -- \textbf{FALSE}. IP is ``best effort'' and provides no guarantee for ordering. That is TCP's job.
 \end{itemize}
 \end{exambox}
 
-\begin{keybox}[Felt som er fjernet i IPv6 (sammenlignet med IPv4)]
+\begin{keybox}[Fields removed in IPv6 (compared to IPv4)]
 \begin{itemize}[noitemsep]
-    \item \textbf{Header checksum:} Fjernet for raskere prosessering (kontrollsum beregnes allerede i transport- og linklaget)
-    \item \textbf{Fragmentering/reassemblering:} Rutere fragmenterer ikke -- avsender m\aa\ bruke Path MTU Discovery
-    \item \textbf{Options:} Erstattet av ``Next Header''-mekanismen
-    \item \textbf{Header Length:} Un\o dvendig med fast headerstorrelse
+    \item \textbf{Header checksum:} Removed for faster processing (checksum is already computed in the transport and link layers)
+    \item \textbf{Fragmentation/reassembly:} Routers do not fragment -- the sender must use Path MTU Discovery
+    \item \textbf{Options:} Replaced by the ``Next Header'' mechanism
+    \item \textbf{Header Length:} Unnecessary with a fixed header size
 \end{itemize}
 \end{keybox}
 
-\subsection{Overgang fra IPv4 til IPv6: Tunneling}
+\subsection{Transition from IPv4 to IPv6: Tunneling}
 
-\begin{keybox}[Tunneling -- IPv6 i IPv4]
-Siden ikke alle rutere kan oppgraderes samtidig, brukes \textbf{tunneling}:
+\begin{keybox}[Tunneling -- IPv6 in IPv4]
+Since not all routers can be upgraded simultaneously, \textbf{tunneling} is used:
 \begin{itemize}[noitemsep]
-    \item IPv6-datagrammet pakkes inn som \emph{payload} i et IPv4-datagram
-    \item IPv4-rutere langs tunnelen ser det som en vanlig IPv4-pakke
-    \item Ved tunnelens ende pakkes IPv6-datagrammet ut igjen
+    \item The IPv6 datagram is encapsulated as \emph{payload} in an IPv4 datagram
+    \item IPv4 routers along the tunnel see it as a regular IPv4 packet
+    \item At the end of the tunnel, the IPv6 datagram is unpacked again
 \end{itemize}
 
-\textbf{Adopsjon:} Ca. 40--50\% av trafikken bruker IPv6 (per ca. 2023).
+\textbf{Adoption:} Approx. 40--50\% of traffic uses IPv6 (as of approx. 2023).
 \end{keybox}
 
 %=============================================================================
-\section{Arkitekturprinsipper (4.5)}
+\section{Architectural Principles (4.5)}
 %=============================================================================
 
-\subsection{IP-timeglass-arkitekturen}
+\subsection{The IP Hourglass Architecture}
 
-\begin{keybox}[IP som ``smal midje'']
-Internett-arkitekturen har en timeglass-form:
+\begin{keybox}[IP as the ``narrow waist'']
+The Internet architecture has an hourglass shape:
 \begin{itemize}[noitemsep]
-    \item \textbf{Over IP:} Mange applikasjoner og transportprotokoller (HTTP, SMTP, TCP, UDP, \ldots)
-    \item \textbf{IP:} Det eneste nettverkslagset -- ``smal midje'' som alt m\aa\ g\aa\ gjennom
-    \item \textbf{Under IP:} Mange linklag-teknologier (Ethernet, WiFi, fiber, \ldots)
+    \item \textbf{Above IP:} Many applications and transport protocols (HTTP, SMTP, TCP, UDP, \ldots)
+    \item \textbf{IP:} The only network layer -- ``narrow waist'' that everything must pass through
+    \item \textbf{Below IP:} Many link layer technologies (Ethernet, WiFi, fiber, \ldots)
 \end{itemize}
-Alle enheter p\aa\ Internett m\aa\ st\o tte IP -- det er det som binder alt sammen.
+All devices on the Internet must support IP -- it is what binds everything together.
 \end{keybox}
 
 \subsection{Middleboxes}
 
 \begin{keybox}[Middleboxes]
-Enheter p\aa\ nettverksveien som utf\o rer funksjoner utover standard IP-forwarding:
+Devices on the network path that perform functions beyond standard IP forwarding:
 \begin{itemize}[noitemsep]
-    \item \textbf{NAT-bokser:} Adresseoversetting
-    \item \textbf{Brannmurer:} Filtrering av trafikk
-    \item \textbf{Lastbalanserere:} Fordeler trafikk over flere servere
-    \item \textbf{Cacher/proxyer:} Mellomlagring av innhold
+    \item \textbf{NAT boxes:} Address translation
+    \item \textbf{Firewalls:} Traffic filtering
+    \item \textbf{Load balancers:} Distribute traffic across multiple servers
+    \item \textbf{Caches/proxies:} Content caching
 \end{itemize}
 
-Middleboxes er omstridte fordi de potensielt bryter med \textbf{ende-til-ende-prinsippet}.
+Middleboxes are controversial because they potentially violate the \textbf{end-to-end principle}.
 \end{keybox}
 
-\subsection{Ende-til-ende-argumentet}
+\subsection{The End-to-End Argument}
 
 \begin{keybox}[End-to-End Argument]
-\textbf{Ende-til-ende-prinsippet:} Funksjonalitet b\o r implementeres i \emph{endesystemene} (vertene), ikke i nettverket.
+\textbf{The end-to-end principle:} Functionality should be implemented in the \emph{end systems} (hosts), not in the network.
 
 \begin{itemize}[noitemsep]
-    \item Nettverket b\o r holdes \textbf{enkelt} -- kun videresending av pakker
-    \item Kompleksitet (p\aa litelighet, sikkerhet, osv.) b\o r ligge i endesystemene
-    \item Begrunnelse: Endesystemene har mest kontekst om hva applikasjonen trenger
+    \item The network should be kept \textbf{simple} -- only forwarding packets
+    \item Complexity (reliability, security, etc.) should reside in the end systems
+    \item Rationale: End systems have the most context about what the application needs
 \end{itemize}
 
-\textbf{Historisk utvikling:}
+\textbf{Historical development:}
 \begin{itemize}[noitemsep]
-    \item 20. \aa rhundre (telefonnett): Intelligens i nettverkets svitsjer
-    \item Internett (pre-2005): Intelligens i ytterkantene (endesystemer)
-    \item Internett (post-2005): Programmerbare nettverksenheter + massiv infrastruktur i ytterkantene
+    \item 20th century (telephone network): Intelligence in the network's switches
+    \item Internet (pre-2005): Intelligence at the edges (end systems)
+    \item Internet (post-2005): Programmable network devices + massive infrastructure at the edges
 \end{itemize}
 \end{keybox}
 
 %=============================================================================
-\section{IP-adressering: ICANN og adressetildeling}
+\section{IP Addressing: ICANN and Address Allocation}
 %=============================================================================
 
-\begin{keybox}[Hvordan f\aa r en ISP adresser?]
+\begin{keybox}[How does an ISP get addresses?]
 \textbf{ICANN} (Internet Corporation for Assigned Names and Numbers):
 \begin{itemize}[noitemsep]
-    \item Tildeler IP-adresseblokker gjennom 5 \textbf{regionale registre} (RIR-er)
-    \item Administrerer DNS-rotsonen
-    \item Delegerer TLD-administrasjon (.com, .no, .edu, osv.)
+    \item Allocates IP address blocks through 5 \textbf{regional registries} (RIRs)
+    \item Administers the DNS root zone
+    \item Delegates TLD administration (.com, .no, .edu, etc.)
 \end{itemize}
 
-\textbf{Adressetildelingshierarki:}
+\textbf{Address allocation hierarchy:}
 \begin{enumerate}[noitemsep]
-    \item ICANN $\rightarrow$ Regionale registre (RIPE NCC for Europa)
-    \item Regionale registre $\rightarrow$ ISP-er
-    \item ISP-er $\rightarrow$ Organisasjoner/kunder (via CIDR-blokker)
-    \item Organisasjoner $\rightarrow$ Enkelthoster (via DHCP eller manuelt)
+    \item ICANN $\rightarrow$ Regional registries (RIPE NCC for Europe)
+    \item Regional registries $\rightarrow$ ISPs
+    \item ISPs $\rightarrow$ Organizations/customers (via CIDR blocks)
+    \item Organizations $\rightarrow$ Individual hosts (via DHCP or manually)
 \end{enumerate}
 \end{keybox}
 
 %=============================================================================
-\section{Oppsummering og eksamenstips}
+\section{Summary and Exam Tips}
 %=============================================================================
 
-\begin{exambox}[Ofte stilte eksamenstemaer -- Kapittel 4]
-Basert p\aa\ eksamener fra V2023 og V2025:
+\begin{exambox}[Frequently tested exam topics -- Chapter 4]
+Based on exams from V2023 and V2025:
 
 \begin{enumerate}[noitemsep]
-    \item \textbf{Forwarding vs. Routing:} Klar definisjon og skille mellom lokal/global, dataplanet/kontrollplanet
-    \item \textbf{Subnettberegning:} Kunne beregne antall verter, kringkastingsadresse, sjekke om en adresse tilh\o rer et subnett (CIDR)
-    \item \textbf{Bin\ae r konvertering:} Konvertere mellom desimal og bin\ae r IP-notasjon
-    \item \textbf{Longest prefix match:} Sl\aa\ opp i forwarding-tabell med CIDR-oppf\o ringer
-    \item \textbf{DHCP:} 4-stegs prosessen (DORA), bruk av broadcast, UDP-porter, hva DHCP gir
-    \item \textbf{IPv4 vs. IPv6:} Forskjeller i header, adresselengde, fragmentering, checksum
-    \item \textbf{NAT:} Hvordan det fungerer, private adresser, konsekvenser for ``globalt unike'' adresser
-    \item \textbf{K\o disipliner:} FIFO, priority, round robin, WFQ -- spesielt FIFO-beregninger
-    \item \textbf{Best effort:} IP gir ingen garantier (rekkef\o lge, levering, forsinkelse)
+    \item \textbf{Forwarding vs. Routing:} Clear definition and distinction between local/global, data plane/control plane
+    \item \textbf{Subnet calculation:} Being able to calculate the number of hosts, broadcast address, check whether an address belongs to a subnet (CIDR)
+    \item \textbf{Binary conversion:} Converting between decimal and binary IP notation
+    \item \textbf{Longest prefix match:} Looking up in a forwarding table with CIDR entries
+    \item \textbf{DHCP:} The 4-step process (DORA), use of broadcast, UDP ports, what DHCP provides
+    \item \textbf{IPv4 vs. IPv6:} Differences in header, address length, fragmentation, checksum
+    \item \textbf{NAT:} How it works, private addresses, consequences for ``globally unique'' addresses
+    \item \textbf{Queue disciplines:} FIFO, priority, round robin, WFQ -- especially FIFO calculations
+    \item \textbf{Best effort:} IP provides no guarantees (ordering, delivery, delay)
 \end{enumerate}
 \end{exambox}
 
-\begin{warnbox}[Vanlige feller p\aa\ eksamen]
+\begin{warnbox}[Common pitfalls on the exam]
 \begin{itemize}[noitemsep]
-    \item \textbf{``IP garanterer rekkef\o lge''} -- \textbf{Feil!} IP er best effort, ingen rekkef\o lgegaranti
-    \item \textbf{``IP-adresser er alltid globalt unike''} -- \textbf{Feil!} Private adresser (NAT) gjenbrukes
-    \item \textbf{Forwarding $\neq$ Routing} -- Ikke bland disse begrepene
-    \item \textbf{Glem ikke \aa\ trekke fra 2} n\aa r du beregner brukbare vertsadresser (nettverksadresse + broadcast)
-    \item \textbf{Broadcast-adresse:} Husk \aa\ sette \emph{alle} vertsbiter til 1, ikke bare siste oktett
-    \item \textbf{DHCP Request er broadcast}, ikke unicast (s\aa\ andre servere vet at de ikke ble valgt)
+    \item \textbf{``IP guarantees ordering''} -- \textbf{Wrong!} IP is best effort, no ordering guarantee
+    \item \textbf{``IP addresses are always globally unique''} -- \textbf{Wrong!} Private addresses (NAT) are reused
+    \item \textbf{Forwarding $\neq$ Routing} -- Do not confuse these terms
+    \item \textbf{Don't forget to subtract 2} when calculating usable host addresses (network address + broadcast)
+    \item \textbf{Broadcast address:} Remember to set \emph{all} host bits to 1, not just the last octet
+    \item \textbf{DHCP Request is broadcast}, not unicast (so other servers know they were not selected)
 \end{itemize}
 \end{warnbox}
 
-\begin{formulabox}[Viktige formler -- Kapittel 4]
+\begin{formulabox}[Important formulas -- Chapter 4]
 \begin{align}
-\text{Antall adresser i subnett } /x &= 2^{32-x} \\
-\text{Brukbare vertsadresser} &= 2^{32-x} - 2 \\
-\text{Antall subnett-biter for } n \text{ subnett} &= \lceil \log_2 n \rceil \\
-\text{Bufferstorrelse (RFC 3439)} &= RTT \times C \\
-\text{Bufferstorrelse (med } N \text{ flyter)} &= \frac{RTT \times C}{\sqrt{N}} \\
-\text{WFQ-andel for klasse } i &= \frac{w_i}{\sum_j w_j} \\
+\text{Number of addresses in subnet } /x &= 2^{32-x} \\
+\text{Usable host addresses} &= 2^{32-x} - 2 \\
+\text{Number of subnet bits for } n \text{ subnets} &= \lceil \log_2 n \rceil \\
+\text{Buffer size (RFC 3439)} &= RTT \times C \\
+\text{Buffer size (with } N \text{ flows)} &= \frac{RTT \times C}{\sqrt{N}} \\
+\text{WFQ share for class } i &= \frac{w_i}{\sum_j w_j} \\
 \text{IP+TCP overhead} &= 20 + 20 = 40 \text{ bytes}
 \end{align}
 \end{formulabox}

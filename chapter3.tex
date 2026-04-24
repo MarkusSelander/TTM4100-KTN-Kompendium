@@ -1,85 +1,85 @@
-\section{Transportlagstjenester og protokoller (3.1)}
+\section{Transport Layer Services and Protocols (3.1)}
 %=============================================================================
 
-\subsection{Transportlagets rolle}
+\subsection{The Role of the Transport Layer}
 
-\begin{keybox}[Transportlaget -- oversikt]
-Transportlaget tilbyr \textbf{logisk kommunikasjon} mellom \emph{applikasjonsprosesser} p\aa\ forskjellige verter (hosts).
+\begin{keybox}[The Transport Layer -- Overview]
+The transport layer provides \textbf{logical communication} between \emph{application processes} on different hosts.
 \begin{itemize}[noitemsep]
-    \item Sendersiden: bryter applikasjonsmeldinger i \textbf{segmenter}, sender dem til nettverkslaget
-    \item Mottakersiden: setter segmenter sammen til meldinger, leverer til applikasjonslaget
-    \item To hovedprotokoller: \textbf{TCP} og \textbf{UDP}
+    \item Sender side: breaks application messages into \textbf{segments}, sends them to the network layer
+    \item Receiver side: reassembles segments into messages, delivers to the application layer
+    \item Two main protocols: \textbf{TCP} and \textbf{UDP}
 \end{itemize}
 \end{keybox}
 
-\subsection{Transportlag vs. nettverkslag}
+\subsection{Transport Layer vs. Network Layer}
 
-\begin{keybox}[Viktig forskjell]
+\begin{keybox}[Important Difference]
 \begin{itemize}[noitemsep]
-    \item \textbf{Nettverkslag (IP):} Logisk kommunikasjon mellom \emph{verter} (hosts)
-    \item \textbf{Transportlag (TCP/UDP):} Logisk kommunikasjon mellom \emph{prosesser}
-    \item Transportlaget utvider nettverkslagets host-til-host-levering til prosess-til-prosess-levering
+    \item \textbf{Network layer (IP):} Logical communication between \emph{hosts}
+    \item \textbf{Transport layer (TCP/UDP):} Logical communication between \emph{processes}
+    \item The transport layer extends the network layer's host-to-host delivery to process-to-process delivery
 \end{itemize}
 \end{keybox}
 
-\begin{warnbox}[Husholdningsanalogi]
-Tenk p\aa\ to hus med 12 barn i hvert hus som sender brev til hverandre:
+\begin{warnbox}[Household Analogy]
+Think of two houses with 12 children in each house sending letters to each other:
 \begin{itemize}[noitemsep]
-    \item \textbf{Prosesser} = barn
-    \item \textbf{Applikasjonsmeldinger} = brev i konvolutter
-    \item \textbf{Verter (hosts)} = hus
-    \item \textbf{Transportprotokoll} = Ann og Bill (barna som samler/sorterer post)
-    \item \textbf{Nettverkslagsprotokoll} = postvesenet
+    \item \textbf{Processes} = children
+    \item \textbf{Application messages} = letters in envelopes
+    \item \textbf{Hosts} = houses
+    \item \textbf{Transport protocol} = Ann and Bill (the children who collect/sort mail)
+    \item \textbf{Network layer protocol} = the postal service
 \end{itemize}
-Ann og Bill jobber innenfor huset -- de kan ikke kontrollere hva som skjer ute i postsystemet.
+Ann and Bill work within the house -- they cannot control what happens out in the postal system.
 \end{warnbox}
 
-\subsection{Internettets transportprotokoller}
+\subsection{Internet Transport Protocols}
 
-\begin{keybox}[TCP vs. UDP -- oversikt]
+\begin{keybox}[TCP vs. UDP -- Overview]
 \textbf{TCP (Transmission Control Protocol):}
 \begin{itemize}[noitemsep]
-    \item P\aa litelig, ordnet levering (\emph{reliable, in-order delivery})
-    \item Metningskontroll (\emph{congestion control})
-    \item Flytkontroll (\emph{flow control})
-    \item Tilkoblingssoppsett (\emph{connection setup})
+    \item Reliable, ordered delivery (\emph{reliable, in-order delivery})
+    \item Congestion control (\emph{congestion control})
+    \item Flow control (\emph{flow control})
+    \item Connection setup (\emph{connection setup})
 \end{itemize}
 
 \textbf{UDP (User Datagram Protocol):}
 \begin{itemize}[noitemsep]
-    \item Up\aa litelig, uordnet levering (\emph{unreliable, unordered delivery})
-    \item Ingen metningskontroll, flytkontroll eller tilkoblingsoppsett
-    \item ``Best effort'' -- ingen garanti p\aa\ levering
+    \item Unreliable, unordered delivery (\emph{unreliable, unordered delivery})
+    \item No congestion control, flow control, or connection setup
+    \item ``Best effort'' -- no guarantee of delivery
 \end{itemize}
 
-\textbf{Tjenester som IKKE tilbys:} Forsinkelses- eller b\aa ndbreddegarantier.
+\textbf{Services NOT provided:} Delay or bandwidth guarantees.
 \end{keybox}
 
 %=============================================================================
-\section{Multipleksing og demultipleksing (3.2)}
+\section{Multiplexing and Demultiplexing (3.2)}
 %=============================================================================
 
-\subsection{Grunnleggende konsept}
+\subsection{Basic Concept}
 
-\begin{keybox}[Multipleksing og demultipleksing]
-\textbf{Multipleksing hos sender:}
+\begin{keybox}[Multiplexing and Demultiplexing]
+\textbf{Multiplexing at sender:}
 \begin{itemize}[noitemsep]
-    \item H\aa ndterer data fra flere sokler (sockets)
-    \item Legger til transportheader (med portnummer) for \aa\ identifisere sokkel
+    \item Handles data from multiple sockets
+    \item Adds transport header (with port number) to identify socket
 \end{itemize}
 
-\textbf{Demultipleksing hos mottaker:}
+\textbf{Demultiplexing at receiver:}
 \begin{itemize}[noitemsep]
-    \item Bruker headerinformasjon (portnummer) for \aa\ levere segmenter til riktig sokkel
+    \item Uses header information (port number) to deliver segments to the correct socket
 \end{itemize}
 \end{keybox}
 
-\subsection{Hvordan demultipleksing fungerer}
+\subsection{How Demultiplexing Works}
 
 \begin{itemize}[noitemsep]
-    \item Verten mottar IP-datagrammer -- hvert datagram har kilde-IP, destinasjons-IP og ett transportlags-segment
-    \item Hvert segment har \textbf{kilde-portnummer} og \textbf{destinasjons-portnummer} (16 bit hver)
-    \item Verten bruker IP-adresser og portnumre for \aa\ dirigere segmentet til riktig sokkel
+    \item The host receives IP datagrams -- each datagram has source IP, destination IP, and one transport layer segment
+    \item Each segment has a \textbf{source port number} and \textbf{destination port number} (16 bits each)
+    \item The host uses IP addresses and port numbers to direct the segment to the correct socket
 \end{itemize}
 
 \begin{center}
@@ -87,274 +87,274 @@ Ann og Bill jobber innenfor huset -- de kan ikke kontrollere hva som skjer ute i
     \draw[fill=lightblue] (0,0) rectangle (8,1.5);
     \draw (2,0) -- (2,1.5);
     \draw (4,0) -- (4,1.5);
-    \node at (1,0.75) {\small Kilde-port};
-    \node at (3,0.75) {\small Dest.-port};
-    \node at (6,0.75) {\small Andre header-felt};
+    \node at (1,0.75) {\small Source port};
+    \node at (3,0.75) {\small Dest. port};
+    \node at (6,0.75) {\small Other header fields};
     \draw[fill=lightgreen] (0,-1.5) rectangle (8,0);
-    \node at (4,-0.75) {\small Applikasjonsdata (payload)};
+    \node at (4,-0.75) {\small Application data (payload)};
     \draw[decorate,decoration={brace,amplitude=5pt,mirror}] (0,-1.7) -- (2,-1.7) node[midway,below=5pt]{\tiny 16 bit};
     \draw[decorate,decoration={brace,amplitude=5pt,mirror}] (2,-1.7) -- (4,-1.7) node[midway,below=5pt]{\tiny 16 bit};
 \end{tikzpicture}
 \end{center}
 
-\subsection{Tilkoblingsl\o s demultipleksing (UDP)}
+\subsection{Connectionless Demultiplexing (UDP)}
 
-\begin{keybox}[UDP-sokkel identifiseres av 2-tuppel]
-UDP-sokkel identifiseres av: \textbf{(destinasjons-IP, destinasjons-port)}
+\begin{keybox}[UDP socket identified by 2-tuple]
+UDP socket identified by: \textbf{(destination IP, destination port)}
 \begin{itemize}[noitemsep]
-    \item Segmenter med \emph{samme} destinasjons-IP og destinasjons-port, men \emph{forskjellig} kilde-IP/port, dirigeres til \textbf{samme sokkel}
-    \item Kilde-port brukes som ``returadresse''
+    \item Segments with the \emph{same} destination IP and destination port, but \emph{different} source IP/port, are directed to the \textbf{same socket}
+    \item Source port is used as a ``return address''
 \end{itemize}
 \end{keybox}
 
-\subsection{Tilkoblingsorientert demultipleksing (TCP)}
+\subsection{Connection-Oriented Demultiplexing (TCP)}
 
-\begin{keybox}[TCP-sokkel identifiseres av 4-tuppel]
-TCP-sokkel identifiseres av: \textbf{(kilde-IP, kilde-port, destinasjons-IP, destinasjons-port)}
+\begin{keybox}[TCP socket identified by 4-tuple]
+TCP socket identified by: \textbf{(source IP, source port, destination IP, destination port)}
 \begin{itemize}[noitemsep]
-    \item Mottaker bruker \emph{alle fire verdier} for \aa\ dirigere segmentet til riktig sokkel
-    \item Serververten kan st\o tte mange samtidige TCP-sokler -- hver identifisert med sin egen 4-tuppel
-    \item Webservere har ulike sokler for hver klient (ulik kilde-IP og/eller kilde-port)
+    \item Receiver uses \emph{all four values} to direct the segment to the correct socket
+    \item The server host can support many simultaneous TCP sockets -- each identified by its own 4-tuple
+    \item Web servers have different sockets for each client (different source IP and/or source port)
 \end{itemize}
 \end{keybox}
 
-\begin{warnbox}[Viktig forskjell UDP vs. TCP demux]
+\begin{warnbox}[Important Difference UDP vs. TCP demux]
 \begin{itemize}[noitemsep]
-    \item \textbf{UDP:} Kun destinasjons-port avgj\o r hvilken sokkel som f\aa r segmentet
-    \item \textbf{TCP:} B\aa de kilde og destinasjon (IP + port) avgj\o r sokkel -- to klienter med ulik kilde-IP/port f\aa r \emph{separate} sokler
+    \item \textbf{UDP:} Only destination port determines which socket receives the segment
+    \item \textbf{TCP:} Both source and destination (IP + port) determine socket -- two clients with different source IP/port get \emph{separate} sockets
 \end{itemize}
 \end{warnbox}
 
 %=============================================================================
-\section{Tilkoblingsl\o s transport: UDP (3.3)}
+\section{Connectionless Transport: UDP (3.3)}
 %=============================================================================
 
-\subsection{UDP -- oversikt}
+\subsection{UDP -- Overview}
 
 \begin{keybox}[UDP -- User Datagram Protocol (RFC 768)]
 \begin{itemize}[noitemsep]
-    \item ``Bare bein'' transportprotokoll -- ``no frills''
-    \item \textbf{Best effort}: Segmenter kan g\aa\ tapt eller leveres i feil rekkef\o lge
-    \item \textbf{Tilkoblingsl\o s:} Ingen h\aa ndtrykk mellom sender og mottaker, hvert segment h\aa ndteres uavhengig
+    \item ``Bare bones'' transport protocol -- ``no frills''
+    \item \textbf{Best effort}: Segments can be lost or delivered in wrong order
+    \item \textbf{Connectionless:} No handshake between sender and receiver, each segment handled independently
 \end{itemize}
 
-\textbf{Hvorfor brukes UDP?}
+\textbf{Why use UDP?}
 \begin{itemize}[noitemsep]
-    \item Ingen tilkoblingsoppsett (som gir forsinkelse)
-    \item Enkel: ingen tilstand i sender/mottaker
-    \item Liten header (8 byte vs. 20 byte for TCP)
-    \item Ingen metningskontroll -- kan sende s\aa\ raskt som \o nsket / applikasjonen tillater
+    \item No connection setup (which adds delay)
+    \item Simple: no state at sender/receiver
+    \item Small header (8 bytes vs. 20 bytes for TCP)
+    \item No congestion control -- can send as fast as desired / the application allows
 \end{itemize}
 \end{keybox}
 
-\subsection{Bruksomr\aa der for UDP}
+\subsection{Use Cases for UDP}
 
 \begin{itemize}[noitemsep]
-    \item Streaming av multimedia (tolererer tap, hastighetssensitiv)
-    \item DNS (raske, korte foresp\o rsler)
-    \item SNMP (nettverksadministrasjon)
-    \item HTTP/3 (bruker QUIC over UDP)
+    \item Multimedia streaming (tolerates loss, rate-sensitive)
+    \item DNS (fast, short queries)
+    \item SNMP (network management)
+    \item HTTP/3 (uses QUIC over UDP)
 \end{itemize}
 
-\begin{warnbox}[UDP og p\aa litelighet]
-Hvis p\aa litelig overf\o ring er n\o dvendig over UDP, m\aa\ det legges til i \textbf{applikasjonslaget}. Eksempel: HTTP/3 / QUIC legger til p\aa litelighet og metningskontroll over UDP.
+\begin{warnbox}[UDP and Reliability]
+If reliable transfer is necessary over UDP, it must be added at the \textbf{application layer}. Example: HTTP/3 / QUIC adds reliability and congestion control over UDP.
 \end{warnbox}
 
-\subsection{UDP-segmentformat}
+\subsection{UDP Segment Format}
 
 \begin{center}
 \begin{tikzpicture}[scale=0.85]
     \draw[fill=lightblue] (0,2) rectangle (3,3);
     \draw[fill=lightblue] (3,2) rectangle (6,3);
-    \node at (1.5,2.5) {\small Kilde-port \#};
-    \node at (4.5,2.5) {\small Dest.-port \#};
+    \node at (1.5,2.5) {\small Source port \#};
+    \node at (4.5,2.5) {\small Dest. port \#};
 
     \draw[fill=lightblue] (0,1) rectangle (3,2);
     \draw[fill=lightblue] (3,1) rectangle (6,2);
-    \node at (1.5,1.5) {\small Lengde};
-    \node at (4.5,1.5) {\small Sjekksum};
+    \node at (1.5,1.5) {\small Length};
+    \node at (4.5,1.5) {\small Checksum};
 
     \draw[fill=lightgreen] (0,-0.5) rectangle (6,1);
-    \node at (3,0.25) {\small Applikasjonsdata (payload)};
+    \node at (3,0.25) {\small Application data (payload)};
 
-    \draw[decorate,decoration={brace,amplitude=5pt}] (-0.2,1) -- (-0.2,3) node[midway,left=5pt,align=center]{\tiny Header\\[-2pt]\tiny 8 byte};
+    \draw[decorate,decoration={brace,amplitude=5pt}] (-0.2,1) -- (-0.2,3) node[midway,left=5pt,align=center]{\tiny Header\\[-2pt]\tiny 8 bytes};
 \end{tikzpicture}
 \end{center}
 
-\subsection{UDP sjekksum (checksum)}
+\subsection{UDP Checksum}
 
-\begin{keybox}[Sjekksum -- feildeteksjon]
-\textbf{M\aa l:} Oppdage ``feil'' (f.eks. flippede biter) i det overf\o rte segmentet.
+\begin{keybox}[Checksum -- Error Detection]
+\textbf{Goal:} Detect ``errors'' (e.g., flipped bits) in the transmitted segment.
 
 \textbf{Sender:}
 \begin{itemize}[noitemsep]
-    \item Behandler segmentinnholdet (inkludert header-felt) som en sekvens av 16-biters ord
-    \item Legger sammen alle 16-biters ord med \textbf{1-er-komplement-addisjon}
-    \item Tar \textbf{1-er-komplementet} av resultatet = sjekksum
-    \item Plasserer sjekksummen i UDP-headerens sjekksumfelt
+    \item Treats the segment contents (including header fields) as a sequence of 16-bit words
+    \item Adds all 16-bit words using \textbf{1's complement addition}
+    \item Takes the \textbf{1's complement} of the result = checksum
+    \item Places the checksum in the UDP header's checksum field
 \end{itemize}
 
-\textbf{Mottaker:}
+\textbf{Receiver:}
 \begin{itemize}[noitemsep]
-    \item Beregner sjekksummen av mottatt segment (inkludert sjekksumfeltet)
-    \item Hvis resultatet \emph{ikke} er \texttt{1111111111111111} $\Rightarrow$ feil detektert
-    \item Hvis resultatet er alle 1-ere $\Rightarrow$ ingen feil detektert (men det kan fortsatt v\ae re feil!)
+    \item Computes the checksum of the received segment (including the checksum field)
+    \item If the result is \emph{not} \texttt{1111111111111111} $\Rightarrow$ error detected
+    \item If the result is all 1s $\Rightarrow$ no error detected (but there may still be errors!)
 \end{itemize}
 \end{keybox}
 
-\begin{formulabox}[Sjekksum-eksempel]
-Legg sammen to 16-biters ord:
+\begin{formulabox}[Checksum Example]
+Add two 16-bit words:
 \begin{align*}
 &\texttt{1110011001100110} \\
 +\ &\texttt{1101010101010101} \\
-=\ &\texttt{1011101110111011} \quad \text{(med wraparound carry)} \\
-\text{Sjekksum} =\ &\texttt{0100010001000100} \quad \text{(1-er-komplement)}
+=\ &\texttt{1011101110111011} \quad \text{(with wraparound carry)} \\
+\text{Checksum} =\ &\texttt{0100010001000100} \quad \text{(1's complement)}
 \end{align*}
 \end{formulabox}
 
 %=============================================================================
-\section{Prinsipper for p\aa litelig dataoverf\o ring (3.4)}
+\section{Principles of Reliable Data Transfer (3.4)}
 %=============================================================================
 
-\subsection{Problemstilling}
+\subsection{Problem Statement}
 
-P\aa litelig dataoverf\o ring er et av de viktigste problemene i nettverking. Utfordringen er \aa\ bygge en \textbf{p\aa litelig kanal} over en \textbf{up\aa litelig kanal} (som kan miste pakker, flippe biter, osv.).
+Reliable data transfer is one of the most important problems in networking. The challenge is to build a \textbf{reliable channel} over an \textbf{unreliable channel} (which can lose packets, flip bits, etc.).
 
 \begin{center}
 \begin{tikzpicture}[>=Stealth, node distance=2.5cm]
     \node[draw, rounded corners, fill=lightblue, minimum width=2.5cm] (s) {Sender};
-    \node[draw, rounded corners, fill=lightblue, minimum width=2.5cm, right=4cm of s] (r) {Mottaker};
-    \draw[->, thick, blue] ([yshift=3mm]s.east) -- ([yshift=3mm]r.west) node[midway, above]{\small P\aa litelig kanal (abstraksjon)};
-    \draw[->, thick, red, dashed] ([yshift=-3mm]s.east) -- ([yshift=-3mm]r.west) node[midway, below]{\small Up\aa litelig kanal (virkelighet)};
+    \node[draw, rounded corners, fill=lightblue, minimum width=2.5cm, right=4cm of s] (r) {Receiver};
+    \draw[->, thick, blue] ([yshift=3mm]s.east) -- ([yshift=3mm]r.west) node[midway, above]{\small Reliable channel (abstraction)};
+    \draw[->, thick, red, dashed] ([yshift=-3mm]s.east) -- ([yshift=-3mm]r.west) node[midway, below]{\small Unreliable channel (reality)};
 \end{tikzpicture}
 \end{center}
 
-\subsection{rdt1.0: Overf\o ring over perfekt p\aa litelig kanal}
+\subsection{rdt1.0: Transfer over a Perfectly Reliable Channel}
 
-\begin{keybox}[rdt1.0 -- Enkleste tilfellet]
-\textbf{Antagelse:} Underliggende kanal er \emph{perfekt p\aa litelig} (ingen bitfeil, ingen pakketap).
+\begin{keybox}[rdt1.0 -- Simplest Case]
+\textbf{Assumption:} Underlying channel is \emph{perfectly reliable} (no bit errors, no packet loss).
 
-\textbf{Sender:} Bare send data ned i kanalen.\\
-\textbf{Mottaker:} Bare les data fra kanalen.
+\textbf{Sender:} Just send data down into the channel.\\
+\textbf{Receiver:} Just read data from the channel.
 
-Ingen feilh\aa ndtering n\o dvendig -- trivielt!
+No error handling necessary -- trivial!
 \end{keybox}
 
-\subsection{rdt2.0: Kanal med bitfeil}
+\subsection{rdt2.0: Channel with Bit Errors}
 
-\begin{keybox}[rdt2.0 -- Stopp-og-vent med ACK/NAK]
-\textbf{Antagelse:} Kanalen kan ha \emph{bitfeil} (men ingen pakketap).
+\begin{keybox}[rdt2.0 -- Stop-and-Wait with ACK/NAK]
+\textbf{Assumption:} The channel may have \emph{bit errors} (but no packet loss).
 
-\textbf{Nye mekanismer:}
+\textbf{New mechanisms:}
 \begin{itemize}[noitemsep]
-    \item \textbf{Sjekksum:} Oppdager bitfeil
-    \item \textbf{ACK (acknowledgement):} Mottaker sier ``OK, mottatt korrekt''
-    \item \textbf{NAK (negative acknowledgement):} Mottaker sier ``feil, send p\aa\ nytt''
-    \item \textbf{Retransmisjon:} Sender retransmitterer ved NAK
+    \item \textbf{Checksum:} Detects bit errors
+    \item \textbf{ACK (acknowledgement):} Receiver says ``OK, received correctly''
+    \item \textbf{NAK (negative acknowledgement):} Receiver says ``error, send again''
+    \item \textbf{Retransmission:} Sender retransmits on NAK
 \end{itemize}
-Senderen sender \'{e}n pakke og \textbf{venter} p\aa\ ACK/NAK f\o r neste pakke sendes (\emph{stop-and-wait}).
+The sender sends one packet and \textbf{waits} for ACK/NAK before the next packet is sent (\emph{stop-and-wait}).
 \end{keybox}
 
-\begin{warnbox}[Fatalt problem med rdt2.0!]
-Hva hvis ACK/NAK selv har bitfeil? Senderen vet ikke om pakken ble mottatt korrekt!
+\begin{warnbox}[Fatal Problem with rdt2.0!]
+What if ACK/NAK itself has bit errors? The sender does not know if the packet was received correctly!
 \begin{itemize}[noitemsep]
-    \item Kan ikke bare retransmittere -- gir mulige duplikater
-    \item L\o sning $\rightarrow$ rdt2.1
+    \item Cannot simply retransmit -- causes possible duplicates
+    \item Solution $\rightarrow$ rdt2.1
 \end{itemize}
 \end{warnbox}
 
-\subsection{rdt2.1: Sekvensnumre}
+\subsection{rdt2.1: Sequence Numbers}
 
-\begin{keybox}[rdt2.1 -- L\o sning: Sekvensnumre]
-Sender legger til et \textbf{sekvensnummer} (0 eller 1) p\aa\ hver pakke:
+\begin{keybox}[rdt2.1 -- Solution: Sequence Numbers]
+Sender adds a \textbf{sequence number} (0 or 1) to each packet:
 \begin{itemize}[noitemsep]
-    \item Hvis ACK/NAK er korrupt $\rightarrow$ sender retransmitterer gjeldende pakke
-    \item Mottaker forkaster duplikater ved hjelp av sekvensnummeret
-    \item To sekvensnumre (0 og 1) er tilstrekkelig for stopp-og-vent
+    \item If ACK/NAK is corrupt $\rightarrow$ sender retransmits current packet
+    \item Receiver discards duplicates using the sequence number
+    \item Two sequence numbers (0 and 1) are sufficient for stop-and-wait
 \end{itemize}
 \end{keybox}
 
-\subsection{rdt2.2: NAK-fri protokoll}
+\subsection{rdt2.2: NAK-Free Protocol}
 
-\begin{keybox}[rdt2.2 -- Kun ACK (ingen NAK)]
-Samme funksjonalitet som rdt2.1, men \emph{uten NAK}:
+\begin{keybox}[rdt2.2 -- ACK Only (no NAK)]
+Same functionality as rdt2.1, but \emph{without NAK}:
 \begin{itemize}[noitemsep]
-    \item Mottaker sender \textbf{ACK med sekvensnummeret} til siste korrekt mottatte pakke
-    \item Duplikat-ACK hos sender fungerer som NAK (betyr: ``den siste pakken var feil'')
-    \item Sender retransmitterer n\aa r den f\aa r duplikat-ACK
+    \item Receiver sends \textbf{ACK with the sequence number} of the last correctly received packet
+    \item Duplicate ACK at sender acts as NAK (means: ``the last packet was wrong'')
+    \item Sender retransmits when it receives a duplicate ACK
 \end{itemize}
 \end{keybox}
 
-\subsection{rdt3.0: Kanal med bitfeil OG pakketap}
+\subsection{rdt3.0: Channel with Bit Errors AND Packet Loss}
 
-\begin{keybox}[rdt3.0 -- Timer / Countdown timer]
-\textbf{Ny antagelse:} Kanalen kan ogs\aa\ \emph{miste pakker} (data eller ACKer).
+\begin{keybox}[rdt3.0 -- Timer / Countdown Timer]
+\textbf{New assumption:} The channel can also \emph{lose packets} (data or ACKs).
 
-\textbf{Ny mekanisme: Nedtellingstimer (countdown timer)}
+\textbf{New mechanism: Countdown timer}
 \begin{itemize}[noitemsep]
-    \item Sender venter en ``rimelig'' tid p\aa\ ACK
-    \item Retransmitterer hvis ingen ACK mottas innen timeout
-    \item Hvis pakken (eller ACK) bare er forsinket (ikke tapt): retransmisjon gir duplikat, men sekvensnumre h\aa ndterer dette
+    \item Sender waits a ``reasonable'' time for ACK
+    \item Retransmits if no ACK is received before timeout
+    \item If the packet (or ACK) is just delayed (not lost): retransmission causes a duplicate, but sequence numbers handle this
 \end{itemize}
-rdt3.0 er korrekt, men ytelsen er d\aa rlig p\aa\ h\o ykapasitets-lenker!
+rdt3.0 is correct, but performance is poor on high-capacity links!
 \end{keybox}
 
-\subsection{Ytelse til rdt3.0 (stopp-og-vent)}
+\subsection{Performance of rdt3.0 (Stop-and-Wait)}
 
-\begin{formulabox}[Utnyttelsesgrad for stopp-og-vent]
+\begin{formulabox}[Utilization for Stop-and-Wait]
 \[
 U_{\text{sender}} = \frac{L/R}{RTT + L/R}
 \]
-hvor:
+where:
 \begin{itemize}[noitemsep]
-    \item $L$ = pakkest\o rrelse (bits)
-    \item $R$ = linkekapasitet (bps)
-    \item $RTT$ = rundturstid (round-trip time)
-    \item $L/R$ = overf\o ringstid for \'{e}n pakke
+    \item $L$ = packet size (bits)
+    \item $R$ = link capacity (bps)
+    \item $RTT$ = round-trip time
+    \item $L/R$ = transmission time for one packet
 \end{itemize}
 \end{formulabox}
 
-\begin{exambox}[Eksempel: D\aa rlig utnyttelse]
-Gitt: $L = 8000$ bits, $R = 1$ Gbps, $RTT = 30$ ms:
+\begin{exambox}[Example: Poor Utilization]
+Given: $L = 8000$ bits, $R = 1$ Gbps, $RTT = 30$ ms:
 \[
 U_{\text{sender}} = \frac{8000 / 10^9}{0{,}030 + 8000/10^9} = \frac{0{,}000008}{0{,}030008} = 0{,}00027 = 0{,}027\%
 \]
-Kun 0,027\% utnyttelse! Senderen er aktiv bare $0{,}008$ ms av $30{,}008$ ms.
+Only 0.027\% utilization! The sender is active only $0{,}008$ ms out of $30{,}008$ ms.
 \end{exambox}
 
-\subsection{Pipelining: \o kt utnyttelse}
+\subsection{Pipelining: Increased Utilization}
 
-\begin{keybox}[Pipelining -- Send flere pakker uten \aa\ vente]
-L\o sning p\aa\ d\aa rlig utnyttelse: \textbf{pipelining} -- sender tillater at flere pakker er ``in flight'' (sendt men ikke enda bekreftet).
+\begin{keybox}[Pipelining -- Send Multiple Packets Without Waiting]
+Solution to poor utilization: \textbf{pipelining} -- the sender allows multiple packets to be ``in flight'' (sent but not yet acknowledged).
 \begin{itemize}[noitemsep]
-    \item Krever st\o rre rekkevidde for sekvensnumre
-    \item Buffering hos sender og/eller mottaker
-    \item To hovedvarianter: \textbf{Go-Back-N} og \textbf{Selective Repeat}
+    \item Requires a larger range of sequence numbers
+    \item Buffering at sender and/or receiver
+    \item Two main variants: \textbf{Go-Back-N} and \textbf{Selective Repeat}
 \end{itemize}
 
-\textbf{Med pipelining (3 pakker):}
+\textbf{With pipelining (3 packets):}
 \[
 U_{\text{sender}} = \frac{3 \cdot L/R}{RTT + L/R}
 \]
-3x bedre utnyttelse enn stopp-og-vent!
+3x better utilization than stop-and-wait!
 \end{keybox}
 
 \subsection{Go-Back-N (GBN)}
 
-\begin{keybox}[Go-Back-N protokoll]
+\begin{keybox}[Go-Back-N Protocol]
 \textbf{Sender:}
 \begin{itemize}[noitemsep]
-    \item ``Vindu'' med opptil $N$ ubekreftede pakker i pipelinen
-    \item \textbf{Kumulativ ACK:} ACK($n$) bekrefter alle pakker t.o.m. sekvensnummer $n$
-    \item Timer for den eldste ubekreftede pakken
-    \item Ved timeout: retransmitter \emph{alle} pakker i vinduet (fra eldste ubekreftede)
+    \item ``Window'' of up to $N$ unacknowledged packets in the pipeline
+    \item \textbf{Cumulative ACK:} ACK($n$) acknowledges all packets up to and including sequence number $n$
+    \item Timer for the oldest unacknowledged packet
+    \item On timeout: retransmit \emph{all} packets in the window (from the oldest unacknowledged)
 \end{itemize}
 
-\textbf{Mottaker:}
+\textbf{Receiver:}
 \begin{itemize}[noitemsep]
-    \item Sender kun ACK for h\o yeste korrekt mottatte pakke \emph{i rekkef\o lge}
-    \item Kan ha kun \'{e}n forventet sekvensnummer
-    \item Forkaster pakker som er ute av rekkef\o lge (ingen buffering) -- sender ACK p\aa\ nytt for siste i rekkef\o lge
+    \item Sends ACK only for the highest correctly received packet \emph{in order}
+    \item Can have only one expected sequence number
+    \item Discards out-of-order packets (no buffering) -- re-sends ACK for last in-order packet
 \end{itemize}
 \end{keybox}
 
@@ -367,93 +367,93 @@ U_{\text{sender}} = \frac{3 \cdot L/R}{RTT + L/R}
     \draw[fill=green!30] (0,0) rectangle (3,0.8);
     \draw[fill=yellow!50] (3,0) rectangle (7,0.8);
 
-    \draw[decorate,decoration={brace,amplitude=5pt}] (3,-0.3) -- (7,-0.3) node[midway,below=5pt]{\small Vindu ($N=4$)};
+    \draw[decorate,decoration={brace,amplitude=5pt}] (3,-0.3) -- (7,-0.3) node[midway,below=5pt]{\small Window ($N=4$)};
 
-    \node[below=1cm] at (1.5,0) {\tiny ACK mottatt};
-    \node[below=1cm] at (5,0) {\tiny Sendt, venter p\aa\ ACK};
-    \node[below=1cm] at (9,0) {\tiny Kan brukes};
+    \node[below=1cm] at (1.5,0) {\tiny ACK received};
+    \node[below=1cm] at (5,0) {\tiny Sent, waiting for ACK};
+    \node[below=1cm] at (9,0) {\tiny Usable};
 \end{tikzpicture}
 \end{center}
 
 \subsection{Selective Repeat (SR)}
 
-\begin{keybox}[Selective Repeat protokoll]
+\begin{keybox}[Selective Repeat Protocol]
 \textbf{Sender:}
 \begin{itemize}[noitemsep]
-    \item Vindu med opptil $N$ ubekreftede pakker
-    \item \textbf{Individuell ACK:} Hver pakke har sin egen ACK
-    \item Timer for \emph{hver} ubekreftet pakke
-    \item Ved timeout: retransmitter kun den \emph{spesifikke} pakken som timet ut
+    \item Window of up to $N$ unacknowledged packets
+    \item \textbf{Individual ACK:} Each packet has its own ACK
+    \item Timer for \emph{each} unacknowledged packet
+    \item On timeout: retransmit only the \emph{specific} packet that timed out
 \end{itemize}
 
-\textbf{Mottaker:}
+\textbf{Receiver:}
 \begin{itemize}[noitemsep]
-    \item Bekrefter \emph{hver} korrekt mottatt pakke individuelt
-    \item \textbf{Bufferer} pakker mottatt ute av rekkef\o lge
-    \item Leverer til applikasjonen n\aa r ``hullet'' fylles inn
+    \item Acknowledges \emph{each} correctly received packet individually
+    \item \textbf{Buffers} out-of-order received packets
+    \item Delivers to the application when the ``gap'' is filled in
 \end{itemize}
 \end{keybox}
 
-\begin{warnbox}[SR-dilemmaet: Vindusst\o rrelse vs. sekvensnummerrom]
-Vindusst\o rrelsen $N$ m\aa\ v\ae re \textbf{h\o yst halvparten av sekvensnummerrommet}:
+\begin{warnbox}[SR Dilemma: Window Size vs. Sequence Number Space]
+The window size $N$ must be \textbf{at most half the sequence number space}:
 \[
-N \leq \frac{k}{2} \quad \text{der } k \text{ er antall mulige sekvensnumre}
+N \leq \frac{k}{2} \quad \text{where } k \text{ is the number of possible sequence numbers}
 \]
-Ellers kan mottaker ikke skille mellom nye pakker og retransmisjoner!
+Otherwise the receiver cannot distinguish between new packets and retransmissions!
 
-\textbf{Eksempel:} Med sekvensnumre $\{0, 1, 2, 3\}$ (4 mulige) m\aa\ $N \leq 2$.
+\textbf{Example:} With sequence numbers $\{0, 1, 2, 3\}$ (4 possible), $N \leq 2$.
 \end{warnbox}
 
 \begin{center}
 \begin{tabular}{lcc}
 \toprule
-\textbf{Egenskap} & \textbf{Go-Back-N} & \textbf{Selective Repeat} \\
+\textbf{Property} & \textbf{Go-Back-N} & \textbf{Selective Repeat} \\
 \midrule
-ACK-type & Kumulativ & Individuell \\
-Mottaker-buffering & Nei & Ja \\
-Ved timeout & Retransmitter alle & Retransmitter \'{e}n \\
-Timer & \'{E}n (eldste) & Per pakke \\
-Kompleksitet & Lavere & H\o yere \\
-Effektivitet & Lavere (mange retransm.) & H\o yere \\
+ACK type & Cumulative & Individual \\
+Receiver buffering & No & Yes \\
+On timeout & Retransmit all & Retransmit one \\
+Timer & One (oldest) & Per packet \\
+Complexity & Lower & Higher \\
+Efficiency & Lower (many retransm.) & Higher \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 %=============================================================================
-\section{Tilkoblingsorientert transport: TCP (3.5)}
+\section{Connection-Oriented Transport: TCP (3.5)}
 %=============================================================================
 
-\subsection{TCP -- oversikt}
+\subsection{TCP -- Overview}
 
-\begin{keybox}[TCP -- Egenskaper]
+\begin{keybox}[TCP -- Properties]
 \begin{itemize}[noitemsep]
-    \item \textbf{Punkt-til-punkt:} \'{E}n sender, \'{e}n mottaker
-    \item \textbf{P\aa litelig, ordnet bytestr\o m:} Ingen meldingsgrenser
-    \item \textbf{Full dupleks:} Data kan flyte begge veier samtidig (bi-directional data flow)
-    \item \textbf{Kumulativ ACK}
-    \item \textbf{Pipelining:} Vindusstyrte segmenter (congestion \& flow control setter vindu)
-    \item \textbf{Tilkoblingsorientert:} H\aa ndtrykk (handshake) f\o r datautveksling
-    \item \textbf{Flyt- og metningskontroll:} Sender overbelaster ikke mottaker eller nettverk
+    \item \textbf{Point-to-point:} One sender, one receiver
+    \item \textbf{Reliable, ordered byte stream:} No message boundaries
+    \item \textbf{Full duplex:} Data can flow in both directions simultaneously (bi-directional data flow)
+    \item \textbf{Cumulative ACK}
+    \item \textbf{Pipelining:} Window-controlled segments (congestion \& flow control set window)
+    \item \textbf{Connection-oriented:} Handshake before data exchange
+    \item \textbf{Flow and congestion control:} Sender does not overwhelm receiver or network
 \end{itemize}
 \end{keybox}
 
-\subsection{TCP-segmentstruktur}
+\subsection{TCP Segment Structure}
 
 \begin{center}
 \begin{tikzpicture}[scale=0.75]
     % Row 1 - Source/Dest port
     \draw[fill=lightblue] (0,6) rectangle (4,7);
     \draw[fill=lightblue] (4,6) rectangle (8,7);
-    \node at (2,6.5) {\small Kilde-portnr (16 bit)};
-    \node at (6,6.5) {\small Dest.-portnr (16 bit)};
+    \node at (2,6.5) {\small Source port nr (16 bit)};
+    \node at (6,6.5) {\small Dest. port nr (16 bit)};
 
     % Row 2 - Sequence number
     \draw[fill=lightblue] (0,5) rectangle (8,6);
-    \node at (4,5.5) {\small Sekvensnummer (32 bit)};
+    \node at (4,5.5) {\small Sequence number (32 bit)};
 
     % Row 3 - ACK number
     \draw[fill=lightblue] (0,4) rectangle (8,5);
-    \node at (4,4.5) {\small Bekreftelsesnummer / ACK-nummer (32 bit)};
+    \node at (4,4.5) {\small Acknowledgement number / ACK number (32 bit)};
 
     % Row 4 - Header length, flags, receive window
     \draw[fill=lightyellow] (0,3) rectangle (2,4);
@@ -466,16 +466,16 @@ Effektivitet & Lavere (mange retransm.) & H\o yere \\
     % Row 5 - Checksum, Urgent pointer
     \draw[fill=lightblue] (0,2) rectangle (4,3);
     \draw[fill=lightblue] (4,2) rectangle (8,3);
-    \node at (2,2.5) {\small Sjekksum (16 bit)};
-    \node at (6,2.5) {\small Urgentpeker (16 bit)};
+    \node at (2,2.5) {\small Checksum (16 bit)};
+    \node at (6,2.5) {\small Urgent pointer (16 bit)};
 
     % Row 6 - Options
     \draw[fill=lightyellow] (0,1) rectangle (8,2);
-    \node at (4,1.5) {\small Opsjoner (variabel lengde)};
+    \node at (4,1.5) {\small Options (variable length)};
 
     % Row 7 - Data
     \draw[fill=lightgreen] (0,-0.5) rectangle (8,1);
-    \node at (4,0.25) {\small Applikasjonsdata (variabel lengde)};
+    \node at (4,0.25) {\small Application data (variable length)};
 
     % Brace for header
     \draw[decorate,decoration={brace,amplitude=5pt}] (-0.3,1) -- (-0.3,7) node[midway,left=5pt,align=center]{\small 20 byte\\[-2pt]\small header\\[-2pt]\small (min.)};
@@ -485,133 +485,133 @@ Effektivitet & Lavere (mange retransm.) & H\o yere \\
 \end{tikzpicture}
 \end{center}
 
-\begin{keybox}[Viktige felt i TCP-headeren]
+\begin{keybox}[Important Fields in the TCP Header]
 \begin{itemize}[noitemsep]
-    \item \textbf{Sekvensnummer:} Bytenummer til f\o rste byte i segmentets data
-    \item \textbf{ACK-nummer:} Neste byte mottakeren forventer (kumulativ ACK)
-    \item \textbf{Receive window (rwnd):} Antall byte mottaker er villig til \aa\ akseptere (flytkontroll)
-    \item \textbf{Flagg:} SYN, FIN, ACK, RST, PSH, URG, CWR, ECE
-    \item \textbf{Header-lengde:} Variabel pga. opsjoner (normalt 20 byte uten opsjoner)
+    \item \textbf{Sequence number:} Byte number of the first byte in the segment's data
+    \item \textbf{ACK number:} Next byte the receiver expects (cumulative ACK)
+    \item \textbf{Receive window (rwnd):} Number of bytes the receiver is willing to accept (flow control)
+    \item \textbf{Flags:} SYN, FIN, ACK, RST, PSH, URG, CWR, ECE
+    \item \textbf{Header length:} Variable due to options (normally 20 bytes without options)
 \end{itemize}
 \end{keybox}
 
-\subsection{MSS og MTU}
+\subsection{MSS and MTU}
 
-\begin{formulabox}[MSS og MTU]
+\begin{formulabox}[MSS and MTU]
 \begin{itemize}[noitemsep]
-    \item \textbf{MTU (Maximum Transmission Unit):} St\o rste linklags-ramme (typisk \textbf{1500 byte} for Ethernet)
-    \item \textbf{MSS (Maximum Segment Size):} Maks applikasjonsdata i segment
-    \item $\text{MSS} = \text{MTU} - \text{IP-header} - \text{TCP-header} = 1500 - 20 - 20 = \textbf{1460 byte}$
-    \item MSS refererer til applikasjonsdata, \emph{ikke} inkludert TCP-header
+    \item \textbf{MTU (Maximum Transmission Unit):} Largest link layer frame (typically \textbf{1500 bytes} for Ethernet)
+    \item \textbf{MSS (Maximum Segment Size):} Max application data in a segment
+    \item $\text{MSS} = \text{MTU} - \text{IP header} - \text{TCP header} = 1500 - 20 - 20 = \textbf{1460 bytes}$
+    \item MSS refers to application data, \emph{not} including the TCP header
 \end{itemize}
 \end{formulabox}
 
-\subsection{TCP sekvensnumre og ACK}
+\subsection{TCP Sequence Numbers and ACK}
 
-\begin{keybox}[Sekvensnumre og ACK i TCP]
-\textbf{Sekvensnumre:}
+\begin{keybox}[Sequence Numbers and ACK in TCP]
+\textbf{Sequence numbers:}
 \begin{itemize}[noitemsep]
-    \item TCP nummererer \emph{byte} (ikke segmenter!)
-    \item Sekvensnummeret er bytenummeret til f\o rste databyte i segmentet
-    \item Eksempel: fil p\aa\ 500\,000 byte, MSS = 1000 byte $\Rightarrow$ segment 0 har seq=0, segment 1 har seq=1000, segment 2 har seq=2000, \ldots
+    \item TCP numbers \emph{bytes} (not segments!)
+    \item The sequence number is the byte number of the first data byte in the segment
+    \item Example: file of 500\,000 bytes, MSS = 1000 bytes $\Rightarrow$ segment 0 has seq=0, segment 1 has seq=1000, segment 2 has seq=2000, \ldots
 \end{itemize}
 
-\textbf{ACK-numre:}
+\textbf{ACK numbers:}
 \begin{itemize}[noitemsep]
-    \item ACK-nummeret er sekvensnummeret til \textbf{neste byte mottakeren forventer}
-    \item \textbf{Kumulativ ACK:} Bekrefter alle byte t.o.m. ACK-nummer $-$ 1
-    \item Sp\o rsm\aa l: Hva gj\o r mottaker med pakker ute av rekkef\o lge? TCP-spec sier ingenting -- opp til implementasjon (i praksis: buffer dem)
+    \item The ACK number is the sequence number of the \textbf{next byte the receiver expects}
+    \item \textbf{Cumulative ACK:} Acknowledges all bytes up to ACK number $-$ 1
+    \item Question: What does the receiver do with out-of-order packets? TCP spec says nothing -- up to implementation (in practice: buffer them)
 \end{itemize}
 \end{keybox}
 
-\begin{exambox}[Eksempel: Telnet-sesjon]
-Vert A sender `C' (1 byte) til Vert B, begge starter med seq=42 (A) og seq=79 (B):
+\begin{exambox}[Example: Telnet Session]
+Host A sends `C' (1 byte) to Host B, both start with seq=42 (A) and seq=79 (B):
 \begin{enumerate}[noitemsep]
     \item A $\rightarrow$ B: Seq=42, ACK=79, data=`C'
-    \item B $\rightarrow$ A: Seq=79, ACK=43, data=`C' (ekko)
+    \item B $\rightarrow$ A: Seq=79, ACK=43, data=`C' (echo)
     \item A $\rightarrow$ B: Seq=43, ACK=80
 \end{enumerate}
 \end{exambox}
 
-\subsection{TCP Round-Trip Time og timeout}
+\subsection{TCP Round-Trip Time and Timeout}
 
-\begin{formulabox}[RTT-estimering og timeout]
-\textbf{SampleRTT:} M\aa lt tid fra segment sendt til ACK mottatt (kun for segmenter sendt \'{e}n gang).
+\begin{formulabox}[RTT Estimation and Timeout]
+\textbf{SampleRTT:} Measured time from segment sent to ACK received (only for segments sent once).
 
-\textbf{Estimert RTT (eksponensielt vektet glidende gjennomsnitt -- EWMA):}
+\textbf{Estimated RTT (exponentially weighted moving average -- EWMA):}
 \[
 \text{EstimatedRTT} = (1 - \alpha) \cdot \text{EstimatedRTT} + \alpha \cdot \text{SampleRTT}
 \]
-Typisk: $\alpha = 0{,}125$ (dvs. $1/8$)
+Typical: $\alpha = 0{,}125$ (i.e. $1/8$)
 
-\textbf{Avviksm\aa l (Safety margin):}
+\textbf{Deviation measure (Safety margin):}
 \[
 \text{DevRTT} = (1 - \beta) \cdot \text{DevRTT} + \beta \cdot |\text{SampleRTT} - \text{EstimatedRTT}|
 \]
-Typisk: $\beta = 0{,}25$ (dvs. $1/4$)
+Typical: $\beta = 0{,}25$ (i.e. $1/4$)
 
-\textbf{Timeout-intervall:}
+\textbf{Timeout interval:}
 \[
 \text{TimeoutInterval} = \text{EstimatedRTT} + 4 \cdot \text{DevRTT}
 \]
 \end{formulabox}
 
-\begin{warnbox}[Viktig om SampleRTT]
-SampleRTT m\aa les \textbf{ikke} for retransmitterte segmenter (Karn's algoritme) -- man kan ikke vite om ACK-en er for originalen eller retransmisjonen.
+\begin{warnbox}[Important about SampleRTT]
+SampleRTT is \textbf{not} measured for retransmitted segments (Karn's algorithm) -- one cannot know whether the ACK is for the original or the retransmission.
 \end{warnbox}
 
-\subsection{TCP p\aa litelig dataoverf\o ring}
+\subsection{TCP Reliable Data Transfer}
 
-\begin{keybox}[TCP sender -- forenklet]
-TCP bruker \textbf{\'{e}n retransmissjonstimer} per tilkobling (ikke per segment).
+\begin{keybox}[TCP Sender -- Simplified]
+TCP uses \textbf{one retransmission timer} per connection (not per segment).
 
-\textbf{Hendelser hos sender:}
+\textbf{Events at sender:}
 \begin{enumerate}[noitemsep]
-    \item \textbf{Data fra applikasjon:} Lag segment med sekvensnummer, start timer hvis ikke allerede kj\o rende
-    \item \textbf{Timeout:} Retransmitter segmentet med lavest sekvensnummer som ikke er bekreftet. Start timer p\aa\ nytt
-    \item \textbf{ACK mottatt:} Hvis ACK bekrefter tidligere ubekreftede segmenter -- oppdater hva som er bekreftet. Start timer p\aa\ nytt hvis det fortsatt er ubekreftede segmenter
+    \item \textbf{Data from application:} Create segment with sequence number, start timer if not already running
+    \item \textbf{Timeout:} Retransmit the segment with the lowest sequence number that is not acknowledged. Restart timer
+    \item \textbf{ACK received:} If ACK acknowledges previously unacknowledged segments -- update what is acknowledged. Restart timer if there are still unacknowledged segments
 \end{enumerate}
 \end{keybox}
 
-\begin{keybox}[TCP fast retransmit]
-Hvis sender mottar \textbf{3 duplikat-ACKer} (dvs.\ 4 ACKer for samme segment): retransmitter segmentet \emph{f\o r timeout} utl\o per.
+\begin{keybox}[TCP Fast Retransmit]
+If sender receives \textbf{3 duplicate ACKs} (i.e.\ 4 ACKs for the same segment): retransmit the segment \emph{before} timeout expires.
 
-Rasjonale: Duplikat-ACKer indikerer at et segment har g\aa tt tapt, men etterfølgende segmenter har kommet frem.
+Rationale: Duplicate ACKs indicate that a segment has been lost, but subsequent segments have arrived.
 \end{keybox}
 
-\subsection{TCP flytkontroll}
+\subsection{TCP Flow Control}
 
-\begin{keybox}[Flytkontroll -- Flow Control]
-\textbf{M\aa l:} Sender skal ikke oversvjemme mottakers buffer.
+\begin{keybox}[Flow Control]
+\textbf{Goal:} Sender should not overflow the receiver's buffer.
 
-\textbf{Mekanisme:}
+\textbf{Mechanism:}
 \begin{itemize}[noitemsep]
-    \item Mottaker annonserer ledig bufferplass i TCP-headeren via \textbf{rwnd}-feltet (receive window)
+    \item Receiver advertises available buffer space in the TCP header via the \textbf{rwnd} field (receive window)
     \item $\text{rwnd} = \text{RcvBuffer} - (\text{LastByteRcvd} - \text{LastByteRead})$
-    \item Sender begrenser ubekreftede data: $\text{LastByteSent} - \text{LastByteAcked} \leq \text{rwnd}$
-    \item Standard RcvBuffer = 4096 byte (kan \o kes via operativsystem)
+    \item Sender limits unacknowledged data: $\text{LastByteSent} - \text{LastByteAcked} \leq \text{rwnd}$
+    \item Default RcvBuffer = 4096 bytes (can be increased via operating system)
 \end{itemize}
 \end{keybox}
 
-\begin{warnbox}[Hva n\aa r rwnd = 0?]
-N\aa r mottaker annonserer $\text{rwnd} = 0$, sender sender fortsatt sm\aa\ \textbf{probe-segmenter} (1 byte) for \aa\ f\aa\ oppdatert rwnd-verdi og unng\aa\ deadlock.
+\begin{warnbox}[What when rwnd = 0?]
+When the receiver advertises $\text{rwnd} = 0$, the sender still sends small \textbf{probe segments} (1 byte) to get an updated rwnd value and avoid deadlock.
 \end{warnbox}
 
-\subsection{TCP tilkoblingsadministrasjon}
+\subsection{TCP Connection Management}
 
-\subsubsection{Treveis h\aa ndtrykk (3-way handshake)}
+\subsubsection{Three-Way Handshake}
 
-\begin{keybox}[TCP tilkoblingsoppsett -- 3-veis h\aa ndtrykk]
+\begin{keybox}[TCP Connection Setup -- 3-Way Handshake]
 \begin{enumerate}[noitemsep]
-    \item \textbf{SYN:} Klient sender SYN-segment (SYN=1, velger tilfeldig sekvensnummer \texttt{client\_isn})
-    \item \textbf{SYN-ACK:} Server svarer med SYNACK (SYN=1, ACK=1, velger \texttt{server\_isn}, acker \texttt{client\_isn+1})
-    \item \textbf{ACK:} Klient sender ACK (ACK=1, acker \texttt{server\_isn+1}). Kan inneholde data!
+    \item \textbf{SYN:} Client sends SYN segment (SYN=1, chooses random sequence number \texttt{client\_isn})
+    \item \textbf{SYN-ACK:} Server responds with SYNACK (SYN=1, ACK=1, chooses \texttt{server\_isn}, acks \texttt{client\_isn+1})
+    \item \textbf{ACK:} Client sends ACK (ACK=1, acks \texttt{server\_isn+1}). Can contain data!
 \end{enumerate}
 \end{keybox}
 
 \begin{center}
 \begin{tikzpicture}[>=Stealth, scale=0.9]
-    \draw[thick] (0,0) -- (0,-5) node[above right, at start]{\textbf{Klient}};
+    \draw[thick] (0,0) -- (0,-5) node[above right, at start]{\textbf{Client}};
     \draw[thick] (7,0) -- (7,-5) node[above left, at start]{\textbf{Server}};
 
     \draw[->, blue, thick] (0,-1) -- (7,-2) node[midway, above, sloped]{\small SYN, Seq=x};
@@ -625,29 +625,29 @@ N\aa r mottaker annonserer $\text{rwnd} = 0$, sender sender fortsatt sm\aa\ \tex
 \end{tikzpicture}
 \end{center}
 
-\begin{warnbox}[Hvorfor ikke toveis h\aa ndtrykk?]
-Et toveis h\aa ndtrykk feiler fordi:
+\begin{warnbox}[Why Not a Two-Way Handshake?]
+A two-way handshake fails because:
 \begin{itemize}[noitemsep]
-    \item Variable forsinkelser -- retransmitterte meldinger kan ankomme etter at tilkoblingen er lukket
-    \item Meldinger kan komme i feil rekkef\o lge
-    \item Kan ikke ``se'' den andre siden -- \textbf{halvåpne tilkoblinger} oppst\aa r
+    \item Variable delays -- retransmitted messages can arrive after the connection is closed
+    \item Messages can arrive in wrong order
+    \item Cannot ``see'' the other side -- \textbf{half-open connections} arise
 \end{itemize}
 \end{warnbox}
 
-\subsubsection{Tilkoblingslukking}
+\subsubsection{Connection Closing}
 
-\begin{keybox}[TCP tilkoblingslukking -- 4-stegs prosess]
+\begin{keybox}[TCP Connection Closing -- 4-Step Process]
 \begin{enumerate}[noitemsep]
-    \item Klient sender \textbf{FIN}-segment
-    \item Server svarer med \textbf{ACK} (halvlukket -- server kan fortsatt sende data)
-    \item Server sender \textbf{FIN}-segment
-    \item Klient svarer med \textbf{ACK}, g\aa r inn i \textbf{TIME\_WAIT} (venter typisk 2 $\times$ MSL)
+    \item Client sends \textbf{FIN} segment
+    \item Server responds with \textbf{ACK} (half-closed -- server can still send data)
+    \item Server sends \textbf{FIN} segment
+    \item Client responds with \textbf{ACK}, enters \textbf{TIME\_WAIT} (waits typically 2 $\times$ MSL)
 \end{enumerate}
 \end{keybox}
 
 \begin{center}
 \begin{tikzpicture}[>=Stealth, scale=0.9]
-    \draw[thick] (0,0) -- (0,-7) node[above right, at start]{\textbf{Klient}};
+    \draw[thick] (0,0) -- (0,-7) node[above right, at start]{\textbf{Client}};
     \draw[thick] (7,0) -- (7,-7) node[above left, at start]{\textbf{Server}};
 
     \draw[->, blue, thick] (0,-0.5) -- (7,-1.5) node[midway, above, sloped]{\small FIN};
@@ -662,114 +662,114 @@ Et toveis h\aa ndtrykk feiler fordi:
     \node[right] at (7,-3.5) {\tiny LAST\_ACK};
     \node[right] at (7,-5.5) {\tiny CLOSED};
 
-    \draw[dashed] (0,-4.5) -- (0,-6.5) node[left, midway]{\tiny Venter 2$\times$MSL};
+    \draw[dashed] (0,-4.5) -- (0,-6.5) node[left, midway]{\tiny Waiting 2$\times$MSL};
     \node[left] at (0,-6.5) {\tiny CLOSED};
 \end{tikzpicture}
 \end{center}
 
-\subsubsection{TCP-tilstander}
+\subsubsection{TCP States}
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-\textbf{Tilstand} & \textbf{Beskrivelse} \\
+\textbf{State} & \textbf{Description} \\
 \midrule
-CLOSED & Ingen tilkobling \\
-LISTEN & Server venter p\aa\ innkommende SYN \\
-SYN\_SENT & Klient har sendt SYN, venter p\aa\ SYN-ACK \\
-SYN\_RCVD & Server har mottatt SYN, sendt SYN-ACK \\
-ESTABLISHED & Tilkobling etablert, data kan overf\o res \\
-FIN\_WAIT\_1 & Har sendt FIN, venter p\aa\ ACK \\
-FIN\_WAIT\_2 & FIN bekreftet, venter p\aa\ FIN fra andre side \\
-CLOSE\_WAIT & Mottatt FIN, venter p\aa\ at applikasjonen lukker \\
-LAST\_ACK & Sendt FIN, venter p\aa\ siste ACK \\
-TIME\_WAIT & Venter 2$\times$MSL f\o r \aa\ sikre at siste ACK mottas \\
+CLOSED & No connection \\
+LISTEN & Server waiting for incoming SYN \\
+SYN\_SENT & Client has sent SYN, waiting for SYN-ACK \\
+SYN\_RCVD & Server has received SYN, sent SYN-ACK \\
+ESTABLISHED & Connection established, data can be transferred \\
+FIN\_WAIT\_1 & Has sent FIN, waiting for ACK \\
+FIN\_WAIT\_2 & FIN acknowledged, waiting for FIN from other side \\
+CLOSE\_WAIT & Received FIN, waiting for application to close \\
+LAST\_ACK & Sent FIN, waiting for final ACK \\
+TIME\_WAIT & Waiting 2$\times$MSL to ensure last ACK is received \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 %=============================================================================
-\section{Prinsipper for metningskontroll (3.6)}
+\section{Principles of Congestion Control (3.6)}
 %=============================================================================
 
-\subsection{Hva er metning (congestion)?}
+\subsection{What is Congestion?}
 
-\begin{keybox}[Metning -- Congestion]
-\textbf{Metning} oppst\aa r n\aa r for mange kilder sender for mye data for fort, slik at \textbf{nettverket} ikke klarer \aa\ h\aa ndtere alt.
+\begin{keybox}[Congestion]
+\textbf{Congestion} occurs when too many sources send too much data too fast, such that \textbf{the network} cannot handle it all.
 
-\textbf{Symptomer:}
+\textbf{Symptoms:}
 \begin{itemize}[noitemsep]
-    \item Lange k\o forsinkelser (k\o er i ruterbuffere)
-    \item Pakketap (buffer-overflyt i rutere)
+    \item Long queueing delays (queues in router buffers)
+    \item Packet loss (buffer overflow in routers)
 \end{itemize}
 
-\textbf{Forskjell fra flytkontroll:}
+\textbf{Difference from flow control:}
 \begin{itemize}[noitemsep]
-    \item \textbf{Flytkontroll:} Hindrer sender i \aa\ oversvjemme \emph{mottaker}
-    \item \textbf{Metningskontroll:} Hindrer sender i \aa\ oversvjemme \emph{nettverket}
+    \item \textbf{Flow control:} Prevents sender from overwhelming the \emph{receiver}
+    \item \textbf{Congestion control:} Prevents sender from overwhelming the \emph{network}
 \end{itemize}
 \end{keybox}
 
-\subsection{Kostnader ved metning}
+\subsection{Costs of Congestion}
 
-\begin{warnbox}[Kostnader ved metning]
+\begin{warnbox}[Costs of Congestion]
 \begin{itemize}[noitemsep]
-    \item K\o forsinkelser \o ker n\aa r ankomsthastighet n\ae rmer seg linkkapasitet
-    \item Retransmisjoner pga.\ pakketap -- ``wasted'' arbeid
-    \item Un\o dvendige retransmisjoner (premature timeout) -- senderen sender \emph{kopier} av pakker som allerede er levert
-    \item N\aa r en pakke droppes langs en sti, g\aa r all oppadg\aa ende overf\o ringskapasitet brukt p\aa\ den pakken til spille
+    \item Queueing delays increase as arrival rate approaches link capacity
+    \item Retransmissions due to packet loss -- ``wasted'' work
+    \item Unnecessary retransmissions (premature timeout) -- the sender sends \emph{copies} of packets already delivered
+    \item When a packet is dropped along a path, all upstream transmission capacity used on that packet is wasted
 \end{itemize}
 \end{warnbox}
 
-\subsection{Tilnm\ae rminger til metningskontroll}
+\subsection{Approaches to Congestion Control}
 
-\begin{keybox}[To hovedtilnm\ae rminger]
-\textbf{1. End-to-end metningskontroll:}
+\begin{keybox}[Two Main Approaches]
+\textbf{1. End-to-end congestion control:}
 \begin{itemize}[noitemsep]
-    \item Ingen eksplisitt tilbakemelding fra nettverket
-    \item Metning utledes fra observert tap og forsinkelse
-    \item TCP bruker denne tilnm\ae rmingen
+    \item No explicit feedback from the network
+    \item Congestion inferred from observed loss and delay
+    \item TCP uses this approach
 \end{itemize}
 
-\textbf{2. Nettverksassistert metningskontroll:}
+\textbf{2. Network-assisted congestion control:}
 \begin{itemize}[noitemsep]
-    \item Rutere gir tilbakemelding til sender
-    \item Kan v\ae re \emph{direkte} (eksplisitt rate) eller \emph{indirekte} (ECN-bit i header)
-    \item ECN (Explicit Congestion Notification): 2 bit i IP-headeren
+    \item Routers provide feedback to the sender
+    \item Can be \emph{direct} (explicit rate) or \emph{indirect} (ECN bit in header)
+    \item ECN (Explicit Congestion Notification): 2 bits in the IP header
 \end{itemize}
 \end{keybox}
 
 %=============================================================================
-\section{TCP metningskontroll (3.7)}
+\section{TCP Congestion Control (3.7)}
 %=============================================================================
 
-\subsection{Oversikt: CWND og RWND}
+\subsection{Overview: CWND and RWND}
 
-\begin{keybox}[De to ``bremsene'' i TCP]
-TCP-sender begrenser overf\o ringshastigheten med to vinduer:
+\begin{keybox}[The Two ``Brakes'' in TCP]
+The TCP sender limits the transmission rate with two windows:
 \begin{itemize}[noitemsep]
-    \item \textbf{cwnd (Congestion Window):} Bestemt av \emph{senderen} basert p\aa\ observert metning. \emph{Ikke} synlig i headeren (intern variabel)
-    \item \textbf{rwnd (Receive Window):} Bestemt av \emph{mottakeren}, annonsert i TCP-headeren
+    \item \textbf{cwnd (Congestion Window):} Determined by the \emph{sender} based on observed congestion. \emph{Not} visible in the header (internal variable)
+    \item \textbf{rwnd (Receive Window):} Determined by the \emph{receiver}, advertised in the TCP header
 \end{itemize}
 
-\textbf{Den gylne regel:}
+\textbf{The golden rule:}
 \[
 \text{LastByteSent} - \text{LastByteAcked} \leq \min(\text{cwnd}, \text{rwnd})
 \]
 
-\textbf{TCP senderate:}
+\textbf{TCP send rate:}
 \[
-\text{rate} \approx \frac{\text{cwnd}}{\text{RTT}} \text{ bytes/sek}
+\text{rate} \approx \frac{\text{cwnd}}{\text{RTT}} \text{ bytes/sec}
 \]
 \end{keybox}
 
-\begin{formulabox}[B\aa ndbredde med og uten metningskontroll]
-\textbf{Uten} metningskontroll (pre-Tahoe):
+\begin{formulabox}[Bandwidth With and Without Congestion Control]
+\textbf{Without} congestion control (pre-Tahoe):
 \[
 BW_i = \frac{\text{TCP Window}}{\text{RTT}} = \frac{\text{RWND} \cdot \text{MSS}}{\text{RTT}}
 \]
 
-\textbf{Med} metningskontroll:
+\textbf{With} congestion control:
 \[
 BW_i = \frac{\text{TCP Window}}{\text{RTT}} = \frac{\min(\text{CWND}, \text{RWND}) \cdot \text{MSS}}{\text{RTT}}
 \]
@@ -777,84 +777,84 @@ BW_i = \frac{\text{TCP Window}}{\text{RTT}} = \frac{\min(\text{CWND}, \text{RWND
 
 \subsection{TCP Slow Start}
 
-\begin{keybox}[Slow Start -- Eksponentiell vekst]
-Ved \textbf{tilkoblingsstart}:
+\begin{keybox}[Slow Start -- Exponential Growth]
+At \textbf{connection start}:
 \begin{itemize}[noitemsep]
     \item $\text{cwnd} = 1$ MSS
     \item Initial rate = MSS/RTT
-    \item For \textbf{hver mottatt ACK}: $\text{cwnd} = \text{cwnd} + \text{MSS}$
-    \item Resulterer i \textbf{dobling} av cwnd per RTT (eksponentiell vekst)
+    \item For \textbf{each ACK received}: $\text{cwnd} = \text{cwnd} + \text{MSS}$
+    \item Results in \textbf{doubling} of cwnd per RTT (exponential growth)
 \end{itemize}
 
-\textbf{Eksempel} (MSS = 500 bytes, RTT = 200 ms):\\
-Initial rate = 500/0{,}2 = 20 kbps, men dobles for hver RTT.
+\textbf{Example} (MSS = 500 bytes, RTT = 200 ms):\\
+Initial rate = 500/0{,}2 = 20 kbps, but doubles every RTT.
 \end{keybox}
 
-\begin{exambox}[Slow Start beregning]
-Om cwnd = 4500 og MSS = 1500:\\
-Det sendes 4500/1500 = 3 segmenter, og det kommer 3 ACK denne RTT:
+\begin{exambox}[Slow Start Calculation]
+If cwnd = 4500 and MSS = 1500:\\
+3 segments are sent (4500/1500 = 3), and 3 ACKs arrive this RTT:
 \begin{itemize}[noitemsep]
     \item ACK 1: cwnd = 4500 + 1500 = 6000
     \item ACK 2: cwnd = 6000 + 1500 = 7500
     \item ACK 3: cwnd = 7500 + 1500 = 9000
 \end{itemize}
-Dvs.\ cwnd \textbf{doblet} fra 4500 til 9000 p\aa\ \'{e}n RTT!
+I.e.\ cwnd \textbf{doubled} from 4500 to 9000 in one RTT!
 \end{exambox}
 
 \subsection{Congestion Avoidance -- AIMD}
 
-\begin{keybox}[Congestion Avoidance -- Line\ae r vekst]
-N\aa r cwnd $\geq$ ssthresh (slow start threshold):
+\begin{keybox}[Congestion Avoidance -- Linear Growth]
+When cwnd $\geq$ ssthresh (slow start threshold):
 \begin{itemize}[noitemsep]
-    \item \textbf{Additive Increase:} For hver mottatt ACK:
+    \item \textbf{Additive Increase:} For each ACK received:
     \[
     \text{cwnd} = \text{cwnd} + \text{MSS} \cdot \frac{\text{MSS}}{\text{cwnd}}
     \]
-    Resulterer i \o kning p\aa\ \textbf{1 MSS per RTT} (line\ae r vekst)
-    \item \textbf{Multiplicative Decrease:} Ved pakketap: halver cwnd
+    Results in an increase of \textbf{1 MSS per RTT} (linear growth)
+    \item \textbf{Multiplicative Decrease:} On packet loss: halve cwnd
 \end{itemize}
-Gir ``sagtann''-m\o nster (\emph{saw tooth behavior}) -- prober stadig etter ledig b\aa ndbredde.
+Gives a ``sawtooth'' pattern (\emph{saw tooth behavior}) -- continually probing for available bandwidth.
 \end{keybox}
 
-\begin{exambox}[Congestion Avoidance beregning]
-Om cwnd = 3000 og MSS = 1500 (i Congestion Avoidance):
+\begin{exambox}[Congestion Avoidance Calculation]
+If cwnd = 3000 and MSS = 1500 (in Congestion Avoidance):
 \begin{itemize}[noitemsep]
-    \item cwnd0 = 3000 (start av RTT)
-    \item Det sendes 3000/1500 = 2 segmenter $\Rightarrow$ 2 ACK
+    \item cwnd0 = 3000 (start of RTT)
+    \item 3000/1500 = 2 segments sent $\Rightarrow$ 2 ACKs
     \item ACK 1: cwnd = 3000 + 1500$\cdot$(1500/3000) = 3000 + 750 = 3750
     \item ACK 2: cwnd = 3750 + 1500$\cdot$(1500/3750) = 3750 + 600 = 4350
 \end{itemize}
-Dvs.\ cwnd \o kte med ca.\ \textbf{1 MSS} til neste RTT (line\ae r vekst). (Eksakt 1 MSS ved start av neste RTT-periode.)
+I.e.\ cwnd increased by approx.\ \textbf{1 MSS} to the next RTT (linear growth). (Exactly 1 MSS at the start of the next RTT period.)
 \end{exambox}
 
-\subsection{Tapshendelser og ssthresh}
+\subsection{Loss Events and ssthresh}
 
-\begin{keybox}[Reaksjon p\aa\ tap -- ssthresh]
-Variabelen \textbf{ssthresh} (slow start threshold) avgj\o r n\aa r man g\aa r fra Slow Start til Congestion Avoidance.
+\begin{keybox}[Reaction to Loss -- ssthresh]
+The variable \textbf{ssthresh} (slow start threshold) determines when to switch from Slow Start to Congestion Avoidance.
 
-\textbf{Ved tapshendelse:}
+\textbf{On loss event:}
 \begin{itemize}[noitemsep]
     \item $\text{ssthresh} = \text{cwnd} / 2$
 \end{itemize}
 
-\textbf{To typer tap -- ulik respons:}
+\textbf{Two types of loss -- different responses:}
 
 \textbf{1. Timeout:}
 \begin{itemize}[noitemsep]
     \item ssthresh = cwnd/2
     \item cwnd = 1 MSS
-    \item G\aa\ tilbake til \textbf{Slow Start}
+    \item Go back to \textbf{Slow Start}
 \end{itemize}
 
-\textbf{2. Trippel duplikat-ACK (3 dup ACK):}
+\textbf{2. Triple duplicate ACK (3 dup ACK):}
 \begin{itemize}[noitemsep]
     \item ssthresh = cwnd/2
     \item cwnd = ssthresh + 3 MSS
-    \item G\aa\ inn i \textbf{Fast Recovery}
+    \item Enter \textbf{Fast Recovery}
 \end{itemize}
 \end{keybox}
 
-\subsection{De tre mekanismene i TCP metningskontroll}
+\subsection{The Three Mechanisms in TCP Congestion Control}
 
 \begin{center}
 \begin{tikzpicture}[>=Stealth, scale=0.85,
@@ -892,86 +892,86 @@ Variabelen \textbf{ssthresh} (slow start threshold) avgj\o r n\aa r man g\aa r f
 \begin{keybox}[TCP Tahoe vs. TCP Reno]
 \textbf{TCP Tahoe (1988):}
 \begin{itemize}[noitemsep]
-    \item Ved \emph{alle} tapshendelser (b\aa de timeout og 3 dup ACK): cwnd = 1 MSS, g\aa\ til Slow Start
+    \item On \emph{all} loss events (both timeout and 3 dup ACK): cwnd = 1 MSS, go to Slow Start
 \end{itemize}
 
 \textbf{TCP Reno (1997, RFC 2001/2581):}
 \begin{itemize}[noitemsep]
-    \item Ved \textbf{timeout}: cwnd = 1 MSS, g\aa\ til Slow Start (som Tahoe)
-    \item Ved \textbf{3 dup ACK}: cwnd = ssthresh + 3, g\aa\ til Fast Recovery (mildere reaksjon)
-    \item Fast Recovery gir bedre ytelse -- pakketap via dup-ACK betyr at nettverket fortsatt leverer noen pakker
+    \item On \textbf{timeout}: cwnd = 1 MSS, go to Slow Start (like Tahoe)
+    \item On \textbf{3 dup ACK}: cwnd = ssthresh + 3, go to Fast Recovery (milder reaction)
+    \item Fast Recovery gives better performance -- packet loss via dup-ACK means the network is still delivering some packets
 \end{itemize}
 \end{keybox}
 
 \subsection{TCP CUBIC}
 
-\begin{keybox}[TCP CUBIC -- Moderne metningskontroll]
-TCP CUBIC er \textbf{standard i Linux} og den mest brukte TCP-varianten for webservere.
+\begin{keybox}[TCP CUBIC -- Modern Congestion Control]
+TCP CUBIC is the \textbf{default in Linux} and the most widely used TCP variant for web servers.
 
-\textbf{Motivasjon:} Klassisk AIMD (line\ae r \o kning) er for treg n\aa r b\aa ndbredden er h\o y.
+\textbf{Motivation:} Classic AIMD (linear increase) is too slow when bandwidth is high.
 
-\textbf{Iid\'{e}:}
+\textbf{Idea:}
 \begin{itemize}[noitemsep]
-    \item $W_{\max}$ = senderate da metning sist ble oppdaget
-    \item Etter halvering av cwnd: \o k raskt tilbake mot $W_{\max}$, men sakk ned n\ae r $W_{\max}$
-    \item $K$ = tidspunkt da vinduet n\aa r $W_{\max}$ (konfigurerbar)
-    \item \O kning av $W$ som funksjon av \textbf{kuben} av avstanden mellom n\aa v\ae rende tid og $K$
-    \item St\o rre \o kninger n\aa r langt fra $K$, mindre \o kninger n\ae r $K$ (forsiktig)
+    \item $W_{\max}$ = send rate when congestion was last detected
+    \item After halving cwnd: increase quickly back toward $W_{\max}$, but slow down near $W_{\max}$
+    \item $K$ = point in time when the window reaches $W_{\max}$ (configurable)
+    \item Increase of $W$ as a function of the \textbf{cube} of the distance between current time and $K$
+    \item Larger increases when far from $K$, smaller increases near $K$ (cautious)
 \end{itemize}
 
-\textbf{Fordeler:}
+\textbf{Advantages:}
 \begin{itemize}[noitemsep]
-    \item Uavhengig av RTT (bruker veggklokketid)
-    \item Rettferdig p\aa\ tvers av ulike RTT-er
-    \item H\o yere gjennomstr\o mning enn klassisk TCP p\aa\ h\o yhastighetslenker
+    \item Independent of RTT (uses wall-clock time)
+    \item Fair across different RTTs
+    \item Higher throughput than classic TCP on high-speed links
 \end{itemize}
 \end{keybox}
 
-\subsection{TCP Fairness -- Rettferdighet}
+\subsection{TCP Fairness}
 
 \begin{keybox}[TCP Fairness]
-\textbf{M\aa l:} Hvis $K$ TCP-sesjoner deler en flaskehalslenke med kapasitet $R$, b\o r hver f\aa\ gjennomsnittlig rate $R/K$.
+\textbf{Goal:} If $K$ TCP sessions share a bottleneck link with capacity $R$, each should get an average rate of $R/K$.
 
-\textbf{Hvorfor AIMD gir rettferdighet:}
+\textbf{Why AIMD gives fairness:}
 \begin{itemize}[noitemsep]
-    \item Additive Increase: begge sesjoner \o ker med stigning 1 (parallelt med likedelingslinjen)
-    \item Multiplicative Decrease: begge halverer (beveger seg mot likedelingslinjen)
-    \item Over tid konvergerer sesjonene mot lik andel av b\aa ndbredden
+    \item Additive Increase: both sessions increase with slope 1 (parallel to the equal-share line)
+    \item Multiplicative Decrease: both halve (moves toward the equal-share line)
+    \item Over time the sessions converge toward an equal share of the bandwidth
 \end{itemize}
 
-\textbf{NB:} Dette er et veldig teoretisk resultat -- i praksis p\aa virker RTT, antall tilkoblinger per applikasjon, og UDP-trafikk (som ikke har metningskontroll) rettferdigheten.
+\textbf{Note:} This is a very theoretical result -- in practice, RTT, number of connections per application, and UDP traffic (which has no congestion control) affect fairness.
 \end{keybox}
 
-\subsection{Bottleneck-lenken}
+\subsection{The Bottleneck Link}
 
-\begin{warnbox}[Bottleneck-lenke og TCP-oppf\o rsel]
-TCP (\aa de klassisk og CUBIC) \o ker senderaten til pakketap oppst\aa r ved en ruters utgang -- \textbf{bottleneck-lenken}.
+\begin{warnbox}[Bottleneck Link and TCP Behavior]
+TCP (both classic and CUBIC) increases the send rate until packet loss occurs at a router's output -- the \textbf{bottleneck link}.
 
-\textbf{Viktige innsikter:}
+\textbf{Key insights:}
 \begin{itemize}[noitemsep]
-    \item \O kt TCP-senderate \textbf{vil ikke} \o ke ende-til-ende-gjennomstr\o mning n\aa r bottleneck er mettet
-    \item \O kt senderate \textbf{vil} \o ke m\aa lt RTT (pga. k\o er)
-    \item M\aa l: ``Hold ende-til-ende-r\o ret akkurat fullt, men ikke fullere''
+    \item Increased TCP send rate \textbf{will not} increase end-to-end throughput when the bottleneck is saturated
+    \item Increased send rate \textbf{will} increase measured RTT (due to queues)
+    \item Goal: ``Keep the end-to-end pipe exactly full, but not fuller''
 \end{itemize}
 \end{warnbox}
 
 %=============================================================================
-\section{Evolusjon av transportlags-funksjonalitet (3.8)}
+\section{Evolution of Transport Layer Functionality (3.8)}
 %=============================================================================
 
-\subsection{Utfordringer med TCP}
+\subsection{Challenges with TCP}
 
-\begin{keybox}[Ulike scenarier -- ulike utfordringer]
+\begin{keybox}[Different Scenarios -- Different Challenges]
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-\textbf{Scenario} & \textbf{Utfordring} \\
+\textbf{Scenario} & \textbf{Challenge} \\
 \midrule
-Lange, fete r\o r (store dataoverf\o ringer) & Mange pakker ``in flight''; tap stopper pipeline \\
-Tr\aa dl\o se nettverk & Tap pga.\ st\o y tolkes som metning \\
-Lange forsinkelser & Ekstremt lang RTT \\
-Datasenternettverk & Latens-sensitiv \\
-Bakgrunnstrafikk & Lav-prioritets TCP-flyter \\
+Long, fat pipes (large data transfers) & Many packets ``in flight''; loss stops pipeline \\
+Wireless networks & Loss due to noise interpreted as congestion \\
+Long delays & Extremely long RTT \\
+Datacenter networks & Latency-sensitive \\
+Background traffic & Low-priority TCP flows \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -979,23 +979,23 @@ Bakgrunnstrafikk & Lav-prioritets TCP-flyter \\
 
 \subsection{QUIC -- Quick UDP Internet Connections}
 
-\begin{keybox}[QUIC og HTTP/3]
-\textbf{QUIC} er en applikasjonslags-protokoll bygget \textbf{over UDP} som gir:
+\begin{keybox}[QUIC and HTTP/3]
+\textbf{QUIC} is an application layer protocol built \textbf{over UDP} that provides:
 \begin{itemize}[noitemsep]
-    \item P\aa litelig dataoverf\o ring
-    \item Metningskontroll
-    \item Autentisering og kryptering
-    \item Tilkoblingsoppsett p\aa\ \textbf{1 RTT} (vs. TCP+TLS = 2 serielleh\aa ndtrykk)
+    \item Reliable data transfer
+    \item Congestion control
+    \item Authentication and encryption
+    \item Connection setup in \textbf{1 RTT} (vs. TCP+TLS = 2 serial handshakes)
 \end{itemize}
 
-\textbf{HTTP/3 = HTTP/2 (slanket) over QUIC over UDP}
+\textbf{HTTP/3 = HTTP/2 (slimmed) over QUIC over UDP}
 
-\textbf{Fordeler over TCP:}
+\textbf{Advantages over TCP:}
 \begin{itemize}[noitemsep]
-    \item Flere applikasjonsniv\aa\ ``str\o mmer'' multiplekset over \'{e}n QUIC-tilkobling
-    \item Str\o mmene er \textbf{uavhengige} -- unng\aa r TCPs head-of-line blocking
-    \item Separat p\aa litelig overf\o ring og sikkerhet per str\o m
-    \item Felles metningskontroll p\aa\ tvers av str\o mmer
+    \item Multiple application-level ``streams'' multiplexed over one QUIC connection
+    \item Streams are \textbf{independent} -- avoids TCP's head-of-line blocking
+    \item Separate reliable transfer and security per stream
+    \item Shared congestion control across streams
 \end{itemize}
 \end{keybox}
 
@@ -1015,7 +1015,7 @@ Bakgrunnstrafikk & Lav-prioritets TCP-flyter \\
     % HTTP/3 over QUIC stack
     \node at (7, 4.5) {\textbf{HTTP/3 over QUIC}};
     \draw[fill=lightblue] (5,3) rectangle (9,4);
-    \node at (7,3.5) {\small HTTP/2 (slanket)};
+    \node at (7,3.5) {\small HTTP/2 (slimmed)};
     \draw[fill=lightyellow] (5,2) rectangle (9,3);
     \node at (7,2.5) {\small QUIC};
     \draw[fill=lightgreen] (5,1) rectangle (9,2);
@@ -1024,70 +1024,70 @@ Bakgrunnstrafikk & Lav-prioritets TCP-flyter \\
     \node at (7,0.5) {\small IP};
 
     % Labels
-    \node[right] at (9.5, 3.5) {\scriptsize Applikasjon};
+    \node[right] at (9.5, 3.5) {\scriptsize Application};
     \node[right] at (9.5, 1.5) {\scriptsize Transport};
-    \node[right] at (9.5, 0.5) {\scriptsize Nettverk};
+    \node[right] at (9.5, 0.5) {\scriptsize Network};
 \end{tikzpicture}
 \end{center}
 
-\subsection{TCPs historiske utvikling}
+\subsection{Historical Development of TCP}
 
 \begin{center}
 \begin{tabular}{lll}
 \toprule
-\textbf{\AA r} & \textbf{Milepæl} & \textbf{Kommentar} \\
+\textbf{Year} & \textbf{Milestone} & \textbf{Comment} \\
 \midrule
-1980--81 & RFC 761 / RFC 793 & Opprinnelig TCP (kun Connection + Transfer) \\
+1980--81 & RFC 761 / RFC 793 & Original TCP (Connection + Transfer only) \\
 1988 & TCP Tahoe (BSD) & Jacobson: Slow Start + Congestion Avoidance \\
 1997 & TCP Reno (RFC 2001/2581) & Fast Retransmit + Fast Recovery \\
-2005 & BIC TCP & Binm\ae r s\o k etter optimal vindusstm\o rrelse \\
-2018 & TCP CUBIC & Kubisk funksjon, standard i Linux \\
+2005 & BIC TCP & Binary search for optimal window size \\
+2018 & TCP CUBIC & Cubic function, default in Linux \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 %=============================================================================
-\section{Oppsummering}
+\section{Summary}
 %=============================================================================
 
-\begin{keybox}[Kapittel 3 -- Hovedpunkter]
+\begin{keybox}[Chapter 3 -- Key Points]
 \begin{itemize}[noitemsep]
-    \item \textbf{Transportlaget} gir logisk kommunikasjon mellom \emph{prosesser} (ikke verter)
-    \item \textbf{Multipleksing/demultipleksing:} Portnumre dirigerer til riktig sokkel (UDP: 2-tuppel, TCP: 4-tuppel)
-    \item \textbf{UDP:} Enkel, tilkoblingsl\o s, ``best effort'' -- bare mux/demux + sjekksum
-    \item \textbf{P\aa litelig dataoverf\o ring:} Sjekksum, sekvensnumre, ACK, timer, retransmisjon
-    \item \textbf{Pipelining:} GBN (kumulativ ACK, retransmitter alle) vs. SR (individuell ACK, buffer ute-av-rekkef\o lge)
-    \item \textbf{TCP:} P\aa litelig, ordnet bytestr\o m med flytkontroll, metningskontroll og tilkoblingsadministrasjon
-    \item \textbf{TCP metningskontroll:} Slow Start (eksponentiell), Congestion Avoidance (AIMD), Fast Recovery
-    \item \textbf{TCP CUBIC:} Kubisk vindusm\o kning, standard i Linux, RTT-uavhengig
-    \item \textbf{QUIC/HTTP/3:} Moderne alternativ over UDP med 1-RTT tilkobling og uavhengige str\o mmer
+    \item \textbf{Transport layer} provides logical communication between \emph{processes} (not hosts)
+    \item \textbf{Multiplexing/demultiplexing:} Port numbers direct to the correct socket (UDP: 2-tuple, TCP: 4-tuple)
+    \item \textbf{UDP:} Simple, connectionless, ``best effort'' -- just mux/demux + checksum
+    \item \textbf{Reliable data transfer:} Checksum, sequence numbers, ACK, timer, retransmission
+    \item \textbf{Pipelining:} GBN (cumulative ACK, retransmit all) vs. SR (individual ACK, buffer out-of-order)
+    \item \textbf{TCP:} Reliable, ordered byte stream with flow control, congestion control and connection management
+    \item \textbf{TCP congestion control:} Slow Start (exponential), Congestion Avoidance (AIMD), Fast Recovery
+    \item \textbf{TCP CUBIC:} Cubic window increase, default in Linux, RTT-independent
+    \item \textbf{QUIC/HTTP/3:} Modern alternative over UDP with 1-RTT connection and independent streams
 \end{itemize}
 \end{keybox}
 
 %=============================================================================
-\section*{Formelsammendrag}
+\section*{Formula Summary}
 %=============================================================================
 
-\begin{formulabox}[Alle viktige formler -- Kapittel 3]
+\begin{formulabox}[All Important Formulas -- Chapter 3]
 
-\textbf{UDP sjekksum:} 1-er-komplement av summen av alle 16-biters ord.
+\textbf{UDP checksum:} 1's complement of the sum of all 16-bit words.
 
-\textbf{Stopp-og-vent utnyttelse:}
+\textbf{Stop-and-wait utilization:}
 \[
 U_{\text{sender}} = \frac{L/R}{RTT + L/R}
 \]
 
-\textbf{Pipelining utnyttelse ($n$ pakker):}
+\textbf{Pipelining utilization ($n$ packets):}
 \[
 U_{\text{sender}} = \frac{n \cdot L/R}{RTT + L/R}
 \]
 
 \textbf{MSS:}
 \[
-\text{MSS} = \text{MTU} - \text{IP-header} - \text{TCP-header} = 1500 - 20 - 20 = 1460 \text{ byte}
+\text{MSS} = \text{MTU} - \text{IP header} - \text{TCP header} = 1500 - 20 - 20 = 1460 \text{ bytes}
 \]
 
-\textbf{RTT-estimering:}
+\textbf{RTT estimation:}
 \begin{align*}
 \text{EstimatedRTT} &= (1 - \alpha) \cdot \text{EstimatedRTT} + \alpha \cdot \text{SampleRTT} & (\alpha = 0{,}125) \\
 \text{DevRTT} &= (1 - \beta) \cdot \text{DevRTT} + \beta \cdot |\text{SampleRTT} - \text{EstimatedRTT}| & (\beta = 0{,}25)
@@ -1098,31 +1098,31 @@ U_{\text{sender}} = \frac{n \cdot L/R}{RTT + L/R}
 \text{TimeoutInterval} = \text{EstimatedRTT} + 4 \cdot \text{DevRTT}
 \]
 
-\textbf{TCP flytkontroll:}
+\textbf{TCP flow control:}
 \[
 \text{rwnd} = \text{RcvBuffer} - (\text{LastByteRcvd} - \text{LastByteRead})
 \]
 
-\textbf{TCP sendebegrensning:}
+\textbf{TCP send limit:}
 \[
 \text{LastByteSent} - \text{LastByteAcked} \leq \min(\text{cwnd}, \text{rwnd})
 \]
 
-\textbf{TCP senderate:}
+\textbf{TCP send rate:}
 \[
-\text{rate} \approx \frac{\min(\text{cwnd}, \text{rwnd})}{\text{RTT}} \text{ bytes/sek}
+\text{rate} \approx \frac{\min(\text{cwnd}, \text{rwnd})}{\text{RTT}} \text{ bytes/sec}
 \]
 
-\textbf{Slow Start (per ACK):} cwnd = cwnd + MSS \quad (dobling per RTT)
+\textbf{Slow Start (per ACK):} cwnd = cwnd + MSS \quad (doubling per RTT)
 
 \textbf{Congestion Avoidance (per ACK):} cwnd = cwnd + MSS $\cdot$ (MSS/cwnd) \quad (+1 MSS per RTT)
 
-\textbf{Ved timeout:} ssthresh = cwnd/2, \quad cwnd = 1 MSS
+\textbf{On timeout:} ssthresh = cwnd/2, \quad cwnd = 1 MSS
 
-\textbf{Ved 3 dup ACK:} ssthresh = cwnd/2, \quad cwnd = ssthresh + 3 MSS
+\textbf{On 3 dup ACK:} ssthresh = cwnd/2, \quad cwnd = ssthresh + 3 MSS
 
-\textbf{TCP fairness:} $K$ sesjoner, kapasitet $R$ $\Rightarrow$ hver f\aa r $R/K$
+\textbf{TCP fairness:} $K$ sessions, capacity $R$ $\Rightarrow$ each gets $R/K$
 
-\textbf{SR vindusst\o rrelse:} $N \leq k/2$ der $k$ = antall sekvensnumre
+\textbf{SR window size:} $N \leq k/2$ where $k$ = number of sequence numbers
 
 \end{formulabox}

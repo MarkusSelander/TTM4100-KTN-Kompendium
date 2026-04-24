@@ -1,57 +1,57 @@
-\section{9.1 – Multimedia Applications og Egenskaper}
+\section{9.1 -- Multimedia Applications and Properties}
 % ===========================================================
 
-\begin{tcolorbox}[keybox, title=Audio -- Digitalisering]
-\textbf{Analog-til-digital konvertering (sampling):}
+\begin{tcolorbox}[keybox, title=Audio -- Digitization]
+\textbf{Analog-to-digital conversion (sampling):}
 \begin{itemize}[nosep]
-  \item Analog signal samples med fast frekvens
-  \item Hvert sample kvantiseres til én av $2^n$ verdier, kodes med $n$ bits
+  \item Analog signal sampled at a fixed frequency
+  \item Each sample quantized to one of $2^n$ values, encoded with $n$ bits
 \end{itemize}
 
 \medskip
-\textbf{Typiske parametere:}
+\textbf{Typical parameters:}
 \begin{center}
 \begin{tabular}{lll}
 \toprule
-\textbf{Bruksområde} & \textbf{Samplingsrate} & \textbf{Bitrate} \\
+\textbf{Use case} & \textbf{Sampling rate} & \textbf{Bit rate} \\
 \midrule
-Telefoni & 8\,000 samples/sek & 64 kbps (8 bit/sample) \\
-CD-lyd & 44\,100 samples/sek & 1.4 Mbps (16 bit, stereo) \\
+Telephony & 8\,000 samples/sec & 64 kbps (8 bit/sample) \\
+CD audio & 44\,100 samples/sec & 1.4 Mbps (16 bit, stereo) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \medskip
-\textbf{Eksempel:} Telefoni: $8\,000 \times 8\,\text{bit} = 64\,000\,\text{bps} = 64\,\text{kbps}$
+\textbf{Example:} Telephony: $8\,000 \times 8\,\text{bit} = 64\,000\,\text{bps} = 64\,\text{kbps}$
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=Video -- Digitalisering og komprimering]
-\textbf{Grunnleggende:}
+\begin{tcolorbox}[keybox, title=Video -- Digitization and compression]
+\textbf{Basics:}
 \begin{itemize}[nosep]
-  \item Video = sekvens av bilder (frames), typisk 24 frames/sekund
-  \item Hvert bilde = array av piksler, hver piksel kodes med bits (luma + chroma)
+  \item Video = sequence of images (frames), typically 24 frames/second
+  \item Each image = array of pixels, each pixel encoded with bits (luma + chroma)
 \end{itemize}
 
 \medskip
-\textbf{Komprimeringsteknikker:}
+\textbf{Compression techniques:}
 \begin{itemize}[nosep]
-  \item \textbf{Spatial coding} (intra-frame): redundans innad i ett bilde -- send ett eksempel-piksel + antall gjentak i stedet for alle piksler
-  \item \textbf{Temporal coding} (inter-frame): redundans mellom frames -- send differansen fra forrige frame (kun endringer)
+  \item \textbf{Spatial coding} (intra-frame): redundancy within a single image -- send one example pixel + repeat count instead of all pixels
+  \item \textbf{Temporal coding} (inter-frame): redundancy between frames -- send the difference from the previous frame (changes only)
 \end{itemize}
 
 \medskip
 \textbf{CBR vs. VBR:}
 \begin{itemize}[nosep]
-  \item \textbf{CBR} (Constant Bit Rate): fast kodingsrate (enklere for nettverk)
-  \item \textbf{VBR} (Variable Bit Rate): varierer med innholdets kompleksitet (bedre kvalitet)
+  \item \textbf{CBR} (Constant Bit Rate): fixed encoding rate (simpler for the network)
+  \item \textbf{VBR} (Variable Bit Rate): varies with content complexity (better quality)
 \end{itemize}
 
 \medskip
-\textbf{Typiske bitrater:}
+\textbf{Typical bit rates:}
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-\textbf{Format} & \textbf{Bitrate} \\
+\textbf{Format} & \textbf{Bit rate} \\
 \midrule
 MPEG-1 (CD-ROM) & $\sim$1.5 Mbps \\
 MPEG-2 (DVD) & 3--6 Mbps \\
@@ -61,474 +61,474 @@ MPEG-4 & $<$1 Mbps \\
 \end{center}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=Tre typer multimediaapplikasjoner]
+\begin{tcolorbox}[keybox, title=Three types of multimedia applications]
 \begin{enumerate}[nosep]
   \item \textbf{Streaming stored audio/video}
     \begin{itemize}[nosep]
-      \item Forhåndsinnspilt innhold lastes fra server
-      \item Kan pause, spole, hoppe (VCR-funksjonalitet)
-      \item Eksempler: YouTube, Netflix
-      \item Forsinkelsestoleranse: sekunder (bufres)
+      \item Pre-recorded content loaded from server
+      \item Can pause, rewind, skip (VCR functionality)
+      \item Examples: YouTube, Netflix
+      \item Delay tolerance: seconds (buffered)
     \end{itemize}
   \item \textbf{Conversational VoIP}
     \begin{itemize}[nosep]
-      \item Toveis, sanntidssamtale
-      \item Svært forsinkelsessensitiv: $<150\,\text{ms}$ ideelt, $>400\,\text{ms}$ uakseptabelt
-      \item Eksempler: Skype, Teams, telefoni over IP
+      \item Two-way, real-time conversation
+      \item Very delay-sensitive: $<150\,\text{ms}$ ideal, $>400\,\text{ms}$ unacceptable
+      \item Examples: Skype, Teams, telephony over IP
     \end{itemize}
   \item \textbf{Streaming live audio/video}
     \begin{itemize}[nosep]
-      \item Live-sending til mange mottakere
-      \item Mer tolerant for forsinkelse enn VoIP, men fortsatt tidssensitiv
-      \item Eksempler: live TV, sport, radio
+      \item Live broadcast to many receivers
+      \item More tolerant of delay than VoIP, but still time-sensitive
+      \item Examples: live TV, sports, radio
     \end{itemize}
 \end{enumerate}
 \end{tcolorbox}
 
 % ===========================================================
-\section{9.2 – Streaming Stored Video}
+\section{9.2 -- Streaming Stored Video}
 % ===========================================================
 
 \begin{tcolorbox}[keybox, title=Continuous Playout Constraint]
-\textbf{Krav:} Avspilling må skje med opprinnelig innspillingsrate -- once started, frames må vises med riktig timing.
+\textbf{Requirement:} Playback must occur at the original recording rate -- once started, frames must be displayed with correct timing.
 
 \medskip
-\textbf{Problemet -- nettverksjitter:}
+\textbf{The problem -- network jitter:}
 \begin{itemize}[nosep]
-  \item Pakker ankommer med varierende forsinkelse (jitter)
-  \item Uten buffer: avspillingen hakker
-  \item Løsning: \textbf{klientside-buffer} -- samler pakker og spiller av med en planlagt forsinkelse
+  \item Packets arrive with varying delay (jitter)
+  \item Without buffer: playback stutters
+  \item Solution: \textbf{client-side buffer} -- collects packets and plays back with a planned delay
 \end{itemize}
 
 \medskip
 \textbf{Playout delay (initial buffering):}
 \begin{itemize}[nosep]
-  \item Klient venter med å starte avspilling til nok data er bufret
-  \item Trade-off: større buffer = mer robust mot jitter, men lengre ventetid
+  \item Client waits before starting playback until enough data is buffered
+  \item Trade-off: larger buffer = more robust against jitter, but longer wait time
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[formulabox, title=Buffering og avspillingsrate]
-La $x$ = nettverksrate inn i buffer, $r$ = avspillingsrate (bitrate til videoen):
+\begin{tcolorbox}[formulabox, title=Buffering and playback rate]
+Let $x$ = network rate into buffer, $r$ = playback rate (video bit rate):
 
 \medskip
 \begin{center}
 \begin{tabular}{lll}
 \toprule
-\textbf{Tilstand} & \textbf{Betingelse} & \textbf{Resultat} \\
+\textbf{State} & \textbf{Condition} & \textbf{Result} \\
 \midrule
-Buffer tømmes & $x < r$ & Frysing/stopp -- bufferen går tom \\
-Buffer fylles & $x > r$ & OK -- buffer akkumulerer mer data \\
-Steady state & $x = r$ & Jevn avspilling uten frysing \\
+Buffer drains & $x < r$ & Freeze/stall -- buffer runs empty \\
+Buffer fills & $x > r$ & OK -- buffer accumulates more data \\
+Steady state & $x = r$ & Smooth playback without freezing \\
 \bottomrule
 \end{tabular}
 \end{center}
 \end{tcolorbox}
 
 \begin{tcolorbox}[keybox, title=UDP Streaming]
-\textbf{Prinsipp:}
+\textbf{Principle:}
 \begin{itemize}[nosep]
-  \item Server sender video med konstant rate tilpasset klientens kapasitet
-  \item UDP: ingen re-transmission, ingen congestion control
-  \item RTP brukes for å strukturere strømmen
-  \item Kort playout delay: typisk 2--5 sekunder
+  \item Server sends video at a constant rate matched to client capacity
+  \item UDP: no re-transmission, no congestion control
+  \item RTP used to structure the stream
+  \item Short playout delay: typically 2--5 seconds
 \end{itemize}
 
 \medskip
-\textbf{Ulemper med UDP streaming:}
+\textbf{Disadvantages of UDP streaming:}
 \begin{itemize}[nosep]
-  \item Kan bli blokkert av brannmurer (UDP blokkeres ofte)
-  \item Ingen garanti for levering
-  \item Vanskelig å skalere (serverbelastning)
+  \item Can be blocked by firewalls (UDP is often blocked)
+  \item No guarantee of delivery
+  \item Difficult to scale (server load)
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=HTTP Streaming - den dominerende metoden]
-\textbf{Prinsipp:}
+\begin{tcolorbox}[keybox, title=HTTP Streaming -- the dominant method]
+\textbf{Principle:}
 \begin{itemize}[nosep]
-  \item Video lagres som vanlig fil på HTTP-server
-  \item Klient bruker HTTP GET for å hente filen
-  \item TCP styrer overføringshastigheten (congestion control)
-  \item Større playout delay nødvendig (TCP variasjoner i rate)
+  \item Video stored as a regular file on an HTTP server
+  \item Client uses HTTP GET to fetch the file
+  \item TCP controls the transfer rate (congestion control)
+  \item Larger playout delay required (TCP rate variations)
 \end{itemize}
 
 \medskip
-\textbf{Fordeler med HTTP streaming:}
+\textbf{Advantages of HTTP streaming:}
 \begin{itemize}[nosep]
-  \item Passerer brannmurer (port 80/443)
-  \item Utnytter eksisterende HTTP-infrastruktur (CDN, cacher)
-  \item TCP re-transmission gir pålitelig levering
-  \item Enklere å integrere med webapplikasjoner
+  \item Passes through firewalls (port 80/443)
+  \item Leverages existing HTTP infrastructure (CDN, caches)
+  \item TCP re-transmission provides reliable delivery
+  \item Easier to integrate with web applications
 \end{itemize}
 
 \medskip
 \textbf{DASH -- Dynamic Adaptive Streaming over HTTP:}
 \begin{itemize}[nosep]
-  \item Video kodet i flere kvalitetsnivåer (bitrater)
-  \item Klient velger best mulig kvalitet basert på tilgjengelig båndbredde
-  \item Dynamisk tilpasning -- bytter kvalitet under avspilling
-  \item Eksempel: Netflix, YouTube adaptiv streaming
+  \item Video encoded at multiple quality levels (bit rates)
+  \item Client selects the best possible quality based on available bandwidth
+  \item Dynamic adaptation -- switches quality during playback
+  \item Example: Netflix, YouTube adaptive streaming
 \end{itemize}
 \end{tcolorbox}
 
 \begin{tcolorbox}[keybox, title=CDN -- Content Distribution Networks]
-\textbf{Problemet:} Videofiler er store; å sende dem fra én sentral server er ineffektivt.
+\textbf{The problem:} Video files are large; sending them from one central server is inefficient.
 
 \medskip
-\textbf{CDN-løsningen:}
+\textbf{The CDN solution:}
 \begin{itemize}[nosep]
-  \item Geografisk distribuerte servere lagrer kopier av innhold
-  \item Brukeren dirigeres til nærmeste/beste CDN-node
-  \item Reduserer forsinkelse og belastning på opprinnelsesserver
-  \item Eksempler: Akamai, Cloudflare, Amazon CloudFront
+  \item Geographically distributed servers store copies of content
+  \item User is directed to the nearest/best CDN node
+  \item Reduces delay and load on the origin server
+  \item Examples: Akamai, Cloudflare, Amazon CloudFront
 \end{itemize}
 
 \medskip
-\textbf{Fordeler:}
+\textbf{Advantages:}
 \begin{itemize}[nosep]
-  \item Skalerer til mange samtidige brukere
-  \item Redundans -- hvis én node feiler, kan andre ta over
-  \item Lavere latens for sluttbrukere
+  \item Scales to many simultaneous users
+  \item Redundancy -- if one node fails, others can take over
+  \item Lower latency for end users
 \end{itemize}
 \end{tcolorbox}
 
 % ===========================================================
-\section{9.3 – Voice-over-IP - VoIP}
+\section{9.3 -- Voice-over-IP -- VoIP}
 % ===========================================================
 
-\begin{tcolorbox}[keybox, title=VoIP -- Kjennetegn og krav]
-\textbf{Forsinkelseskrav:}
+\begin{tcolorbox}[keybox, title=VoIP -- Characteristics and requirements]
+\textbf{Delay requirements:}
 \begin{itemize}[nosep]
-  \item $< 150\,\text{ms}$: God, merkbar forsinkelse
-  \item $150$--$400\,\text{ms}$: Akseptabelt
-  \item $> 400\,\text{ms}$: Uakseptabelt for interaktiv tale
+  \item $< 150\,\text{ms}$: Good, noticeable delay
+  \item $150$--$400\,\text{ms}$: Acceptable
+  \item $> 400\,\text{ms}$: Unacceptable for interactive speech
 \end{itemize}
 
 \medskip
-\textbf{Tale-karakteristikk:}
+\textbf{Speech characteristics:}
 \begin{itemize}[nosep]
-  \item \textbf{Talk spurts} og \textbf{silence periods} -- typisk 50\% av tid er stille
-  \item Under talk spurt: data genereres med 64 kbps
-  \item 20 ms per chunk: $64\,\text{kbps} \times 0.02\,\text{s} = 1280\,\text{bits} = 160\,\text{bytes}$ per pakke
-  \item Pakke = 20 bytes RTP-header + 8 bytes UDP-header + 20 bytes IP-header + 160 bytes data
+  \item \textbf{Talk spurts} and \textbf{silence periods} -- typically 50\% of the time is silent
+  \item During talk spurt: data generated at 64 kbps
+  \item 20 ms per chunk: $64\,\text{kbps} \times 0.02\,\text{s} = 1280\,\text{bits} = 160\,\text{bytes}$ per packet
+  \item Packet = 20 bytes RTP header + 8 bytes UDP header + 20 bytes IP header + 160 bytes data
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=Pakkettap i VoIP]
-\textbf{To typer tap:}
+\begin{tcolorbox}[keybox, title=Packet loss in VoIP]
+\textbf{Two types of loss:}
 \begin{enumerate}[nosep]
-  \item \textbf{Nettverkstap}: pakken droppes av router (kø-overflow)
-  \item \textbf{Forsinkelses-tap}: pakken ankommer for sent til å spilles av (etter playout-deadline)
+  \item \textbf{Network loss}: packet dropped by router (queue overflow)
+  \item \textbf{Delay loss}: packet arrives too late to be played (after playout deadline)
 \end{enumerate}
 
 \medskip
-\textbf{Toleranse:}
+\textbf{Tolerance:}
 \begin{itemize}[nosep]
-  \item VoIP tåler typisk 1--10\% pakketap (avhengig av codec og FEC)
-  \item Lavere taperate = bedre talekvalitet
+  \item VoIP typically tolerates 1--10\% packet loss (depending on codec and FEC)
+  \item Lower loss rate = better speech quality
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=Fast Playout Delay]
-\textbf{Prinsipp:}
+\begin{tcolorbox}[keybox, title=Fixed Playout Delay]
+\textbf{Principle:}
 \begin{itemize}[nosep]
-  \item Klient venter fast tid $q$ ms etter sending før avspilling
-  \item Pakke med timestamp $t$ spilles av ved klokketime $t + q$
-  \item Pakker som ankommer etter $t + q$ forkastes (forsinkelsestap)
+  \item Client waits a fixed time $q$ ms after sending before playback
+  \item Packet with timestamp $t$ is played at clock time $t + q$
+  \item Packets arriving after $t + q$ are discarded (delay loss)
 \end{itemize}
 
 \medskip
 \textbf{Trade-off:}
 \begin{itemize}[nosep]
-  \item Stor $q$: Færre forsinkelsestap, men dårligere interaktivitet
-  \item Liten $q$: Bedre interaktivitet, men flere forsinkelsestap
+  \item Large $q$: Fewer delay losses, but worse interactivity
+  \item Small $q$: Better interactivity, but more delay losses
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[formulabox, title=Adaptiv Playout Delay -- EWMA]
-\textbf{Mål:} Estimér nettverksforsinkelse og jitter dynamisk; tilpass playout-delay.
+\begin{tcolorbox}[formulabox, title=Adaptive Playout Delay -- EWMA]
+\textbf{Goal:} Estimate network delay and jitter dynamically; adapt playout delay.
 
 \medskip
-\textbf{Definisjoner:}
+\textbf{Definitions:}
 \begin{itemize}[nosep]
-  \item $t_i$ = timestamp på pakke $i$ (sendetidspunkt hos avsender)
-  \item $r_i$ = mottakstidspunkt for pakke $i$ (klokkeslett hos mottaker)
-  \item $d_i$ = estimert nettverksforsinkelse for pakke $i$
-  \item $v_i$ = estimert jitter (avvik fra gjennomsnittlig forsinkelse)
-  \item $\alpha, \beta$ = glattefaktorer (typisk $\alpha = 0.1$, $\beta = 0.25$)
+  \item $t_i$ = timestamp of packet $i$ (send time at sender)
+  \item $r_i$ = receive time of packet $i$ (clock time at receiver)
+  \item $d_i$ = estimated network delay for packet $i$
+  \item $v_i$ = estimated jitter (deviation from average delay)
+  \item $\alpha, \beta$ = smoothing factors (typically $\alpha = 0.1$, $\beta = 0.25$)
 \end{itemize}
 
 \medskip
-\textbf{EWMA-formler:}
+\textbf{EWMA formulas:}
 \begin{align}
   d_i &= (1 - \alpha)\,d_{i-1} + \alpha\,(r_i - t_i) \\
   v_i &= (1 - \beta)\,v_{i-1} + \beta\,|r_i - t_i - d_i|
 \end{align}
 
 \medskip
-\textbf{Playout-tidspunkt for pakke $i$:}
+\textbf{Playout time for packet $i$:}
 \[
   p_i = t_i + d_i + K \cdot v_i
 \]
-der $K$ er en konstant (typisk 4) som bestemmer hvor mye jitter-margin som legges til.
+where $K$ is a constant (typically 4) that determines how much jitter margin is added.
 
 \medskip
-\textbf{Talk spurt-deteksjon:}
+\textbf{Talk spurt detection:}
 \begin{itemize}[nosep]
-  \item Hvis differansen mellom to timestamps $> 20\,\text{ms}$: pakken er starten på ny talk spurt
-  \item Ved start av ny talk spurt: tilpass playout-delay basert på estimert $d_i$ og $v_i$
-  \item Justeringen skjer bare mellom talk spurts -- ikke midt i en setning
+  \item If the difference between two timestamps $> 20\,\text{ms}$: the packet is the start of a new talk spurt
+  \item At the start of a new talk spurt: adjust playout delay based on estimated $d_i$ and $v_i$
+  \item Adjustment happens only between talk spurts -- not in the middle of a sentence
 \end{itemize}
 \end{tcolorbox}
 
 \begin{tcolorbox}[keybox, title=FEC -- Forward Error Correction]
-\textbf{Mål:} Gjenopprette tapte pakker uten re-transmission (for lav latens).
+\textbf{Goal:} Recover lost packets without re-transmission (for low latency).
 
 \medskip
-\textbf{Metode 1 -- Enkel XOR-redundans:}
+\textbf{Method 1 -- Simple XOR redundancy:}
 \begin{itemize}[nosep]
-  \item For hver gruppe på $n$ pakker, send én ekstra redundanspakke = XOR av alle $n$ pakker
-  \item Hvis én pakke tapes, kan den rekonstrueres fra de $n-1$ andre + redundanspakken
-  \item Overhead: $1/n$ ekstra båndbredde
-  \item Fungerer kun hvis \textbf{én} pakke per gruppe tapes
-  \item Introduserer forsinkelse: må vente på hele gruppen
+  \item For each group of $n$ packets, send one extra redundancy packet = XOR of all $n$ packets
+  \item If one packet is lost, it can be reconstructed from the $n-1$ others + the redundancy packet
+  \item Overhead: $1/n$ extra bandwidth
+  \item Works only if \textbf{one} packet per group is lost
+  \item Introduces delay: must wait for the entire group
 \end{itemize}
 
 \medskip
-\textbf{Metode 2 -- Piggyback lavkvalitetskopi:}
+\textbf{Method 2 -- Piggyback low-quality copy:}
 \begin{itemize}[nosep]
-  \item Legg til lavkvalitetskopi av pakke $n-1$ i pakke $n$
-  \item Eksempel: full PCM-kvalitet (64 kbps) + komprimert GSM-kopi (13 kbps) fra forrige pakke
-  \item Hvis pakke $n-1$ tapes, brukes lavkvalitetskopien fra pakke $n$
-  \item Tap av to påfølgende pakker gir hørbart problem
-  \item Lav ekstra overhead, ingen ekstra forsinkelse utover én pakke
+  \item Append a low-quality copy of packet $n-1$ to packet $n$
+  \item Example: full PCM quality (64 kbps) + compressed GSM copy (13 kbps) from previous packet
+  \item If packet $n-1$ is lost, the low-quality copy from packet $n$ is used
+  \item Loss of two consecutive packets produces an audible problem
+  \item Low extra overhead, no additional delay beyond one packet
 \end{itemize}
 
 \medskip
-\textbf{Metode 3 -- Interleaving:}
+\textbf{Method 3 -- Interleaving:}
 \begin{itemize}[nosep]
-  \item Del opp chunks og send dem i blandet rekkefølge
-  \item Eksempel: chunk 1 bit 1,5,9,...; chunk 2 bit 2,6,10,...
-  \item Tap av én pakke medfører tap av spredte bits -- lettere å maskere
-  \item Ingen ekstra overhead, men introduserer \textbf{mer forsinkelse}
+  \item Split chunks and send them in mixed order
+  \item Example: chunk 1 bits 1,5,9,...; chunk 2 bits 2,6,10,...
+  \item Loss of one packet causes loss of scattered bits -- easier to conceal
+  \item No extra overhead, but introduces \textbf{more delay}
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=Skype -- P2P VoIP Arkitektur]
-\textbf{P2P-arkitektur med supernoder:}
+\begin{tcolorbox}[keybox, title=Skype -- P2P VoIP Architecture]
+\textbf{P2P architecture with supernodes:}
 \begin{itemize}[nosep]
-  \item \textbf{Supernoder}: Skype-klienter med god båndbredde/tilgjengelighet -- fungerer som hjelperouter
-  \item \textbf{Overlay network}: Logisk nettverk over IP-nettverket
-  \item Indeks over brukere og deres IP-adresser er distribuert blant supernodene
+  \item \textbf{Supernodes}: Skype clients with good bandwidth/availability -- act as helper routers
+  \item \textbf{Overlay network}: Logical network on top of the IP network
+  \item Index of users and their IP addresses is distributed among the supernodes
 \end{itemize}
 
 \medskip
-\textbf{NAT-traversal:}
+\textbf{NAT traversal:}
 \begin{itemize}[nosep]
-  \item Mange Skype-klienter sitter bak NAT -- kan ikke nås direkte utenfra
-  \item Supernoder brukes som \textbf{relay}: pakker sendes via supernode for å omgå NAT
-  \item Muliggjør VoIP mellom klienter som ellers ikke kan kommunisere direkte
+  \item Many Skype clients are behind NAT -- cannot be reached directly from outside
+  \item Supernodes used as \textbf{relay}: packets sent via supernode to bypass NAT
+  \item Enables VoIP between clients that otherwise cannot communicate directly
 \end{itemize}
 \end{tcolorbox}
 
 % ===========================================================
-\section{9.4.1 – RTP -- Real-Time Transport Protocol}
+\section{9.4.1 -- RTP -- Real-Time Transport Protocol}
 % ===========================================================
 
-\begin{tcolorbox}[keybox, title=RTP -- Oversikt]
-\textbf{Hva er RTP?}
+\begin{tcolorbox}[keybox, title=RTP -- Overview]
+\textbf{What is RTP?}
 \begin{itemize}[nosep]
-  \item Spesifisert i RFC 3550
-  \item Definerer pakkestruktur for lyd og video i sanntid
-  \item Kjører i endesystemer (ikke i nettverksroutere)
-  \item Kjører over \textbf{UDP} (ikke TCP)
-  \item Applikasjoner: VoIP, videokonferanse, streaming
+  \item Specified in RFC 3550
+  \item Defines packet structure for real-time audio and video
+  \item Runs in end systems (not in network routers)
+  \item Runs over \textbf{UDP} (not TCP)
+  \item Applications: VoIP, video conferencing, streaming
 \end{itemize}
 
 \medskip
-\textbf{Hva RTP tilbyr:}
+\textbf{What RTP provides:}
 \begin{itemize}[nosep]
-  \item Payload type identifikasjon (hvilken codec brukes)
-  \item Sekvensnummerering (detektere tap og reordering)
-  \item Timestamping (timing/synkronisering av avspilling)
-  \item Kildeidentifikasjon (SSRC)
+  \item Payload type identification (which codec is used)
+  \item Sequence numbering (detect loss and reordering)
+  \item Timestamping (timing/synchronization of playback)
+  \item Source identification (SSRC)
 \end{itemize}
 
 \medskip
-\textbf{Viktig begrensning:}
+\textbf{Important limitation:}
 \begin{itemize}[nosep]
-  \item RTP tilbyr \textbf{ikke} QoS-garantier
-  \item Routere ser UDP -- ikke RTP (RTP-header er inne i UDP-payload)
-  \item Ingen garanti for forsinkelse, jitter eller tap i nettverket
+  \item RTP does \textbf{not} provide QoS guarantees
+  \item Routers see UDP -- not RTP (RTP header is inside the UDP payload)
+  \item No guarantee of delay, jitter, or loss in the network
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=RTP Header-felt]
+\begin{tcolorbox}[keybox, title=RTP Header fields]
 \begin{center}
 \begin{tabular}{p{3.5cm}p{2cm}p{7cm}}
 \toprule
-\textbf{Felt} & \textbf{Størrelse} & \textbf{Funksjon} \\
+\textbf{Field} & \textbf{Size} & \textbf{Function} \\
 \midrule
-Payload type & 7 bits & Identifiserer codec/format for lyddata \\
-Sequence number & 16 bits & Øker med 1 per pakke; detekterer tap og reordering \\
-Timestamp & 32 bits & Samplingstidspunkt for første byte i pakken; øker med 160 per pakke ved 8 kHz PCM-lyd \\
-SSRC & 32 bits & Synchronization source -- identifiserer kilden (sender) \\
+Payload type & 7 bits & Identifies codec/format for audio data \\
+Sequence number & 16 bits & Increments by 1 per packet; detects loss and reordering \\
+Timestamp & 32 bits & Sampling time of the first byte in the packet; increments by 160 per packet for 8 kHz PCM audio \\
+SSRC & 32 bits & Synchronization source -- identifies the source (sender) \\
 \bottomrule
 \end{tabular}
 \end{center}
 \end{tcolorbox}
 
-\begin{tcolorbox}[keybox, title=RTP Payload Types -- Vanlige kodeker]
+\begin{tcolorbox}[keybox, title=RTP Payload Types -- Common codecs]
 \begin{center}
 \begin{tabular}{p{2cm}p{3.5cm}p{2.5cm}p{5cm}}
 \toprule
-\textbf{PT-nummer} & \textbf{Codec} & \textbf{Bitrate} & \textbf{Kommentar} \\
+\textbf{PT number} & \textbf{Codec} & \textbf{Bit rate} & \textbf{Comment} \\
 \midrule
-0 & PCM mu-law & 64 kbps & Telefoni standard (North America/Japan) \\
-3 & GSM & 13 kbps & Mobiltelefoni; god komprimering \\
-7 & LPC & 2.4 kbps & Svært lav bitrate; lavere kvalitet \\
-26 & Motion JPEG & variabel & Komprimert video (JPEG per frame) \\
-31 & H.261 & variabel & Video videokonferanse (eldre standard) \\
-33 & MPEG-2 video & variabel & DVD-kvalitet video \\
+0 & PCM mu-law & 64 kbps & Telephony standard (North America/Japan) \\
+3 & GSM & 13 kbps & Mobile telephony; good compression \\
+7 & LPC & 2.4 kbps & Very low bit rate; lower quality \\
+26 & Motion JPEG & variable & Compressed video (JPEG per frame) \\
+31 & H.261 & variable & Video conferencing (older standard) \\
+33 & MPEG-2 video & variable & DVD-quality video \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \medskip
-\textbf{Merk:} Payload type-feltet er dynamisk -- applikasjoner kan forhandle andre typer via SDP/SIP (ikke pensum).
+\textbf{Note:} The payload type field is dynamic -- applications can negotiate other types via SDP/SIP (not part of the curriculum).
 \end{tcolorbox}
 
-\begin{tcolorbox}[formulabox, title=RTP Timestamp -- Beregning]
-\textbf{Eksempel -- PCM lyd ved 8 kHz, 20 ms per pakke:}
+\begin{tcolorbox}[formulabox, title=RTP Timestamp -- Calculation]
+\textbf{Example -- PCM audio at 8 kHz, 20 ms per packet:}
 
 \begin{itemize}[nosep]
-  \item Samplingsrate: $8\,000\,\text{samples/sek}$
-  \item Pakkelengde: $20\,\text{ms} = 0.02\,\text{s}$
-  \item Samples per pakke: $8\,000 \times 0.02 = 160\,\text{samples}$
-  \item Timestamp øker med \textbf{160} per pakke (selv om pakken sendes hvert 20 ms)
+  \item Sampling rate: $8\,000\,\text{samples/sec}$
+  \item Packet length: $20\,\text{ms} = 0.02\,\text{s}$
+  \item Samples per packet: $8\,000 \times 0.02 = 160\,\text{samples}$
+  \item Timestamp increments by \textbf{160} per packet (even though the packet is sent every 20 ms)
 \end{itemize}
 
 \medskip
-\textbf{Timestamp er i enheter av samplingstakt -- ikke ms eller sekunder!}
+\textbf{Timestamp is in units of sampling clock -- not ms or seconds!}
 \end{tcolorbox}
 
-\begin{tcolorbox}[warnbox, title=Viktige misforståelser om RTP]
+\begin{tcolorbox}[warnbox, title=Common misconceptions about RTP]
 \begin{itemize}[nosep]
-  \item \textbf{RTP $\neq$ QoS:} RTP garanterer ikke lav forsinkelse eller lav jitter. Det er en pakke-struktur, ikke en QoS-mekanisme.
-  \item \textbf{RTP kjører over UDP -- ikke TCP:} TCP re-transmission og congestion control er for langsom for sanntid.
-  \item \textbf{Routere ser ikke RTP:} RTP-headeren er skjult inne i UDP-datagrammet. Nettverket behandler det som vanlig UDP.
-  \item \textbf{Sekvensnummer $\neq$ garanti:} Sekvensnummer lar mottaker \emph{oppdage} tap, men ikke gjenopprette tapte pakker (det er FECs jobb).
+  \item \textbf{RTP $\neq$ QoS:} RTP does not guarantee low delay or low jitter. It is a packet structure, not a QoS mechanism.
+  \item \textbf{RTP runs over UDP -- not TCP:} TCP re-transmission and congestion control are too slow for real-time.
+  \item \textbf{Routers do not see RTP:} The RTP header is hidden inside the UDP datagram. The network treats it as ordinary UDP.
+  \item \textbf{Sequence number $\neq$ guarantee:} Sequence numbers allow the receiver to \emph{detect} loss, but not recover lost packets (that is FEC's job).
 \end{itemize}
 \end{tcolorbox}
 
 % ===========================================================
-\section{Sammendrag -- Nøkkelkonsepter}
+\section{Summary -- Key Concepts}
 % ===========================================================
 
-\begin{tcolorbox}[keybox, title=Sammendrag -- Alt du må kunne]
-\textbf{9.1 -- Multimedia-egenskaper:}
+\begin{tcolorbox}[keybox, title=Summary -- Everything you need to know]
+\textbf{9.1 -- Multimedia properties:}
 \begin{itemize}[nosep]
-  \item Lyd: sampling 8 kHz telefoni → 64 kbps; 44.1 kHz CD
+  \item Audio: sampling 8 kHz telephony → 64 kbps; 44.1 kHz CD
   \item Video: 24 fps, spatial + temporal coding, CBR vs VBR
-  \item 3 applikasjonstyper: stored streaming, VoIP, live streaming
+  \item 3 application types: stored streaming, VoIP, live streaming
 \end{itemize}
 
 \medskip
 \textbf{9.2 -- Stored streaming:}
 \begin{itemize}[nosep]
-  \item Continuous playout constraint; klientbuffer mot jitter
-  \item Hvis $x < r$: buffer tømmes (frysing); hvis $x > r$: OK
-  \item HTTP streaming dominerer (brannmur-vennlig, CDN, DASH)
-  \item UDP streaming: lavere latens, blokkeres av brannmur
+  \item Continuous playout constraint; client buffer against jitter
+  \item If $x < r$: buffer drains (freezing); if $x > r$: OK
+  \item HTTP streaming dominates (firewall-friendly, CDN, DASH)
+  \item UDP streaming: lower latency, blocked by firewalls
 \end{itemize}
 
 \medskip
 \textbf{9.3 -- VoIP:}
 \begin{itemize}[nosep]
-  \item Krav: $<150\,\text{ms}$; 64 kbps under talk spurt, 160 bytes/20ms-pakke
-  \item Tap: nettverkstap + forsinkelses-tap; toleranse 1--10\%
-  \item Fast playout delay: trade-off tap vs. interaktivitet
-  \item Adaptiv EWMA: $d_i = (1-\alpha)d_{i-1} + \alpha(r_i - t_i)$
-  \item FEC: XOR-redundans, piggyback lavkvalitet, interleaving
-  \item Skype: P2P med supernoder, overlay-nettverk, NAT-relay
+  \item Requirements: $<150\,\text{ms}$; 64 kbps during talk spurt, 160 bytes/20ms packet
+  \item Loss: network loss + delay loss; tolerance 1--10\%
+  \item Fixed playout delay: trade-off loss vs. interactivity
+  \item Adaptive EWMA: $d_i = (1-\alpha)d_{i-1} + \alpha(r_i - t_i)$
+  \item FEC: XOR redundancy, piggyback low quality, interleaving
+  \item Skype: P2P with supernodes, overlay network, NAT relay
 \end{itemize}
 
 \medskip
 \textbf{9.4.1 -- RTP:}
 \begin{itemize}[nosep]
-  \item RFC 3550; over UDP; i endesystemer, ikke routere
+  \item RFC 3550; over UDP; in end systems, not routers
   \item Header: payload type (7b), seq\# (16b), timestamp (32b), SSRC (32b)
-  \item Timestamp øker med 160 per pakke (8 kHz, 20 ms chunks)
-  \item \textbf{Gir ikke QoS}; routere ser bare UDP
+  \item Timestamp increments by 160 per packet (8 kHz, 20 ms chunks)
+  \item \textbf{Does not provide QoS}; routers only see UDP
 \end{itemize}
 \end{tcolorbox}
 
 % ===========================================================
-\section{Eksamensoppgaver}
+\section{Exam Questions}
 % ===========================================================
 
 \begin{tcolorbox}[exambox, title=V24 -- Q1.5.4 -- HTTP vs UDP Streaming]
-\textbf{Spørsmål:} Multimedia streaming kan gjøres ved hjelp av UDP eller HTTP. Hvilke av følgende er grunner til at HTTP streaming er mer populær enn UDP streaming?
+\textbf{Question:} Multimedia streaming can be done using UDP or HTTP. Which of the following are reasons why HTTP streaming is more popular than UDP streaming?
 
 \medskip
-\textbf{Alternativer (velg de riktige):}
+\textbf{Alternatives (select the correct ones):}
 \begin{itemize}[nosep]
-  \item[a)] HTTP streaming har lavere forsinkelse (playout delay)
-  \item[b)] HTTP-pakker passerer brannmurer, UDP blokkeres ofte
-  \item[c)] UDP gir mer pålitelig levering enn TCP
-  \item[d)] HTTP streaming utnytter eksisterende CDN-infrastruktur
-  \item[e)] UDP gir bedre videokvalitet per kbps
+  \item[a)] HTTP streaming has lower delay (playout delay)
+  \item[b)] HTTP packets pass through firewalls; UDP is often blocked
+  \item[c)] UDP provides more reliable delivery than TCP
+  \item[d)] HTTP streaming leverages existing CDN infrastructure
+  \item[e)] UDP provides better video quality per kbps
 \end{itemize}
 
 \medskip
-\textbf{Svar: b og d}
+\textbf{Answer: b and d}
 
 \medskip
-\textbf{Forklaring:}
+\textbf{Explanation:}
 \begin{itemize}[nosep]
-  \item \textbf{b -- Korrekt:} UDP blokkeres hyppig av bedriftsbrannmurer (port-filtrering). HTTP bruker port 80/443 som alltid er åpen.
-  \item \textbf{d -- Korrekt:} HTTP-innhold kan caches og distribueres via CDN (Content Delivery Networks), noe som gir god skalering og lav latens for brukere globalt.
-  \item \textbf{a -- Feil:} HTTP streaming krever \emph{større} playout delay fordi TCP-raten varierer med congestion control.
-  \item \textbf{c -- Feil:} TCP (brukt av HTTP) gir pålitelig levering, ikke UDP.
-  \item \textbf{e -- Feil:} UDP vs TCP påvirker ikke selve videokodingen.
-\end{itemize}
-\end{tcolorbox}
-
-\begin{tcolorbox}[exambox, title=S2025 -- Del I Q1 -- CDN-innholdslevering]
-\textbf{Spørsmål:} En CDN (Content Delivery Network) leverer innhold til brukere. Hva er det beste svaret på hvorfor CDN fungerer effektivt?
-
-\medskip
-\textbf{Alternativ A:} CDN lagrer kopier av innhold på geografisk distribuerte servere, og brukerne dirigeres til nærmeste server.
-
-\medskip
-\textbf{Svar: A}
-
-\medskip
-\textbf{Forklaring:}
-\begin{itemize}[nosep]
-  \item CDN fungerer ved å \textbf{replisere} innhold til mange servere spredt geografisk
-  \item Brukeren dirigeres til sin nærmeste CDN-node (lavest RTT, minst hopp)
-  \item Reduserer belastning på opprinnelsesserver og lavere forsinkelse
-  \item Dette er grunnkonseptet bak tjenester som Netflix, YouTube og Akamai
+  \item \textbf{b -- Correct:} UDP is frequently blocked by corporate firewalls (port filtering). HTTP uses port 80/443 which is always open.
+  \item \textbf{d -- Correct:} HTTP content can be cached and distributed via CDN (Content Delivery Networks), providing good scalability and low latency for users globally.
+  \item \textbf{a -- Wrong:} HTTP streaming requires \emph{larger} playout delay because the TCP rate varies with congestion control.
+  \item \textbf{c -- Wrong:} TCP (used by HTTP) provides reliable delivery, not UDP.
+  \item \textbf{e -- Wrong:} UDP vs TCP does not affect the video encoding itself.
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[exambox, title=Typiske eksamenstemaer -- Kap 9]
-\textbf{Ofte testede konsepter:}
+\begin{tcolorbox}[exambox, title=S2025 -- Part I Q1 -- CDN content delivery]
+\textbf{Question:} A CDN (Content Delivery Network) delivers content to users. What is the best answer for why CDN works effectively?
+
+\medskip
+\textbf{Alternative A:} CDN stores copies of content on geographically distributed servers, and users are directed to the nearest server.
+
+\medskip
+\textbf{Answer: A}
+
+\medskip
+\textbf{Explanation:}
+\begin{itemize}[nosep]
+  \item CDN works by \textbf{replicating} content to many servers spread geographically
+  \item The user is directed to their nearest CDN node (lowest RTT, fewest hops)
+  \item Reduces load on the origin server and lowers delay
+  \item This is the core concept behind services such as Netflix, YouTube, and Akamai
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=Typical exam topics -- Ch. 9]
+\textbf{Frequently tested concepts:}
 
 \begin{enumerate}[nosep]
-  \item \textbf{Forsinkelseskrav VoIP:} $<150\,\text{ms}$ = bra, $>400\,\text{ms}$ = uakseptabelt
-  \item \textbf{Lyddigitalisering:} $8\,000\,\text{samples/s} \times 8\,\text{bit} = 64\,\text{kbps}$ (telefoni)
-  \item \textbf{Pakkeberegning:} 64 kbps, 20 ms chunk $\Rightarrow$ 160 bytes data per pakke
-  \item \textbf{HTTP vs UDP streaming:} HTTP = brannmur-vennlig + CDN-kompatibel; UDP = lavere latens
-  \item \textbf{EWMA-formelen:} $d_i = (1-\alpha)d_{i-1} + \alpha(r_i - t_i)$ -- kunne forklare symbolene
-  \item \textbf{FEC:} Kunne forklare XOR-metoden og piggyback-metoden
-  \item \textbf{RTP header-felt:} payload type (7 bit), seq\# (16 bit), timestamp (32 bit, øker 160/pakke), SSRC (32 bit)
-  \item \textbf{RTP gir ikke QoS} -- viktig felle
-  \item \textbf{CDN:} Geografisk distribusjon av innhold for lav latens og skalering
-  \item \textbf{Interleaving:} Reduserer effekten av burstytap, men øker forsinkelse
+  \item \textbf{VoIP delay requirements:} $<150\,\text{ms}$ = good, $>400\,\text{ms}$ = unacceptable
+  \item \textbf{Audio digitization:} $8\,000\,\text{samples/s} \times 8\,\text{bit} = 64\,\text{kbps}$ (telephony)
+  \item \textbf{Packet calculation:} 64 kbps, 20 ms chunk $\Rightarrow$ 160 bytes data per packet
+  \item \textbf{HTTP vs UDP streaming:} HTTP = firewall-friendly + CDN-compatible; UDP = lower latency
+  \item \textbf{EWMA formula:} $d_i = (1-\alpha)d_{i-1} + \alpha(r_i - t_i)$ -- be able to explain the symbols
+  \item \textbf{FEC:} Be able to explain the XOR method and the piggyback method
+  \item \textbf{RTP header fields:} payload type (7 bit), seq\# (16 bit), timestamp (32 bit, increments 160/packet), SSRC (32 bit)
+  \item \textbf{RTP does not provide QoS} -- important pitfall
+  \item \textbf{CDN:} Geographic distribution of content for low latency and scalability
+  \item \textbf{Interleaving:} Reduces effect of burst loss, but increases delay
 \end{enumerate}
 
 \medskip
-\textbf{Pensumsgrense:} 9.4.2 SIP er \textbf{ikke} pensum -- svar aldri på SIP-spørsmål uten eksplisitt instruksjon.
+\textbf{Curriculum boundary:} 9.4.2 SIP is \textbf{not} in the curriculum -- never answer SIP questions without explicit instruction.
 \end{tcolorbox}
