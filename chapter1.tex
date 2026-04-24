@@ -1,0 +1,786 @@
+\section{Hva er Internett?}
+%=============================================================================
+
+Internett kan beskrives fra to perspektiver: \textbf{``nuts and bolts''} (komponentene) og \textbf{``service''} (tjenestene).
+
+\subsection{``Nuts and Bolts'' -- Komponentperspektivet}
+
+\begin{keybox}[Internett er et ``network of networks'']
+Internett best\aa r av milliarder tilkoblede enheter som kommuniserer via \textbf{pakkesvitsjer} (rutere og svitsjer) over \textbf{kommunikasjonslinker} (fiber, kobber, radio, satellitt).
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    host/.style={rectangle, draw, fill=blue!10, minimum width=1.5cm, minimum height=0.8cm, font=\footnotesize},
+    router/.style={circle, draw, fill=orange!30, minimum size=0.9cm, font=\footnotesize},
+    cloud/.style={ellipse, draw, fill=blue!5, minimum width=4cm, minimum height=2cm},
+    link/.style={thick, -},
+    >=Stealth
+]
+    % ISP Cloud
+    \node[cloud] (isp) at (0,0) {};
+    \node[font=\footnotesize\bfseries, text=ntnu] at (0,0.3) {Nettverkskjerne};
+    \node[font=\footnotesize, text=ntnu] at (0,-0.2) {(ISP-er, rutere)};
+
+    % Routers inside
+    \node[router] (r1) at (-0.8,0) {R};
+    \node[router] (r2) at (0.8,0) {R};
+    \draw[link] (r1) -- (r2);
+
+    % Home network
+    \node[host] (pc1) at (-4.5, 1.5) {PC};
+    \node[host] (phone) at (-4.5, 0) {Mobil};
+    \node[router] (hr) at (-3, 0.75) {\tiny WiFi};
+    \draw[link] (pc1) -- (hr);
+    \draw[link] (phone) -- (hr);
+    \draw[link, blue!60, thick] (hr) -- (r1) node[midway, above, font=\tiny] {aksessnett};
+
+    % Enterprise
+    \node[host] (srv) at (4.5, 1.5) {Server};
+    \node[host] (ws) at (4.5, 0) {PC};
+    \node[router] (er) at (3, 0.75) {\tiny Sw};
+    \draw[link] (srv) -- (er);
+    \draw[link] (ws) -- (er);
+    \draw[link, blue!60, thick] (er) -- (r2) node[midway, above, font=\tiny] {aksessnett};
+
+    % Labels
+    \node[font=\footnotesize\itshape, text=gray] at (-4.5, -1) {Hjemmenettverk};
+    \node[font=\footnotesize\itshape, text=gray] at (4.5, -1) {Bedriftsnettverk};
+
+    % Annotations
+    \draw[decorate, decoration={brace,amplitude=5pt}, thick, ntnu] (-5.2,-0.5) -- (-5.2,2) node[midway, left, font=\footnotesize, text=ntnu, xshift=-3pt] {Edge};
+    \draw[decorate, decoration={brace,amplitude=5pt}, thick, orange!70!black] (-1.8,-1) -- (1.8,-1) node[midway, below, font=\footnotesize, text=orange!70!black, yshift=-3pt] {Core};
+\end{tikzpicture}
+\end{center}
+
+\textbf{Viktige komponenter:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Hosts / endesystemer} -- enheter som kj\o rer nettverksapplikasjoner (PC-er, mobiler, servere, IoT)
+    \item \textbf{Pakkesvitsjer} -- videresender pakker: \emph{rutere} (nettverkslaget) og \emph{svitsjer} (linklaget)
+    \item \textbf{Kommunikasjonslinker} -- fiber, kobber, radio, satellitt. Overf\o ringsrate = \emph{b\aa ndbredde}
+    \item \textbf{Nettverk} -- samling av enheter, rutere og linker styrt av en organisasjon
+    \item \textbf{ISP} (Internet Service Provider) -- gir tilgang til Internett
+\end{itemize}
+
+\begin{keybox}[Internettstandarder]
+\begin{itemize}[noitemsep]
+    \item \textbf{RFC} (Request for Comments) -- dokumenter som beskriver standardene
+    \item \textbf{IETF} (Internet Engineering Task Force) -- utvikler standardene
+\end{itemize}
+\end{keybox}
+
+\subsection{``Service'' -- Tjenesteperspektivet}
+
+Internett er en \textbf{infrastruktur som leverer tjenester til applikasjoner}: web, video, e-post, spill, e-handel, sosiale medier, IoT, etc.
+
+Internett tilbyr et \textbf{programmeringsgrensesnitt} (socket API) til distribuerte applikasjoner -- ``hooks'' som lar apper koble seg til og bruke transporttjenester.
+
+%=============================================================================
+\section{Hva er en protokoll?}
+%=============================================================================
+
+\begin{keybox}[Definisjon: Protokoll]
+En \textbf{protokoll} definerer \textbf{formatet}, \textbf{rekkef\o lgen} av meldinger som sendes og mottas mellom nettverksenheter, og \textbf{handlingene} som utf\o res n\aa r meldinger sendes eller mottas.
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize]
+    % Human protocol
+    \node[font=\bfseries, text=ntnu] at (-3.5, 4.5) {Menneskelig protokoll};
+    \node[inner sep=0pt] (p1) at (-4.5, 4) {};
+    \node[inner sep=0pt] (p2) at (-2.5, 4) {};
+
+    \draw[->, thick, blue] (-4.3, 3.5) -- (-2.7, 3.0) node[midway, above, sloped] {Hei!};
+    \draw[->, thick, blue] (-2.7, 2.5) -- (-4.3, 2.0) node[midway, above, sloped] {Hei!};
+    \draw[->, thick, blue] (-4.3, 1.5) -- (-2.7, 1.0) node[midway, above, sloped] {Hva er klokka?};
+    \draw[->, thick, blue] (-2.7, 0.5) -- (-4.3, 0.0) node[midway, above, sloped] {14:00};
+
+    % Dashed line
+    \draw[dashed, gray] (-4.5, 3.8) -- (-4.5, -0.3);
+    \draw[dashed, gray] (-2.5, 3.8) -- (-2.5, -0.3);
+
+    % Network protocol
+    \node[font=\bfseries, text=ntnu] at (3.5, 4.5) {Nettverksprotokoll (TCP/HTTP)};
+    \node[inner sep=0pt] (c) at (2, 4) {};
+    \node[inner sep=0pt] (s) at (5, 4) {};
+
+    \node[font=\tiny] at (2, 4.1) {Klient};
+    \node[font=\tiny] at (5, 4.1) {Server};
+
+    \draw[->, thick, red!70!black] (2.2, 3.3) -- (4.8, 2.8) node[midway, above, sloped] {TCP conn. request};
+    \draw[->, thick, red!70!black] (4.8, 2.3) -- (2.2, 1.8) node[midway, above, sloped] {TCP conn. response};
+    \draw[->, thick, red!70!black] (2.2, 1.3) -- (4.8, 0.8) node[midway, above, sloped] {GET /index.html};
+    \draw[->, thick, red!70!black] (4.8, 0.3) -- (2.2, -0.2) node[midway, above, sloped] {<file>};
+
+    \draw[dashed, gray] (2, 3.8) -- (2, -0.5);
+    \draw[dashed, gray] (5, 3.8) -- (5, -0.5);
+
+    % Time arrows
+    \draw[->, gray, thick] (-4.8, 3.8) -- (-4.8, -0.3) node[below, font=\tiny] {tid};
+    \draw[->, gray, thick] (1.7, 3.8) -- (1.7, -0.5) node[below, font=\tiny] {tid};
+\end{tikzpicture}
+\end{center}
+
+All kommunikasjonsaktivitet p\aa\ Internett er styrt av protokoller.
+
+%=============================================================================
+\section{Nettverkets ytterkant (Network Edge)}
+%=============================================================================
+
+\subsection{Hosts: Klienter og servere}
+\begin{itemize}[noitemsep]
+    \item \textbf{Hosts} (endesystemer) sitter i nettverkets ``edge''
+    \item To typer: \textbf{klienter} (foresp\o r tjenester) og \textbf{servere} (tilbyr tjenester)
+    \item Servere er ofte i \textbf{datasentre}
+\end{itemize}
+
+\subsection{Aksessnettverk (Access Networks)}
+
+Aksessnettverket kobler endesystemer til den f\o rste ruteren (``edge router'').
+
+\bigskip
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, fill=#1, minimum width=3cm, minimum height=1.2cm, text width=2.8cm, align=center, font=\footnotesize},
+    >=Stealth
+]
+    \node[box=blue!10] (dsl) at (0,0) {\textbf{DSL}\\Telefonlinje\\Ned: 24--52 Mbps\\Opp: 3.5--16 Mbps\\\textbf{Dedikert}};
+    \node[box=green!10] (cable) at (4.5,0) {\textbf{Kabel (HFC)}\\TV-kabel\\Ned: 40 Mbps--1.2 Gbps\\Opp: 30--100 Mbps\\\textbf{Delt}};
+    \node[box=orange!10] (fiber) at (9,0) {\textbf{Fiber (FTTH)}\\Fiberoptisk\\Opp til 10 Gbps\\\textbf{Dedikert}};
+
+    \node[box=purple!10] (wifi) at (0,-2.5) {\textbf{WiFi (WLAN)}\\802.11b/g/n\\11, 54, 450 Mbps\\Rekkevidde: $\sim$30m};
+    \node[box=red!10] (cell) at (4.5,-2.5) {\textbf{Mobilnett}\\4G/5G\\10--100+ Mbps\\Rekkevidde: $\sim$10 km};
+    \node[box=cyan!10] (ent) at (9,-2.5) {\textbf{Enterprise}\\Ethernet + WiFi\\100 Mbps -- 10 Gbps};
+\end{tikzpicture}
+\end{center}
+
+\begin{warnbox}[Delt vs. dedikert aksess]
+\begin{itemize}[noitemsep]
+    \item \textbf{DSL}: Dedikert linje til sentralen (DSLAM) -- ingen deling med naboer
+    \item \textbf{Kabel}: Delt medium -- alle i nabolaget deler b\aa ndbredden til ``cable headend''
+\end{itemize}
+\end{warnbox}
+
+\subsection{Hjemmenettverk}
+
+\begin{center}
+\begin{tikzpicture}[
+    device/.style={rectangle, draw, fill=blue!5, minimum width=1.3cm, minimum height=0.6cm, font=\tiny},
+    router/.style={rectangle, draw, fill=orange!20, minimum width=1.5cm, minimum height=0.6cm, font=\tiny},
+    >=Stealth
+]
+    % Devices
+    \node[device] (mob) at (-2, 1) {Mobil};
+    \node[device] (pc) at (0, 1) {PC};
+    \node[device] (tv) at (2, 1) {Smart-TV};
+
+    % Router
+    \node[router] (rtr) at (0, 0) {WiFi-ruter/NAT};
+
+    % Modem
+    \node[router] (mdm) at (0, -1) {Kabel/DSL-modem};
+
+    % Links
+    \draw[->, dashed] (mob) -- (rtr) node[midway, left, font=\tiny] {WiFi};
+    \draw[->] (pc) -- (rtr) node[midway, right, font=\tiny] {Ethernet};
+    \draw[->, dashed] (tv) -- (rtr) node[midway, right, font=\tiny] {WiFi};
+    \draw[->] (rtr) -- (mdm);
+    \draw[->, thick, red!60] (mdm) -- (0, -2) node[below, font=\tiny] {Til ISP / headend / sentral};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Hosts sender pakker}
+
+\begin{formulabox}[Overf\o ringsforsinkelse (Transmission Delay)]
+En host deler applikasjonsmeldinger i \textbf{pakker} med lengde $L$ bits og sender dem med overf\o ringsrate $R$ bits/sek:
+\[
+d_{\text{trans}} = \frac{L}{R}
+\]
+\end{formulabox}
+
+\subsection{Fysiske medier}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Type} & \textbf{Kategori} & \textbf{Kjennetegn} \\
+\midrule
+Twisted pair (TP) & Guided & To isolerte kobberledere, Cat6: 10 Gbps \\
+Koaksialkabel & Guided & To konsentriske ledere, bredb\aa nd \\
+Fiberoptisk & Guided & Lyspulser i glass, h\o y hastighet, lav feil \\
+Tr\aa dl\o s radio & Unguided & EM-b\o lger, p\aa virkes av refleksjon/st\o y \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Guided media}: Signal f\o lger fysisk medium (kobber, fiber, koaks)
+    \item \textbf{Unguided media}: Signal g\aa r fritt (radio, WiFi, satellitt)
+    \item Radio: kan v\ae re \textbf{half-duplex} (en retning om gangen)
+\end{itemize}
+
+%=============================================================================
+\section{Nettverkskjernen (Network Core)}
+%=============================================================================
+
+Nettverkskjernen er et nettverk av sammenkoblede rutere -- et ``network of networks''.
+
+\subsection{Pakkesvitsjing (Packet Switching)}
+
+\begin{keybox}[Store-and-forward]
+Hele pakken m\aa\ ankomme en ruter f\o r den kan videresendes til neste link.\\
+Forsinkelse for \'{e}n pakke over \'{e}n link: $d = L/R$
+\end{keybox}
+
+To n\o kkelfunksjoner:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Forwarding} (videresending): Flytte pakke fra inngangslink til riktig utgangslink
+    \item \textbf{Routing} (ruting): Bestemme ruten pakken skal ta fra kilde til destinasjon
+\end{enumerate}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize]
+    \node[rectangle, draw, fill=blue!10, minimum width=1.5cm] (src) at (0,0) {Kilde};
+    \node[circle, draw, fill=orange!20, minimum size=1cm] (r1) at (3,0) {R1};
+    \node[circle, draw, fill=orange!20, minimum size=1cm] (r2) at (6,0) {R2};
+    \node[rectangle, draw, fill=green!10, minimum width=1.5cm] (dst) at (9,0) {Dest.};
+
+    \draw[->, thick] (src) -- (r1) node[midway, above] {$L/R$};
+    \draw[->, thick] (r1) -- (r2) node[midway, above] {$L/R$};
+    \draw[->, thick] (r2) -- (dst) node[midway, above] {$L/R$};
+
+    % Buffer illustration
+    \draw[fill=yellow!20] (2.5, -0.8) rectangle (3.5, -1.2);
+    \node[font=\tiny] at (3, -1) {buffer};
+    \draw[->] (3, -0.5) -- (3, -0.8);
+
+    \node[text=red, font=\tiny] at (3, -1.6) {K\o\ her $\rightarrow$ forsinkelse};
+    \node[text=red, font=\tiny] at (3, -2.0) {Buffer full $\rightarrow$ pakketap};
+\end{tikzpicture}
+\end{center}
+
+\textbf{K\o dannelse og pakketap:} Hvis pakker ankommer raskere enn de kan sendes videre, legges de i \textbf{buffer} (k\o). Hvis bufferen er full, \textbf{droppes} pakkene (tap).
+
+\subsection{Kretssvitsjing (Circuit Switching)}
+
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize]
+    % Packet switching
+    \node[font=\bfseries, text=ntnu] at (-3, 3) {Pakkesvitsjing};
+    \draw[thick] (-4.5, 2.5) rectangle (-1.5, 0.5);
+    \foreach \y in {2.3, 1.9, 1.5, 1.1, 0.7} {
+        \draw[fill=blue!\y 0!white] (-4.3, \y) rectangle (-1.7, \y-0.25);
+    }
+    \node[font=\tiny, text width=2.5cm, align=center] at (-3, 0) {Delt link:\\pakker k\o er og deler};
+
+    % Circuit switching
+    \node[font=\bfseries, text=ntnu] at (3, 3) {Kretssvitsjing};
+    \draw[thick] (1.5, 2.5) rectangle (4.5, 0.5);
+    \draw[fill=red!30] (1.7, 2.3) rectangle (4.3, 1.9);
+    \node[font=\tiny] at (3, 2.1) {Bruker 1 -- reservert};
+    \draw[fill=green!30] (1.7, 1.7) rectangle (4.3, 1.3);
+    \node[font=\tiny] at (3, 1.5) {Bruker 2 -- reservert};
+    \draw[fill=gray!20] (1.7, 1.1) rectangle (4.3, 0.7);
+    \node[font=\tiny] at (3, 0.9) {Ledig -- bortkastet};
+    \node[font=\tiny, text width=2.5cm, align=center] at (3, 0) {Dedikert link:\\reservert per samtale};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Pakkesvitsjing} & \textbf{Kretssvitsjing} \\
+\midrule
+Ressursdeling & Ja (statistisk multipleksing) & Nei (reservert) \\
+Garanti & Ingen & Ja (fast b\aa ndbredde) \\
+Effektivitet & H\o y (utnytter ledig kapasitet) & Lav (ledig = bortkastet) \\
+K\o ing/tap & Ja & Nei \\
+Best for & Bursty trafikk (web, e-post) & Konstant trafikk (telefon) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{FDM og TDM}
+
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize]
+    % FDM
+    \node[font=\bfseries, text=ntnu] at (-3, 2.5) {FDM};
+    \draw[thick] (-5, 2) rectangle (-1, -0.5);
+    \draw[fill=red!30] (-4.8, 1.8) rectangle (-1.2, 1.2);
+    \node[font=\tiny] at (-3, 1.5) {Frekvensb\aa nd 1};
+    \draw[fill=blue!30] (-4.8, 1.0) rectangle (-1.2, 0.4);
+    \node[font=\tiny] at (-3, 0.7) {Frekvensb\aa nd 2};
+    \draw[fill=green!30] (-4.8, 0.2) rectangle (-1.2, -0.3);
+    \node[font=\tiny] at (-3, -0.05) {Frekvensb\aa nd 3};
+    \node[font=\tiny, text width=3cm, align=center] at (-3, -1) {Hver bruker f\aa r\\eget frekvensb\aa nd};
+
+    % TDM
+    \node[font=\bfseries, text=ntnu] at (3, 2.5) {TDM};
+    \draw[thick] (1, 2) rectangle (5, 0.5);
+    \foreach \x/\col in {1.2/red, 2.0/blue, 2.8/green, 3.6/red} {
+        \draw[fill=\col!30] (\x, 1.8) rectangle (\x+0.6, 0.7);
+    }
+    \draw[->] (1, 0.2) -- (5, 0.2) node[right, font=\tiny] {tid};
+    \node[font=\tiny] at (1.5, 0.4) {t1};
+    \node[font=\tiny] at (2.3, 0.4) {t2};
+    \node[font=\tiny] at (3.1, 0.4) {t3};
+    \node[font=\tiny] at (3.9, 0.4) {t4};
+    \node[font=\tiny, text width=3cm, align=center] at (3, -0.5) {Hver bruker f\aa r\\egne tidsluker};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Internettstruktur}
+
+\begin{center}
+\begin{tikzpicture}[
+    isp/.style={ellipse, draw, fill=#1, minimum width=2cm, minimum height=1cm, font=\footnotesize},
+    >=Stealth
+]
+    % Tier 1
+    \node[isp=red!20] (t1a) at (-1.5, 3) {Tier-1 ISP};
+    \node[isp=red!20] (t1b) at (1.5, 3) {Tier-1 ISP};
+    \draw[<->, thick] (t1a) -- (t1b);
+
+    % IXP
+    \node[rectangle, draw, fill=yellow!30, font=\footnotesize] (ixp) at (0, 2) {IXP};
+    \draw[<->] (t1a) -- (ixp);
+    \draw[<->] (t1b) -- (ixp);
+
+    % Regional
+    \node[isp=blue!15] (r1) at (-3, 1) {Regional ISP};
+    \node[isp=blue!15] (r2) at (3, 1) {Regional ISP};
+    \draw[->] (r1) -- (t1a);
+    \draw[->] (r2) -- (t1b);
+
+    % Access
+    \node[isp=green!15] (a1) at (-4, -0.5) {\tiny Aksess-ISP};
+    \node[isp=green!15] (a2) at (-2, -0.5) {\tiny Aksess-ISP};
+    \node[isp=green!15] (a3) at (2, -0.5) {\tiny Aksess-ISP};
+    \node[isp=green!15] (a4) at (4, -0.5) {\tiny Aksess-ISP};
+    \draw[->] (a1) -- (r1);
+    \draw[->] (a2) -- (r1);
+    \draw[->] (a3) -- (r2);
+    \draw[->] (a4) -- (r2);
+
+    % Content provider
+    \node[isp=purple!15] (goog) at (0, 0) {\tiny Google/Netflix};
+    \draw[<->, dashed] (goog) -- (ixp);
+    \draw[<->, dashed] (goog) -- (r1);
+
+    % Labels
+    \node[font=\tiny, text=gray] at (-4, -1.2) {brukere kobler seg til her};
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Aksess-ISP}: Gir brukere tilgang (Telenor, Altibox, etc.)
+    \item \textbf{Regionale ISP}: Kobler aksess-ISP-er sammen
+    \item \textbf{Tier-1 ISP}: Store, globale nettverk (f.eks.\ Telenor, AT\&T)
+    \item \textbf{IXP} (Internet Exchange Point): Kobler ISP-er direkte
+    \item \textbf{Content provider networks} (Google, Netflix): Bygger egne nettverk
+\end{itemize}
+
+%=============================================================================
+\section{Ytelse: Forsinkelse, Tap og Throughput}
+%=============================================================================
+
+\subsection{Fire typer forsinkelse}
+
+\begin{formulabox}[Total nodal delay]
+\[
+d_{\text{nodal}} = d_{\text{proc}} + d_{\text{queue}} + d_{\text{trans}} + d_{\text{prop}}
+\]
+\end{formulabox}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize]
+    % Router
+    \node[circle, draw, fill=orange!20, minimum size=1.5cm] (r1) at (0,0) {Ruter};
+    \node[circle, draw, fill=orange!20, minimum size=1.5cm] (r2) at (7,0) {Neste};
+
+    % Packets in queue
+    \foreach \x in {-1.5, -1.8, -2.1} {
+        \draw[fill=blue!30] (\x, -0.15) rectangle (\x+0.25, 0.15);
+    }
+
+    % Packet on link
+    \draw[fill=green!40] (3, -0.1) rectangle (3.3, 0.1);
+
+    % Link
+    \draw[thick] (0.75, 0) -- (6.25, 0);
+
+    % Braces and labels
+    \draw[decorate, decoration={brace,amplitude=4pt,mirror}] (-2.3, -0.5) -- (-1.3, -0.5)
+        node[midway, below, yshift=-4pt, font=\tiny, text=red] {$d_{\text{queue}}$: k\o tid};
+
+    \draw[decorate, decoration={brace,amplitude=4pt}] (-0.5, 0.9) -- (0.5, 0.9)
+        node[midway, above, yshift=4pt, font=\tiny, text=red] {$d_{\text{proc}}$: prosessering};
+
+    \draw[decorate, decoration={brace,amplitude=4pt,mirror}] (0.75, -0.5) -- (2.5, -0.5)
+        node[midway, below, yshift=-4pt, font=\tiny, text=red] {$d_{\text{trans}} = L/R$};
+
+    \draw[decorate, decoration={brace,amplitude=4pt}] (2.5, 0.5) -- (6.25, 0.5)
+        node[midway, above, yshift=4pt, font=\tiny, text=red] {$d_{\text{prop}} = d/s$};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Forsinkelse} & \textbf{Formel} & \textbf{Avhenger av} & \textbf{Typisk} \\
+\midrule
+$d_{\text{proc}}$ -- Prosessering & -- & Bitfeilsjekk, velge link & $< 1$ ms \\
+$d_{\text{queue}}$ -- K\o & -- & Trafikkintensitet & varierer \\
+$d_{\text{trans}}$ -- Overf\o ring & $L/R$ & Pakkest\o rrelse, linkrate & $\mu$s--ms \\
+$d_{\text{prop}}$ -- Propagering & $d/s$ & Avstand, signalhastighet & $\mu$s--ms \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warnbox}[Viktig: Transmission delay $\neq$ Propagation delay!]
+\begin{itemize}[noitemsep]
+    \item $d_{\text{trans}} = L/R$ -- tid for \aa\ \textbf{dytte alle bits ut p\aa\ linken}
+    \item $d_{\text{prop}} = d/s$ -- tid for signalet \aa\ \textbf{reise gjennom linken}
+    \item $s \approx 2 \times 10^8$ m/s i fiber (lyshastighet / brytningsindeks 1.47)
+\end{itemize}
+\textbf{Eksempel:} Trondheim--Oslo (540 km), fiber:\\
+$d_{\text{prop}} = 540\,000 / 200\,000\,000 = 2{,}7$ ms\\
+Pakke 1500 bytes, link 1 Gbps:\\
+$d_{\text{trans}} = 12\,000 / 1\,000\,000\,000 = 0{,}012$ ms
+\end{warnbox}
+
+\subsection{Trafikkintensitet og k\o forsinkelse}
+
+\begin{formulabox}[Trafikkintensitet]
+\[
+\text{Trafikkintensitet} = \frac{L \cdot a}{R}
+\]
+hvor $L$ = pakkest\o rrelse (bits), $a$ = gjennomsnittlig ankomstrate (pakker/s), $R$ = linkrate (bps).
+\end{formulabox}
+
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize]
+    \draw[->] (0,0) -- (6,0) node[right] {$La/R$};
+    \draw[->] (0,0) -- (0,4.5) node[above] {Gjsn. k\o forsinkelse};
+
+    % Curve
+    \draw[thick, red, domain=0:0.95, samples=100] plot ({5*\x}, {0.3*\x/(1-\x)});
+
+    % Asymptote
+    \draw[dashed, gray] (5, 0) -- (5, 4.5);
+    \node[below, font=\tiny] at (5, 0) {1};
+
+    % Annotations
+    \node[text=green!50!black, font=\tiny] at (1.5, 0.5) {$La/R \approx 0$: lite k\o};
+    \node[text=orange!70!black, font=\tiny, text width=2cm, align=center] at (4, 2.5) {$La/R \to 1$:\\ stor k\o!};
+    \node[text=red, font=\tiny, text width=2cm, align=center] at (6.5, 4) {$La/R > 1$:\\ uendelig!};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Pakketap}
+
+N\aa r en pakke ankommer en ruter med \textbf{full buffer}, blir pakken \textbf{droppet} (tapt). Tapte pakker kan retransmitteres av forrige node, kilde-endesystemet, eller ikke i det hele tatt.
+
+\subsection{Throughput}
+
+\begin{keybox}[Throughput og flaskehals]
+\textbf{Throughput}: Rate (bits/tidsenhet) som bits faktisk overf\o res fra sender til mottaker.
+\begin{itemize}[noitemsep]
+    \item \textbf{Instantaneous throughput}: Rate p\aa\ et gitt tidspunkt
+    \item \textbf{Average throughput}: Rate over lengre tid
+    \item \textbf{Bottleneck link}: Linken med lavest kapasitet bestemmer ende-til-ende throughput
+\end{itemize}
+\[
+\text{Throughput} = \min(R_s, R_c)
+\]
+Med 10 samtidige forbindelser som deler en backbone $R$:
+\[
+\text{Per-connection throughput} = \min(R_c, R_s, R/10)
+\]
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, font=\footnotesize]
+    \node[rectangle, draw, fill=blue!10] (srv) at (0, 0) {Server};
+    \node[circle, draw, fill=orange!20, minimum size=0.8cm] (r) at (4, 0) {R};
+    \node[rectangle, draw, fill=green!10] (cli) at (8, 0) {Klient};
+
+    % Pipes
+    \draw[thick, fill=gray!10] (0.8, 0.3) -- (3.6, 0.3) -- (3.6, -0.3) -- (0.8, -0.3) -- cycle;
+    \draw[thick, fill=gray!10] (4.4, 0.15) -- (7.2, 0.15) -- (7.2, -0.15) -- (4.4, -0.15) -- cycle;
+
+    \node[font=\tiny, text=red] at (2.2, 0.5) {$R_s$ bits/sec};
+    \node[font=\tiny, text=red] at (5.8, 0.35) {$R_c$ bits/sec};
+    \node[font=\tiny] at (5.8, -0.5) {\textit{smalere = flaskehals}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Traceroute}
+
+\textbf{Traceroute} m\aa ler forsinkelse langs hele ruten fra kilde til destinasjon:
+\begin{itemize}[noitemsep]
+    \item Sender 3 pakker til hver ruter $i$ p\aa\ veien (med TTL = $i$)
+    \item Ruter $i$ returnerer pakken, og senderen m\aa ler tiden
+    \item Viser ogs\aa\ pakketap (``* * *'' = ingen respons)
+\end{itemize}
+
+%=============================================================================
+\section{Sikkerhet}
+%=============================================================================
+
+Internett ble opprinnelig designet \textbf{uten} mye sikkerhet -- ``a group of mutually trusting users.''
+
+\begin{center}
+\begin{tabular}{lp{7cm}}
+\toprule
+\textbf{Trussel} & \textbf{Beskrivelse} \\
+\midrule
+\textbf{Malware} & Virus (krever brukeraksjon), ormer (selvreplikerende), spyware, botnets \\
+\textbf{DoS/DDoS} & Overbelaster ressurser med falsk trafikk fra mange kompromitterte maskiner \\
+\textbf{Packet sniffing} & Leser alle pakker p\aa\ delt medium (WiFi, Ethernet) med promiscuous NIC \\
+\textbf{IP spoofing} & Sender pakker med falsk avsenderadresse \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}[Forsvar]
+\begin{itemize}[noitemsep]
+    \item \textbf{Autentisering} -- beskytter mot spoofing
+    \item \textbf{Kryptering} -- beskytter mot sniffing (konfidensialitet)
+    \item \textbf{Digitale signaturer} -- sikrer integritet
+    \item \textbf{Brannmurer} -- blokkerer uautorisert trafikk
+    \item \textbf{VPN} -- begrenser tilgang til ressurser
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Protokollag og innkapsling}
+%=============================================================================
+
+\subsection{Internettets 5-lags protokollstakk}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, fill=#1, minimum width=7cm, minimum height=1cm, font=\footnotesize},
+    >=Stealth
+]
+    \node[layer=red!15] (app) at (0, 4) {\textbf{5. Applikasjonslaget} -- HTTP, DNS, SMTP, FTP};
+    \node[layer=orange!15] (trans) at (0, 3) {\textbf{4. Transportlaget} -- TCP, UDP};
+    \node[layer=yellow!15] (net) at (0, 2) {\textbf{3. Nettverkslaget} -- IP, rutingprotokoller};
+    \node[layer=green!15] (link) at (0, 1) {\textbf{2. Linklaget} -- Ethernet, WiFi};
+    \node[layer=blue!15] (phys) at (0, 0) {\textbf{1. Fysisk lag} -- bits p\aa\ ledningen};
+
+    % Descriptions on right
+    \node[font=\tiny, text=gray, text width=4cm, right] at (3.8, 4) {St\o tter nettverksapper\\Data: \textbf{melding}};
+    \node[font=\tiny, text=gray, text width=4cm, right] at (3.8, 3) {Prosess-til-prosess\\Data: \textbf{segment}};
+    \node[font=\tiny, text=gray, text width=4cm, right] at (3.8, 2) {Host-til-host ruting\\Data: \textbf{datagram}};
+    \node[font=\tiny, text=gray, text width=4cm, right] at (3.8, 1) {Nabo-til-nabo\\Data: \textbf{ramme (frame)}};
+    \node[font=\tiny, text=gray, text width=4cm, right] at (3.8, 0) {Bits over medium};
+\end{tikzpicture}
+\end{center}
+
+\begin{warnbox}[ISO/OSI-modellen har 7 lag]
+OSI legger til \textbf{Presentasjon} og \textbf{Sesjon} mellom applikasjon og transport. Disse er i praksis inkludert i applikasjonslaget i Internett-modellen.
+\end{warnbox}
+
+\subsection{Innkapsling (Encapsulation)}
+
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize, >=Stealth]
+    % Application
+    \draw[fill=red!15] (0, 4) rectangle (4, 4.5);
+    \node at (2, 4.25) {Melding (M)};
+
+    % Transport
+    \draw[fill=orange!15] (-0.5, 3) rectangle (0, 3.5);
+    \draw[fill=red!15] (0, 3) rectangle (4, 3.5);
+    \node[font=\tiny] at (-0.25, 3.25) {$H_t$};
+    \node at (2, 3.25) {Segment ($H_t$ + M)};
+
+    % Network
+    \draw[fill=yellow!15] (-1, 2) rectangle (-0.5, 2.5);
+    \draw[fill=orange!15] (-0.5, 2) rectangle (0, 2.5);
+    \draw[fill=red!15] (0, 2) rectangle (4, 2.5);
+    \node[font=\tiny] at (-0.75, 2.25) {$H_n$};
+    \node at (2, 2.25) {Datagram ($H_n$ + $H_t$ + M)};
+
+    % Link
+    \draw[fill=green!15] (-1.5, 1) rectangle (-1, 1.5);
+    \draw[fill=yellow!15] (-1, 1) rectangle (-0.5, 1.5);
+    \draw[fill=orange!15] (-0.5, 1) rectangle (0, 1.5);
+    \draw[fill=red!15] (0, 1) rectangle (4, 1.5);
+    \node[font=\tiny] at (-1.25, 1.25) {$H_l$};
+    \node at (2, 1.25) {Ramme ($H_l$ + $H_n$ + $H_t$ + M)};
+
+    % Arrows
+    \draw[->, thick, gray] (4.5, 4.25) -- (4.5, 3.25);
+    \draw[->, thick, gray] (4.5, 3.25) -- (4.5, 2.25);
+    \draw[->, thick, gray] (4.5, 2.25) -- (4.5, 1.25);
+
+    \node[font=\tiny, text=gray, rotate=-90] at (5, 2.75) {innkapsling};
+\end{tikzpicture}
+\end{center}
+
+Hvert lag legger til sin \textbf{header} ($H$) rundt dataene fra laget over. Mottaker fjerner headers i omvendt rekkef\o lge.
+
+\bigskip
+\begin{keybox}[Hvorfor lagdeling?]
+\begin{itemize}[noitemsep]
+    \item Gir \textbf{klar struktur} -- lettere \aa\ designe og vedlikeholde
+    \item \textbf{Modularisering} -- kan endre ett lag uten \aa\ p\aa virke andre
+    \item Separerer komplekse systemer i h\aa ndterbare deler
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Pensumssp\o rsm\aa l -- Kapittel 1}
+%=============================================================================
+
+Her er de viktigste sp\o rsm\aa lene fra pensum, organisert etter tema.
+
+\subsection{1.1 Nuts and bolts vs. Service view}
+
+\begin{exambox}[Eksamensssp\o rsm\aa l]
+\begin{longtable}{p{6.5cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+Hva er internett if\o lge ``nuts and bolts''? & Et globalt nettverk som kobler sammen milliarder av endesystemer. \\
+\midrule
+Hva er en ISP? & En internettleverand\o r som gir endesystemer tilgang til internett. \\
+\midrule
+Hvilke protokoller styrer internett? & TCP/IP. \\
+\midrule
+Hvem utvikler internettstandardene? & IETF (Internet Engineering Task Force). \\
+\midrule
+Hva kalles dokumentene som beskriver standardene? & RFC-er (Requests for Comments). \\
+\midrule
+Hva er internett if\o lge ``services view''? & En plattform som leverer tjenester til applikasjoner. \\
+\midrule
+Hva er en protokoll? & Et regelsett som definerer format, rekkef\o lge og handlinger for meldinger mellom kommunikasjonsenheter. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+\subsection{1.2 Network Edge}
+
+\begin{exambox}[Eksamensssp\o rsm\aa l]
+\begin{longtable}{p{6.5cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+Hvilke to typer verter finnes? & Klienter og servere. \\
+\midrule
+Hva st\aa r DSL for? & Digital Subscriber Line. \\
+\midrule
+Er DSL symmetrisk eller asymmetrisk? & Asymmetrisk (h\o yere nedlasting). \\
+\midrule
+Hva er HFC? & Hybrid Fiber Coax -- kabelnett med fiber + koaks. \\
+\midrule
+Hva er forskjellen p\aa\ delt og dedikert aksess? & DSL er dedikert, kabel er delt. \\
+\midrule
+Hva er formelen for packet transmission delay? & $D = L / R$. \\
+\midrule
+Hva er guided vs.\ unguided media? & Guided: signal i fysisk medium (kobber, fiber). Unguided: signal fritt (radio). \\
+\midrule
+Hva er fordelene med fiber? & H\o y hastighet, lav feilrate. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+\subsection{1.3 Network Core}
+
+\begin{exambox}[Eksamensssp\o rsm\aa l]
+\begin{longtable}{p{6.5cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+Hva er ``store-and-forward''? & Hele pakken m\aa\ ankomme f\o r den kan sendes videre. \\
+\midrule
+Hva skjer n\aa r bufferen er full? & Pakker droppes (tap). \\
+\midrule
+Hva er forskjellen p\aa\ pakkesvitsjing og kretssvitsjing? & Krets reserverer fast forbindelse; pakke sender data i sm\aa\ biter som deler linjen. \\
+\midrule
+Hva er FDM? & Frequency Division Multiplexing -- hver bruker f\aa r eget frekvensb\aa nd. \\
+\midrule
+Hva er TDM? & Time Division Multiplexing -- hver bruker f\aa r egne tidsluker. \\
+\midrule
+N\aa r er pakkesvitsjing best? & For bursty trafikk -- noen ganger aktiv, noen ganger ikke. \\
+\midrule
+Hva er tier-1 ISP? & Store, globale nettverk (f.eks.\ Telenor, AT\&T). \\
+\midrule
+Hva er IXP? & Internet Exchange Point -- kobler ISP-er direkte. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+\subsection{1.4 Performance}
+
+\begin{exambox}[Eksamensssp\o rsm\aa l]
+\begin{longtable}{p{6.5cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+Hva er de fire forsinkelsestypene? & Processing, queueing, transmission ($L/R$), propagation ($d/s$). \\
+\midrule
+Hva er trafikkintensitet? & $(L \times a) / R$ -- forholdet mellom ankomstrate og tjenesterate. \\
+\midrule
+Hva skjer n\aa r $La/R > 1$? & Mer arbeid ankommer enn kan h\aa ndteres; forsinkelse $\to \infty$. \\
+\midrule
+Hva er throughput? & Rate bits faktisk overf\o res fra sender til mottaker. \\
+\midrule
+Hva er bottleneck link? & Linken med lavest kapasitet -- bestemmer ende-til-ende throughput. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+\subsection{1.5 Lagdeling og 1.6 Sikkerhet}
+
+\begin{exambox}[Eksamensssp\o rsm\aa l]
+\begin{longtable}{p{6.5cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+Hvor mange lag i internett-protokollstakken? & Fem: applikasjon, transport, nettverk, link, fysisk. \\
+\midrule
+Hva er innkapsling? & Pakke data med headers fra hvert lag. \\
+\midrule
+Hva er packet sniffing? & Lese alle pakker p\aa\ delt nettverk. \\
+\midrule
+Hva er IP spoofing? & Sende pakker med falsk avsenderadresse. \\
+\midrule
+Hva er et DoS-angrep? & Gj\o re ressurser utilgjengelige ved \aa\ overbelaste med falsk trafikk. \\
+\midrule
+Hva beskytter mot sniffing? & Kryptering. \\
+\midrule
+Hva beskytter mot spoofing? & Autentisering. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+%=============================================================================
+\section{Oppsummering -- viktige formler}
+%=============================================================================
+
+\begin{formulabox}[Formler du m\aa\ kunne]
+\begin{align}
+d_{\text{trans}} &= \frac{L}{R} & &\text{Transmission delay (pakkest\o rrelse / linkrate)} \\[6pt]
+d_{\text{prop}} &= \frac{d}{s} & &\text{Propagation delay (avstand / signalhastighet)} \\[6pt]
+d_{\text{nodal}} &= d_{\text{proc}} + d_{\text{queue}} + d_{\text{trans}} + d_{\text{prop}} & &\text{Total forsinkelse per node} \\[6pt]
+\text{Trafikk\-intensitet} &= \frac{L \cdot a}{R} & &\text{Ankomstrate vs.\ tjenesterate} \\[6pt]
+\text{Throughput} &= \min(R_s, R_c) & &\text{Bestemt av flaskehalsen}
+\end{align}
+
+\textbf{Verdier \aa\ huske:}
+\begin{itemize}[noitemsep]
+    \item Signalhastighet i fiber: $s \approx 2 \times 10^8$ m/s
+    \item Lyshastighet: $c = 3 \times 10^8$ m/s (fiber har brytningsindeks $\approx 1{,}47$)
+    \item 1 byte = 8 bits
+\end{itemize}
+\end{formulabox}

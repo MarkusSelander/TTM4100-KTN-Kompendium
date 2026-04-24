@@ -1,0 +1,784 @@
+\section{Introduction to the Link Layer (6.1)}
+%=============================================================================
+
+\subsection{Terminology and Context}
+
+\begin{keybox}[Link Layer -- Basic Terminology]
+\begin{itemize}[noitemsep]
+    \item \textbf{Nodes:} Hosts and routers (any device running a link-layer protocol).
+    \item \textbf{Links:} Communication channels that connect adjacent nodes along a communication path. Links can be wired (e.g., Ethernet cable), wireless (e.g., WiFi), or LANs.
+    \item \textbf{Frame:} The link-layer PDU (protocol data unit). The link layer encapsulates a network-layer datagram into a frame.
+\end{itemize}
+
+\medskip
+The link layer is responsible for transferring a datagram from one node to a \textbf{physically adjacent} node over a single link.
+\end{keybox}
+
+\begin{warnbox}[Important Distinction]
+Different link protocols may be used on different links along the same path. For example, a datagram might travel over Ethernet on the first link, then over a point-to-point link, then over WiFi -- each hop uses whatever link-layer protocol is appropriate for that link.
+\end{warnbox}
+
+\subsection{Link Layer Services}
+
+\begin{keybox}[Services Provided by the Link Layer]
+\begin{enumerate}[noitemsep]
+    \item \textbf{Framing:} Encapsulate datagram into a frame, adding header and trailer.
+    \item \textbf{Link access (MAC protocol):} Controls how frames are transmitted onto the link. Especially important for shared (broadcast) links, where multiple nodes share the same medium.
+    \item \textbf{Reliable delivery:} Guarantees to move each datagram across the link without error (not all link-layer protocols offer this; common on high-error-rate links like wireless).
+    \item \textbf{Flow control:} Pacing between adjacent sending and receiving nodes.
+    \item \textbf{Error detection:} Errors caused by signal attenuation and electromagnetic noise. The receiver detects the presence of errors.
+    \item \textbf{Error correction:} The receiver identifies \emph{and corrects} bit errors without retransmission.
+    \item \textbf{Half-duplex and full-duplex:} Half-duplex means nodes at both ends can transmit, but not at the same time.
+\end{enumerate}
+\end{keybox}
+
+\subsection{Where is the Link Layer Implemented?}
+
+\begin{keybox}[Network Interface Card (NIC)]
+The link layer is implemented in the \textbf{Network Interface Card (NIC)}, also known as the \textbf{network adapter}:
+\begin{itemize}[noitemsep]
+    \item Implements link-layer and physical-layer functionality
+    \item Attaches to the host's system bus (PCIe, USB, etc.)
+    \item Is a combination of hardware, software, and firmware
+    \item The ``adaptor'' communicates with the rest of the host system
+\end{itemize}
+
+\medskip
+\textbf{Sending side:} Encapsulates datagram in a frame, adds error-checking bits, manages flow control, etc.\\
+\textbf{Receiving side:} Looks for errors, extracts datagram, passes it up to the receiving node's network layer.
+\end{keybox}
+
+%=============================================================================
+\section{Error Detection and Correction (6.2)}
+%=============================================================================
+
+\subsection{Overview}
+
+\begin{keybox}[Error Detection and Correction -- EDC]
+Error detection is \textbf{not 100\% reliable}: the protocol may miss some errors (i.e., undetected bit errors). However, we can make the probability of undetected errors extremely small by using stronger (larger) EDC fields.
+
+The general approach:
+\begin{itemize}[noitemsep]
+    \item Sender computes EDC bits based on the data $D$
+    \item Both $D$ and EDC are sent
+    \item Receiver recomputes EDC over received $D'$ and compares with received EDC
+\end{itemize}
+\end{keybox}
+
+\subsection{Parity Checking}
+
+\begin{keybox}[Single-Bit Parity]
+Add a single parity bit so that the total number of 1's is even (even parity) or odd (odd parity).
+\begin{itemize}[noitemsep]
+    \item Can detect \textbf{single-bit} errors
+    \item Cannot detect errors where an even number of bits are flipped
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[Two-Dimensional (2D) Bit Parity]
+Arrange the data bits in a matrix (rows and columns). Compute parity for each row and each column:
+\begin{itemize}[noitemsep]
+    \item Can \textbf{detect and correct} single-bit errors (identify the exact row and column of the flipped bit)
+    \item Can \textbf{detect} (but not correct) any combination of two-bit errors
+\end{itemize}
+\end{keybox}
+
+\begin{exambox}[Exam-Type: 2D Even Parity -- V23 Q1.4.2, V24 Q1.4.2]
+\textbf{Question:} Which alternatives show correct implementation(s) of a two-dimensional even parity scheme?
+
+\medskip
+You are given 8 matrices (a--h), each with 4 rows of 4 data bits plus a parity column and a parity row. To verify:
+\begin{enumerate}[noitemsep]
+    \item Count the 1's in each \textbf{row} (including the parity bit). Must be even.
+    \item Count the 1's in each \textbf{column} (including the parity bit). Must be even.
+    \item If all rows AND all columns have even counts $\Rightarrow$ correct.
+\end{enumerate}
+
+\textbf{Tip:} Carefully check \emph{every} row and column. A single mismatch means that alternative is wrong.
+\end{exambox}
+
+\subsection{Internet Checksum}
+
+\begin{keybox}[Internet Checksum (Review)]
+Used in the transport layer (TCP/UDP) and IP header:
+\begin{itemize}[noitemsep]
+    \item Treat data as a sequence of 16-bit integers
+    \item Compute the 1's complement sum of all 16-bit words
+    \item The checksum is the 1's complement of that sum
+    \item Receiver adds all words including checksum; result should be \texttt{1111111111111111}
+\end{itemize}
+
+\textbf{Weakness:} Relatively weak -- can miss certain patterns of errors. Used at the transport/network layer but \emph{not} typically at the link layer, which uses CRC instead.
+\end{keybox}
+
+\subsection{Cyclic Redundancy Check (CRC)}
+
+\begin{keybox}[CRC -- Key Concepts]
+CRC is a more powerful error-detection technique used at the link layer:
+\begin{itemize}[noitemsep]
+    \item Based on \textbf{modulo-2 arithmetic} (XOR, no carries/borrows)
+    \item Uses a \textbf{generator polynomial} $G$ of degree $r$ (i.e., $r+1$ bits long)
+    \item The sender appends $r$ CRC bits (remainder $R$) to the data $D$
+    \item The transmitted bits are: $D \cdot 2^r \oplus R$
+    \item The receiver divides the received bits by $G$; if the remainder is 0, no error is detected
+\end{itemize}
+\end{keybox}
+
+\begin{formulabox}[CRC Computation]
+Given data bits $D$ and generator $G$ (of $r+1$ bits):
+\begin{enumerate}[noitemsep]
+    \item Append $r$ zero bits to $D$: $D \cdot 2^r$
+    \item Divide $D \cdot 2^r$ by $G$ using modulo-2 division (XOR)
+    \item The remainder $R$ (exactly $r$ bits) is the CRC
+    \item Transmit: $D \cdot 2^r \oplus R$ (which is exactly divisible by $G$)
+\end{enumerate}
+
+\medskip
+\textbf{Key properties:}
+\begin{itemize}[noitemsep]
+    \item Can detect \textbf{all burst errors of fewer than $r+1$ bits}
+    \item Can detect \textbf{all odd numbers of bit errors} (if $G$ contains $(x+1)$ as a factor)
+    \item Burst errors of length $> r+1$ are detected with probability $1 - (1/2)^r$
+\end{itemize}
+\end{formulabox}
+
+\begin{warnbox}[CRC vs.\ Checksum]
+CRC is much stronger than the Internet checksum. CRC is used at the link layer (e.g., Ethernet CRC-32), while the Internet checksum is used at higher layers. CRC can detect all burst errors up to length $r$, whereas the checksum can miss many error patterns.
+\end{warnbox}
+
+\begin{exambox}[Exam-Type: CRC Matching -- S2025 Q7]
+\textbf{Question:} Given data string 101110 and a CRC generator, match the following:
+\begin{itemize}[noitemsep]
+    \item CRC value $\rightarrow$ 001
+    \item CRC length $\rightarrow$ 3
+    \item CRC generator $\rightarrow$ 1001
+    \item Total bits sent $\rightarrow$ 9
+    \item CRC generator polynomial $\rightarrow$ $x^3 + 1$
+\end{itemize}
+
+\textbf{How to solve:} The generator 1001 has 4 bits, so $r = 3$. Append 3 zeros to data: 101110\textbf{000}. Perform modulo-2 division by 1001 to get remainder 001. Total bits = 6 (data) + 3 (CRC) = 9. The polynomial $1001 = 1\cdot x^3 + 0\cdot x^2 + 0\cdot x^1 + 1\cdot x^0 = x^3 + 1$.
+\end{exambox}
+
+%=============================================================================
+\section{Multiple Access Protocols (6.3)}
+%=============================================================================
+
+\subsection{The Multiple Access Problem}
+
+\begin{keybox}[The Shared Channel Problem]
+On a \textbf{broadcast link} (shared medium), when two or more nodes transmit simultaneously, a \textbf{collision} occurs -- the signals interfere and the transmitted frames are corrupted.
+
+\textbf{Goal of MAC (Medium Access Control) protocols:} Determine how nodes share the channel, i.e., determine when a node can transmit.
+
+\medskip
+\textbf{Ideal properties for a MAC protocol} (channel rate $R$):
+\begin{enumerate}[noitemsep]
+    \item When one node wants to transmit, it can send at rate $R$
+    \item When $M$ nodes want to transmit, each gets average rate $R/M$
+    \item Fully decentralized (no master node, no clock synchronization)
+    \item Simple
+\end{enumerate}
+\end{keybox}
+
+\subsection{Taxonomy of MAC Protocols}
+
+\begin{keybox}[Three Categories of MAC Protocols]
+\begin{enumerate}
+    \item \textbf{Channel Partitioning:} Divide channel into smaller ``pieces'' (time slots, frequency bands, codes). Allocate a piece to each node for exclusive use.
+    \begin{itemize}[noitemsep]
+        \item TDMA, FDMA, CDMA
+    \end{itemize}
+
+    \item \textbf{Random Access:} Channel not divided; allow collisions, then ``recover'' from them.
+    \begin{itemize}[noitemsep]
+        \item ALOHA, Slotted ALOHA, CSMA, CSMA/CD, CSMA/CA
+    \end{itemize}
+
+    \item \textbf{Taking Turns:} Nodes take turns, but nodes with more to send can take longer turns.
+    \begin{itemize}[noitemsep]
+        \item Polling, Token passing
+    \end{itemize}
+\end{enumerate}
+\end{keybox}
+
+\subsection{Channel Partitioning Protocols}
+
+\begin{keybox}[TDMA -- Time Division Multiple Access]
+\begin{itemize}[noitemsep]
+    \item Access to the channel is divided into ``rounds'' of fixed-length time slots
+    \item Each station gets a fixed-length slot in every round
+    \item Unused slots go idle (wasted capacity)
+    \item \textbf{Pros:} No collisions, fair
+    \item \textbf{Cons:} Wasted capacity when nodes have nothing to send; each node limited to $R/N$ even if it's the only one transmitting
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[FDMA -- Frequency Division Multiple Access]
+\begin{itemize}[noitemsep]
+    \item Channel spectrum divided into frequency bands
+    \item Each station gets a fixed frequency band
+    \item Unused bands are idle (wasted capacity)
+    \item Same pros/cons as TDMA
+\end{itemize}
+\end{keybox}
+
+\subsection{Random Access Protocols}
+
+\subsubsection{Slotted ALOHA}
+
+\begin{keybox}[Slotted ALOHA]
+\textbf{Assumptions:}
+\begin{itemize}[noitemsep]
+    \item All frames are exactly the same size
+    \item Time is divided into equal-size slots (= time to transmit 1 frame)
+    \item Nodes start to transmit only at the beginning of a slot
+    \item Nodes are synchronized (they all know when slots begin)
+    \item If 2 or more nodes transmit in the same slot, all nodes detect the collision
+\end{itemize}
+
+\textbf{Operation:}
+\begin{itemize}[noitemsep]
+    \item When a node has a frame to send, it transmits in the next slot
+    \item If no collision: success!
+    \item If collision: retransmit in each subsequent slot with probability $p$, until success
+\end{itemize}
+\end{keybox}
+
+\begin{formulabox}[Slotted ALOHA Efficiency]
+Maximum efficiency = $1/e \approx 0.37$ (37\%)
+
+This means: even under best conditions, the channel is productive only 37\% of the time. The remaining 63\% is wasted on collisions and empty slots.
+
+\medskip
+Derivation: With $N$ active nodes, each transmitting with probability $p$, the probability of a successful slot is $N \cdot p \cdot (1-p)^{N-1}$. Optimizing over $p$ and letting $N \to \infty$ gives $\lim_{N\to\infty} N \cdot \frac{1}{N} \cdot (1 - \frac{1}{N})^{N-1} = 1/e$.
+\end{formulabox}
+
+\subsubsection{Pure (Unslotted) ALOHA}
+
+\begin{keybox}[Pure ALOHA]
+\begin{itemize}[noitemsep]
+    \item No synchronization, no slots
+    \item A node transmits immediately when it has a frame
+    \item Collision risk: if any other node transmits during the \emph{entire} vulnerable period (2 frame times), there's a collision
+    \item \textbf{Maximum efficiency = $1/(2e) \approx 0.18$ (18\%)} -- half that of slotted ALOHA
+\end{itemize}
+\end{keybox}
+
+\begin{exambox}[Exam-Type: ALOHA Properties -- V24 Q1.4.5]
+\textbf{Question:} Which statements about pure ALOHA and slotted ALOHA are true?
+
+\textbf{Key facts:}
+\begin{itemize}[noitemsep]
+    \item Pure ALOHA has lower efficiency than slotted ALOHA \checkmark
+    \item Max efficiency of slotted ALOHA ($1/e$) is \textbf{two times} that of pure ALOHA ($1/2e$) \checkmark
+    \item Slotted ALOHA reduces collisions compared to pure ALOHA \checkmark
+    \item In slotted ALOHA, stations must wait for the beginning of the next time slot $\Rightarrow$ they \textbf{cannot} send at any time without synchronization
+    \item In pure ALOHA, stations can transmit at any time (no waiting for slots)
+\end{itemize}
+\end{exambox}
+
+\subsubsection{CSMA -- Carrier Sense Multiple Access}
+
+\begin{keybox}[CSMA -- ``Listen Before Transmit'']
+\textbf{CSMA} adds \textbf{carrier sensing}: if the channel is sensed busy, defer transmission.
+
+\medskip
+\textbf{Why do collisions still occur?} Because of \textbf{propagation delay}: a node may not hear another node's transmission that has already started (the signal hasn't arrived yet). The longer the propagation delay, the higher the chance of collision.
+\end{keybox}
+
+\subsubsection{CSMA/CD -- CSMA with Collision Detection}
+
+\begin{keybox}[CSMA/CD (used in Ethernet)]
+CSMA/CD adds \textbf{collision detection}: if a collision is detected, the transmission is \textbf{aborted immediately}, reducing channel waste.
+
+\textbf{Algorithm:}
+\begin{enumerate}[noitemsep]
+    \item NIC receives datagram from network layer, creates frame
+    \item If NIC senses channel idle, start transmitting. If busy, wait until idle, then transmit.
+    \item If entire frame transmitted without detecting collision $\Rightarrow$ done!
+    \item If collision detected, abort and send a \textbf{jam signal}
+    \item After aborting, enter \textbf{binary (exponential) backoff}
+\end{enumerate}
+\end{keybox}
+
+\begin{formulabox}[Binary Exponential Backoff]
+After the $m$th collision (for the same frame):
+\begin{itemize}[noitemsep]
+    \item Choose $K$ randomly from $\{0, 1, 2, \ldots, 2^m - 1\}$
+    \item Wait $K \times 512$ bit times (for Ethernet)
+    \item After 10 collisions, freeze the range at $\{0, 1, \ldots, 1023\}$
+    \item After 16 collisions, give up and report an error
+\end{itemize}
+
+The idea: adapt the retransmission delay to the estimated number of colliding stations. More collisions $\Rightarrow$ longer expected backoff.
+\end{formulabox}
+
+\begin{formulabox}[CSMA/CD Efficiency]
+\[
+\text{Efficiency} = \frac{1}{1 + 5 \cdot t_{\text{prop}} / t_{\text{trans}}}
+\]
+where:
+\begin{itemize}[noitemsep]
+    \item $t_{\text{prop}}$ = maximum propagation delay between any 2 nodes
+    \item $t_{\text{trans}}$ = time to transmit a maximum-size frame
+\end{itemize}
+
+\medskip
+Key insight: Efficiency $\to 1$ as $t_{\text{prop}} \to 0$ or $t_{\text{trans}} \to \infty$.\\
+Better than ALOHA, and is decentralized, simple, and cheap.
+\end{formulabox}
+
+\subsection{Taking Turns Protocols}
+
+\begin{keybox}[Polling and Token Passing]
+\textbf{Polling:}
+\begin{itemize}[noitemsep]
+    \item A master node ``invites'' slave nodes to transmit in turn
+    \item \textbf{Concerns:} Polling overhead, latency, single point of failure (master)
+    \item Example: Bluetooth
+\end{itemize}
+
+\textbf{Token Passing:}
+\begin{itemize}[noitemsep]
+    \item A special ``token'' frame is passed from node to node sequentially
+    \item A node can transmit only when it holds the token
+    \item \textbf{Concerns:} Token overhead, latency, single point of failure (token loss)
+    \item Example: FDDI (Fiber Distributed Data Interface)
+\end{itemize}
+\end{keybox}
+
+\begin{exambox}[Exam-Type: Classify MAC Protocols -- S2025 Q6]
+\textbf{Question:} Categorize these protocols into Channel Partitioning, Random Access, or Taking Turns:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Protocol} & \textbf{Category} \\
+\midrule
+Bluetooth & Taking Turns (polling) \\
+Ethernet CSMA/CD & Random Access \\
+CDMA & Channel Partitioning \\
+Slotted ALOHA & Random Access \\
+FDDI & Taking Turns (token passing) \\
+FDMA & Channel Partitioning \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{exambox}
+
+\subsection{Cable Access Network: DOCSIS}
+
+\begin{keybox}[DOCSIS -- Data Over Cable Service Interface Specification]
+Cable internet uses a shared medium (coaxial cable + fiber):
+\begin{itemize}[noitemsep]
+    \item \textbf{Downstream:} FDM (Frequency Division Multiplexing) -- multiple channels, broadcast to all homes
+    \item \textbf{Upstream:} FDM + TDM + Random Access
+    \item Upstream channels are divided into time slots; some slots are assigned (for data), some are for contention (random access using mini-slots)
+    \item MAP messages from CMTS (Cable Modem Termination System) assign upstream slots
+    \item Random access slots use a form of ALOHA with binary backoff for requesting bandwidth
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{LANs -- Addressing and ARP (6.4)}
+%=============================================================================
+
+\subsection{MAC Addresses}
+
+\begin{keybox}[MAC (Physical/LAN) Addresses]
+\begin{itemize}[noitemsep]
+    \item \textbf{48-bit} address (6 bytes), written in hexadecimal (e.g., \texttt{1A-2F-BB-76-09-AD})
+    \item \textbf{Burned into} the NIC's ROM (or set by software)
+    \item Administered by IEEE: manufacturers buy blocks of addresses
+    \item \textbf{Flat address space:} portable -- you can move a NIC from one LAN to another without changing its MAC address
+    \item \textbf{Broadcast address:} \texttt{FF-FF-FF-FF-FF-FF} -- delivered to all adapters on the LAN
+\end{itemize}
+\end{keybox}
+
+\begin{warnbox}[MAC vs.\ IP Addresses]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& \textbf{MAC Address} & \textbf{IP Address} \\
+\midrule
+Length & 48 bits (6 bytes) & 32 bits (IPv4) \\
+Structure & Flat (no hierarchy) & Hierarchical (network + host) \\
+Scope & Link-layer, local & Network-layer, global \\
+Portability & Portable (burned in NIC) & Depends on subnet \\
+Analogy & SSN (identity number) & Postal address (location) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Why both?} IP addresses are needed for network-layer routing (hierarchical, location-dependent). MAC addresses are needed for link-layer frame delivery on a single LAN segment.
+\end{warnbox}
+
+\subsection{ARP -- Address Resolution Protocol}
+
+\begin{keybox}[ARP -- How It Works]
+ARP maps an IP address to a MAC address \emph{on the same subnet}:
+
+\begin{enumerate}[noitemsep]
+    \item Node A wants to send a frame to Node B (knows B's IP, but not B's MAC)
+    \item A broadcasts an \textbf{ARP query} (dest MAC = \texttt{FF-FF-FF-FF-FF-FF}) containing B's IP address
+    \item \textbf{All nodes} on the LAN receive the query
+    \item Node B recognizes its IP and replies with a \textbf{unicast ARP response} containing its MAC address
+    \item A caches the IP$\to$MAC mapping in its \textbf{ARP table} (with TTL, typically 20 minutes)
+\end{enumerate}
+
+ARP is ``plug-and-play'': tables are built automatically, no manual configuration needed.
+\end{keybox}
+
+\begin{exambox}[Exam-Type: ARP -- V23 Q1.4.1]
+\textbf{Question:} It is \_\_\_\_'s job to translate between IP addresses and MAC (medium access control) addresses.
+
+\textbf{Answer:} \textbf{ARP (Address Resolution Protocol)}.
+
+\medskip
+\textbf{Common confusion:}
+\begin{itemize}[noitemsep]
+    \item \textbf{DNS} translates \emph{hostnames} to \emph{IP addresses} (application layer)
+    \item \textbf{ARP} translates \emph{IP addresses} to \emph{MAC addresses} (link layer)
+\end{itemize}
+\end{exambox}
+
+\subsection{Routing to Another Subnet}
+
+\begin{keybox}[Sending a Datagram to Another Subnet]
+When host A (on subnet 1) sends to host B (on subnet 2), going through router R:
+
+\textbf{Key principle:} \textbf{IP addresses stay the same} end-to-end; \textbf{MAC addresses change at each hop}.
+
+\begin{enumerate}[noitemsep]
+    \item A creates IP datagram: src IP = A, dest IP = B
+    \item A looks up next-hop (router R) using its routing table
+    \item A uses ARP to find R's MAC address on subnet 1
+    \item A creates link-layer frame: src MAC = A, dest MAC = R (on subnet 1 interface)
+    \item Router R receives frame, extracts datagram, looks up next hop for B
+    \item R uses ARP to find B's MAC address on subnet 2
+    \item R creates new frame: src MAC = R (on subnet 2 interface), dest MAC = B
+    \item B receives the frame
+\end{enumerate}
+\end{keybox}
+
+\begin{warnbox}[Critical Exam Point: MAC Changes -- IP Stays]
+At every hop:
+\begin{itemize}[noitemsep]
+    \item The \textbf{source and destination IP addresses} remain \textbf{unchanged} (A $\to$ B)
+    \item The \textbf{source and destination MAC addresses} are \textbf{rewritten} to reflect the current link
+\end{itemize}
+This is a very commonly tested concept!
+\end{warnbox}
+
+%=============================================================================
+\section{Ethernet (6.4)}
+%=============================================================================
+
+\subsection{Ethernet Overview}
+
+\begin{keybox}[Ethernet -- The Dominant Wired LAN Technology]
+Ethernet is the most widely used wired LAN technology:
+\begin{itemize}[noitemsep]
+    \item First widely used LAN technology
+    \item Kept up with speed demands: 10 Mbps $\to$ 10 Gbps $\to$ 400 Gbps
+    \item Simple, cheap, and standardized (IEEE 802.3)
+\end{itemize}
+\end{keybox}
+
+\subsection{Ethernet Frame Structure}
+
+\begin{keybox}[Ethernet Frame Format]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Preamble} & \textbf{Dest MAC} & \textbf{Src MAC} & \textbf{Type} & \textbf{Data (Payload)} & \textbf{CRC} \\
+\hline
+8 bytes & 6 bytes & 6 bytes & 2 bytes & 46--1500 bytes & 4 bytes \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Preamble} (8 bytes): 7 bytes of \texttt{10101010} followed by 1 byte of \texttt{10101011} (SFD -- Start Frame Delimiter). Used for clock synchronization.
+    \item \textbf{Destination MAC} (6 bytes): MAC address of the receiving adapter. If broadcast (\texttt{FF-FF-FF-FF-FF-FF}), all adapters process the frame.
+    \item \textbf{Source MAC} (6 bytes): MAC address of the sending adapter.
+    \item \textbf{Type} (2 bytes): Indicates the higher-layer protocol (e.g., \texttt{0x0800} = IPv4, \texttt{0x0806} = ARP). Acts as a demultiplexing key.
+    \item \textbf{Data/Payload} (46--1500 bytes): The network-layer datagram. Minimum 46 bytes (padded if necessary). Maximum 1500 bytes = \textbf{MTU} (Maximum Transmission Unit).
+    \item \textbf{CRC} (4 bytes): Cyclic Redundancy Check for error detection. If CRC check fails, the frame is \textbf{dropped} (no NAK/retransmission at link layer).
+\end{itemize}
+\end{keybox}
+
+\subsection{Ethernet Properties}
+
+\begin{keybox}[Ethernet -- Key Properties]
+\begin{itemize}[noitemsep]
+    \item \textbf{Connectionless:} No handshaking between sending and receiving NICs.
+    \item \textbf{Unreliable:} Receiving NIC does \textbf{not} send ACKs or NAKs. Dropped frames are only recovered if the sender uses a reliable higher-layer protocol (e.g., TCP).
+    \item \textbf{MAC protocol:} Uses unslotted CSMA/CD with binary exponential backoff (in half-duplex mode).
+\end{itemize}
+\end{keybox}
+
+\subsection{Ethernet Topologies}
+
+\begin{keybox}[Bus vs.\ Star Topology]
+\textbf{Bus topology (legacy):}
+\begin{itemize}[noitemsep]
+    \item All nodes share a single coaxial cable (broadcast medium)
+    \item Collisions are common; uses CSMA/CD
+    \item Popular in the 1990s
+\end{itemize}
+
+\textbf{Star topology (modern):}
+\begin{itemize}[noitemsep]
+    \item Each node has a dedicated connection to a central \textbf{switch}
+    \item The switch operates in full-duplex mode -- \textbf{no collisions!}
+    \item Each link is its own collision domain
+    \item Dominant topology today
+\end{itemize}
+\end{keybox}
+
+\subsection{802.3 Ethernet Standards}
+
+\begin{keybox}[Common Ethernet Standards]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Standard} & \textbf{Speed} & \textbf{Medium} \\
+\midrule
+100BASE-TX & 100 Mbps & Copper (Cat5) \\
+1000BASE-T & 1 Gbps & Copper (Cat5e/6) \\
+10GBASE-T & 10 Gbps & Copper (Cat6a) \\
+100GBASE-SR & 100 Gbps & Fiber \\
+400GBASE & 400 Gbps & Fiber \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All share the same frame format and use CSMA/CD (at lower speeds) or full-duplex switched (at higher speeds).
+\end{keybox}
+
+%=============================================================================
+\section{Link-Layer Switches (6.4)}
+%=============================================================================
+
+\subsection{Switch Basics}
+
+\begin{keybox}[Ethernet Switch -- Key Properties]
+An Ethernet switch is a \textbf{link-layer device}:
+\begin{itemize}[noitemsep]
+    \item \textbf{Store-and-forward:} Examines incoming frame's destination MAC, selectively forwards to one or more outgoing links
+    \item \textbf{Transparent:} Hosts are \textbf{unaware} of the switch's presence
+    \item \textbf{Plug-and-play / self-learning:} Switches do \textbf{not} need to be manually configured
+    \item Uses a \textbf{switch table}: entries of (MAC address, interface, TTL)
+\end{itemize}
+\end{keybox}
+
+\subsection{Switch Self-Learning}
+
+\begin{keybox}[Self-Learning Algorithm]
+The switch \textbf{learns} which hosts are reachable through which interfaces:
+\begin{enumerate}[noitemsep]
+    \item When a frame arrives on interface $i$, the switch records the \textbf{source MAC address} in its switch table, along with the interface $i$ and a timestamp
+    \item If an entry is not refreshed within the \textbf{TTL} (aging time), it is deleted
+\end{enumerate}
+
+This is completely automatic -- no configuration needed!
+\end{keybox}
+
+\subsection{Switch Forwarding}
+
+\begin{keybox}[Frame Forwarding/Filtering]
+When a frame arrives at a switch on interface $i$, with destination MAC address \texttt{dest}:
+
+\begin{enumerate}[noitemsep]
+    \item Look up \texttt{dest} in the switch table
+    \item \textbf{If entry found:}
+    \begin{itemize}[noitemsep]
+        \item If \texttt{dest} is on interface $i$ (same segment) $\Rightarrow$ \textbf{drop/filter} (no need to forward)
+        \item If \texttt{dest} is on interface $j \neq i$ $\Rightarrow$ \textbf{forward} the frame to interface $j$
+    \end{itemize}
+    \item \textbf{If entry not found:} \textbf{flood} -- forward the frame on \textbf{all} interfaces except $i$
+\end{enumerate}
+\end{keybox}
+
+\subsection{Switches vs.\ Routers}
+
+\begin{keybox}[Switches vs.\ Routers]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& \textbf{Switch (Layer 2)} & \textbf{Router (Layer 3)} \\
+\midrule
+Layer & Data link layer & Network layer \\
+Addresses & MAC addresses & IP addresses \\
+Forwarding & Switch table (self-learned) & Routing table (algorithms) \\
+Broadcast & Floods unknown frames & Does not forward broadcasts \\
+Configuration & Plug-and-play & Needs IP configuration \\
+Scalability & Limited (flat addressing) & Hierarchical (IP subnets) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{keybox}
+
+\begin{exambox}[Exam-Type: Switches vs.\ Routers -- V24 Q1.4.1]
+\textbf{Question:} What is/are \textbf{false} when comparing between switches and routers?
+
+\textbf{Key facts:}
+\begin{itemize}[noitemsep]
+    \item Both routers and switches are connecting devices in networking \checkmark
+    \item Routers operate at the \textbf{Data link layer} and switches at \textbf{Network layer} $\Rightarrow$ \textbf{FALSE!} (It's the opposite)
+    \item Switches operate at the Data link layer, routers at the Network layer \checkmark
+    \item Switches connect devices within a network; routers connect different networks \checkmark
+    \item Routers rely on IP addresses; switches rely on MAC addresses \checkmark
+\end{itemize}
+\end{exambox}
+
+%=============================================================================
+\section{A Day in the Life of a Web Request (6.7)}
+%=============================================================================
+
+\begin{keybox}[Synthesis: All Layers Working Together]
+When a laptop connects to a network and requests a web page, the following protocols interact across \textbf{all five layers}:
+
+\textbf{Step 1: Connecting to the network (DHCP)}
+\begin{itemize}[noitemsep]
+    \item Laptop needs an IP address, subnet mask, default gateway, and DNS server
+    \item DHCP Discover $\to$ DHCP Offer $\to$ DHCP Request $\to$ DHCP ACK
+    \item DHCP is encapsulated in UDP, then IP, then Ethernet (broadcast)
+\end{itemize}
+
+\textbf{Step 2: Getting the router's MAC address (ARP)}
+\begin{itemize}[noitemsep]
+    \item Laptop knows the gateway IP (from DHCP) but needs its MAC address
+    \item ARP request (broadcast) $\to$ ARP reply (unicast) gives the router's MAC
+\end{itemize}
+
+\textbf{Step 3: Resolving the web server's IP (DNS)}
+\begin{itemize}[noitemsep]
+    \item Laptop creates DNS query for the web server hostname
+    \item DNS query sent via UDP to DNS server (IP from DHCP)
+    \item DNS response provides the web server's IP address
+\end{itemize}
+
+\textbf{Step 4: Establishing a connection (TCP)}
+\begin{itemize}[noitemsep]
+    \item TCP SYN to web server $\to$ SYN-ACK $\to$ ACK (three-way handshake)
+    \item IP datagram routed through network; at each hop, link-layer frames are created
+\end{itemize}
+
+\textbf{Step 5: Requesting the web page (HTTP)}
+\begin{itemize}[noitemsep]
+    \item HTTP GET request sent inside TCP segment
+    \item Web server responds with HTTP response containing the web page
+\end{itemize}
+\end{keybox}
+
+\begin{exambox}[Exam-Type: Protocols at Each Step -- S2025 Part II Q3]
+\textbf{Question:} A researcher plugs his laptop into the Ethernet port. He sends an email using Outlook. Elaborate the protocols used at each step.
+
+\textbf{Answer outline:}
+\begin{enumerate}[noitemsep]
+    \item \textbf{DHCP} (over UDP/IP/Ethernet broadcast): Obtain IP address, gateway, DNS server
+    \item \textbf{ARP}: Resolve gateway router's MAC address
+    \item \textbf{DNS} (over UDP): Resolve mail server hostname to IP
+    \item \textbf{TCP}: Establish connection to mail server
+    \item \textbf{SMTP}: Send the email (application layer)
+    \item On the receiving end: \textbf{IMAP/POP3/HTTP} to retrieve the email
+\end{enumerate}
+
+At every hop along the path, the \textbf{link layer} (Ethernet or other) handles frame creation and MAC addressing, while \textbf{IP} handles routing.
+\end{exambox}
+
+%=============================================================================
+\section{Summary of Key Formulas and Facts}
+%=============================================================================
+
+\begin{formulabox}[Key Formulas -- Chapter 6]
+\begin{center}
+\begin{longtable}{p{5.5cm}p{8.5cm}}
+\toprule
+\textbf{Concept} & \textbf{Formula / Value} \\
+\midrule
+Slotted ALOHA max efficiency & $1/e \approx 37\%$ \\
+\addlinespace
+Pure ALOHA max efficiency & $1/(2e) \approx 18\%$ \\
+\addlinespace
+CSMA/CD efficiency & $\dfrac{1}{1 + 5 \cdot t_{\text{prop}} / t_{\text{trans}}}$ \\
+\addlinespace
+Binary exponential backoff & After $m$th collision: $K \in \{0, 1, \ldots, 2^m - 1\}$, wait $K \times 512$ bit times \\
+\addlinespace
+CRC remainder bits & $r = \deg(G) = $ length of $G$ minus 1 \\
+\addlinespace
+CRC burst detection & Detects all bursts $< r+1$ bits \\
+\addlinespace
+MAC address length & 48 bits (6 bytes) \\
+\addlinespace
+ARP table TTL & Typically 20 minutes \\
+\addlinespace
+Ethernet MTU & 1500 bytes \\
+\addlinespace
+Ethernet min payload & 46 bytes \\
+\bottomrule
+\end{longtable}
+\end{center}
+\end{formulabox}
+
+%=============================================================================
+\section{Additional Exam Questions from Past Papers}
+%=============================================================================
+
+\begin{exambox}[S2025 -- CSMA Analysis -- Part II Q7]
+\textbf{Question:} Consider 6 packets arriving at times $t=0.1, 1.4, 1.8, 3.2, 3.3, 4.1$ at different wireless nodes. Each transmission takes exactly 1 time unit. Propagation delay = 0.2 time units. For CSMA (without collision detection), determine which packets are successfully transmitted.
+
+\medskip
+\textbf{Approach:}
+\begin{enumerate}[noitemsep]
+    \item Packet 1 starts at $t=0.1$, finishes at $t=1.1$. No other node has transmitted yet $\Rightarrow$ \textbf{success}.
+    \item Packet 2 at $t=1.4$: channel is free (packet 1 ended at $t=1.1$). Check if signal from packet 2 reaches other nodes before they transmit.
+    \item Packet 3 at $t=1.8$: does it sense packet 2? Packet 2 started at $t=1.4$, prop delay = 0.2, so signal reaches at $t=1.6$. At $t=1.8$, packet 3's node senses busy $\Rightarrow$ defers.
+    \item Continue this analysis for each packet\ldots
+\end{enumerate}
+
+\textbf{Key points:}
+\begin{itemize}[noitemsep]
+    \item A node senses the channel \emph{before} transmitting
+    \item Signal takes 0.2 time units to propagate between nodes
+    \item If the channel is sensed busy, the node does \emph{not} transmit
+    \item If collision occurs, both frames are lost (no CD, so full transmission happens)
+\end{itemize}
+\end{exambox}
+
+\begin{exambox}[S2025 -- Link-Layer Frame Headers -- Q8]
+\textbf{Question:} A link-layer frame travels from a host to a router. Match headers H$_1$, H$_2$, H$_3$ (outermost to innermost before the message M) to the correct layer.
+
+\textbf{Answer:}
+\begin{itemize}[noitemsep]
+    \item H$_1$ (outermost) = \textbf{Link layer} (Ethernet header with MAC addresses)
+    \item H$_2$ = \textbf{Network layer} (IP header)
+    \item H$_3$ (closest to M) = \textbf{Transport layer} (TCP/UDP header)
+\end{itemize}
+
+Remember: encapsulation adds headers from top to bottom. At the link layer, the frame wraps everything, so the link-layer header is the outermost.
+\end{exambox}
+
+\begin{exambox}[V23/V24 -- Flow Control in Link Layer -- V23 Q2.2]
+\textbf{Question:} Besides Transport Layer, which of Physical Layer, Link Layer, and Network Layer has flow control concepts?
+
+\textbf{Answer:} The \textbf{Link Layer} has flow control (pacing between adjacent sending and receiving nodes). This is analogous to TCP flow control but operates at the link level.
+
+\medskip
+The Link Layer also has error detection/correction (like transport layer's checksum), and reliable delivery on some link protocols (like WiFi 802.11).
+\end{exambox}
+
+\begin{exambox}[S2025 -- Subnetting and Broadcast Address -- Q5 and Q12]
+\textbf{Q5:} Given 208.27.1.0/22, create 12 subnets. How many usable hosts per subnet?
+
+/22 = 1024 addresses total. To get 12 subnets, need $\lceil\log_2 12\rceil = 4$ subnet bits $\Rightarrow$ /26.
+Each /26 subnet has $2^6 - 2 = 62$ usable hosts. \textbf{Answer: b) 62}
+
+\medskip
+\textbf{Q12:} What is the broadcast address of prefix 172.18.16.0/21?
+
+/21 means 21 network bits, 11 host bits. $2^{11} = 2048$ addresses.
+$172.18.16.0 + 2047 = 172.18.23.255$. \textbf{Answer: b) 172.18.23.255}
+\end{exambox}

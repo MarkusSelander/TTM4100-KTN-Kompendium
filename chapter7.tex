@@ -1,0 +1,643 @@
+\section{Introduction to Wireless Networks (7.1)}
+%=============================================================================
+
+\subsection{Elements of a Wireless Network}
+
+\begin{keybox}[Key Components of a Wireless Network]
+A wireless network consists of several key elements:
+\begin{itemize}[noitemsep]
+    \item \textbf{Wireless hosts:} End-user devices (laptops, smartphones, tablets) running applications. May be stationary or mobile.
+    \item \textbf{Base stations:} Fixed infrastructure devices (cell towers, WiFi access points) that relay packets between wired network and wireless hosts within coverage area.
+    \item \textbf{Wireless links:} Communication medium connecting hosts to base stations (or hosts to hosts in ad hoc mode). Various link standards differ in range, data rate, and frequency band.
+    \item \textbf{Infrastructure (wired) network:} The backbone connecting base stations to each other and to the global Internet.
+\end{itemize}
+\end{keybox}
+
+\subsection{Infrastructure Mode vs.\ Ad Hoc Mode}
+
+\begin{keybox}[Infrastructure Mode vs.\ Ad Hoc Mode]
+\textbf{Infrastructure mode:}
+\begin{itemize}[noitemsep]
+    \item Hosts connect \emph{through} a base station (access point or cell tower).
+    \item Base station connects to wired network -- provides Internet access.
+    \item Handoff: host moves from one base station's coverage to another (typical in cellular networks, possible in WiFi).
+\end{itemize}
+
+\medskip
+\textbf{Ad hoc (infrastructure-less) mode:}
+\begin{itemize}[noitemsep]
+    \item No base station. Hosts communicate \emph{directly} with each other.
+    \item Hosts must self-organize, self-route.
+    \item Examples: Bluetooth devices, vehicular networks, emergency scenarios where infrastructure is unavailable.
+\end{itemize}
+\end{keybox}
+
+\subsection{Wireless Network Taxonomy}
+
+\begin{keybox}[Wireless Network Taxonomy -- 2x2 Matrix]
+Networks are classified along two dimensions:
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+ & \textbf{Single hop} & \textbf{Multiple hops} \\
+\hline
+\textbf{Infrastructure} & WiFi 802.11, 4G/5G LTE & Wireless mesh, relay \\
+\hline
+\textbf{No infrastructure} & Bluetooth, ad hoc WiFi & MANET, VANET \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Single-hop, infrastructure:} Host connects to base station in one hop. Most common (home WiFi, cellular).
+    \item \textbf{Single-hop, no infrastructure:} Hosts talk directly, no base station (Bluetooth).
+    \item \textbf{Multi-hop, infrastructure:} Packets may relay through wireless nodes before reaching a base station (wireless mesh).
+    \item \textbf{Multi-hop, no infrastructure:} Packets relay hop-by-hop with no fixed infrastructure (MANET -- Mobile Ad-hoc NETwork).
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Wireless Link Characteristics (7.2)}
+%=============================================================================
+
+\subsection{Challenges of the Wireless Channel}
+
+\begin{warnbox}[Why Wireless Is Harder Than Wired]
+Three fundamental challenges in wireless communications:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Path loss / decreased signal strength:} Signal energy attenuates as it propagates through space (even in free space). Signal strength falls off roughly as $1/d^2$ (free-space) or faster with obstacles.
+    \item \textbf{Interference from other sources:} ISM bands (2.4 GHz, 5 GHz used by WiFi) are unlicensed -- shared with microwaves, Bluetooth, cordless phones. Licensed cellular bands still experience inter-cell interference.
+    \item \textbf{Multipath propagation:} Signal reflects off objects (buildings, ground, furniture) and arrives at receiver via multiple paths with different delays. Causes constructive/destructive interference -- the channel changes over time (fading).
+\end{enumerate}
+All three mean: wireless links have \emph{higher} bit error rates than wired links, and the error rate is highly variable.
+\end{warnbox}
+
+\subsection{SNR vs.\ BER -- The Fundamental Tradeoff}
+
+\begin{formulabox}[SNR and BER -- Signal-to-Noise Ratio vs.\ Bit Error Rate]
+\textbf{SNR (Signal-to-Noise Ratio):} Ratio of received signal power to noise power, expressed in dB.
+\[ \text{SNR}_{dB} = 10 \cdot \log_{10}\!\left(\frac{P_\text{signal}}{P_\text{noise}}\right) \]
+
+\textbf{BER (Bit Error Rate):} Fraction of transmitted bits received in error.
+
+\medskip
+\textbf{Key relationships:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Higher SNR $\Rightarrow$ lower BER.} More signal power relative to noise makes it easier to decode bits correctly.
+    \item \textbf{Higher bit-rate modulation $\Rightarrow$ higher BER} (for the same SNR). E.g., QAM-256 encodes more bits per symbol but requires higher SNR to achieve the same BER as BPSK.
+    \item As a host moves farther from the base station, SNR decreases and BER increases.
+\end{itemize}
+\end{formulabox}
+
+\begin{keybox}[Modulation and Adaptive Rate]
+Different modulation schemes achieve different tradeoffs:
+\begin{itemize}[noitemsep]
+    \item \textbf{BPSK} (2 states): 1 bit/symbol -- robust, low BER at given SNR, but slow.
+    \item \textbf{QPSK} (4 states): 2 bits/symbol.
+    \item \textbf{QAM-16} (16 states): 4 bits/symbol.
+    \item \textbf{QAM-256} (256 states): 8 bits/symbol -- fast, but requires high SNR.
+\end{itemize}
+
+\medskip
+\textbf{Rate adaptation / adaptive modulation and coding (AMC):}\\
+Transmitter and receiver dynamically adjust the modulation scheme based on measured channel quality (SNR estimate).
+\begin{itemize}[noitemsep]
+    \item Good channel (high SNR) $\rightarrow$ use high-rate modulation (e.g., QAM-64) to maximize throughput.
+    \item Poor channel (low SNR, e.g., host far from AP) $\rightarrow$ fall back to lower-rate, more robust modulation (e.g., BPSK).
+    \item Both 802.11 WiFi and 4G/5G LTE use AMC.
+\end{itemize}
+\end{keybox}
+
+\begin{exambox}[Exam -- SNR/BER/Modulation - V23 Q1.4.3 and V24 Q1.4.3]
+\textbf{V23 Q1.4.3 -- Which statements about wireless physical layer are true?}
+\begin{itemize}[noitemsep]
+    \item \textbf{a) Higher SNR means lower BER.} \checkmark\ \textbf{TRUE}
+    \item b) Wireless links have lower BER than wired links. \texttimes\ FALSE -- wireless is generally worse.
+    \item c) Higher modulation bit rate means lower BER at same SNR. \texttimes\ FALSE -- higher bit rate means higher BER.
+    \item d) Multipath propagation eliminates interference. \texttimes\ FALSE -- it causes fading/interference.
+    \item \textbf{e) As SNR decreases, using a lower modulation bit rate can maintain BER.} \checkmark\ \textbf{TRUE} -- this is exactly rate adaptation.
+\end{itemize}
+
+\medskip
+\textbf{V24 Q1.4.3 -- SNR/BER/Modulation statements:}
+\begin{itemize}[noitemsep]
+    \item \textbf{a) Lower SNR means higher BER.} \checkmark\ \textbf{TRUE} (equivalent to: lower SNR $\Rightarrow$ worse channel $\Rightarrow$ more errors).
+    \item b) Lower SNR means lower BER. \texttimes\ FALSE.
+    \item c) Higher modulation rate means lower BER at given SNR. \texttimes\ FALSE.
+    \item \textbf{d) Higher modulation bit rate means higher BER at given SNR.} \checkmark\ \textbf{TRUE}
+    \item e) Path loss increases signal strength. \texttimes\ FALSE -- path loss \emph{decreases} signal strength.
+\end{itemize}
+
+\medskip
+\textbf{Rule of thumb for exam:} Higher SNR = better; higher bit-rate modulation = more errors per bit for same SNR.
+\end{exambox}
+
+\subsection{Hidden Terminal Problem}
+
+\begin{warnbox}[The Hidden Terminal Problem]
+In wireless networks, node A may be able to hear node B, but \emph{not} hear node C which is also transmitting to B. From A's perspective, the channel appears idle even though B is experiencing a collision.
+
+\begin{center}
+\texttt{A ~~---~~> B <---~~ C} \quad (A and C cannot hear each other)
+\end{center}
+
+\begin{itemize}[noitemsep]
+    \item A transmits to B. C also transmits to B simultaneously (C cannot hear A's transmission, so C thinks channel is idle).
+    \item At B, both signals collide -- but A and C don't know this.
+    \item This is the \textbf{hidden terminal problem}: C is ``hidden'' from A.
+    \item CSMA carrier sense does \emph{not} solve this -- A hears nothing and proceeds to transmit regardless.
+    \item Solution: \textbf{RTS/CTS} mechanism (see Section~\ref{sec:rtscst}).
+\end{itemize}
+\end{warnbox}
+
+%=============================================================================
+\section{IEEE 802.11 -- WiFi Wireless LANs (7.3)}
+%=============================================================================
+
+\subsection{802.11 Standards Overview}
+
+\begin{keybox}[IEEE 802.11 WiFi Standards]
+\begin{center}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Standard} & \textbf{Name} & \textbf{Freq.\ band} & \textbf{Max rate} & \textbf{Notes}\\
+\midrule
+802.11b & WiFi 1 & 2.4 GHz & 11 Mbps & First widely deployed\\
+802.11a & WiFi 2 & 5 GHz & 54 Mbps & Less range than b\\
+802.11g & WiFi 3 & 2.4 GHz & 54 Mbps & Backward compat with b\\
+802.11n & WiFi 4 & 2.4/5 GHz & 600 Mbps & MIMO antennas\\
+802.11ac & WiFi 5 & 5 GHz & 3.47 Gbps & Wide channels, MU-MIMO\\
+802.11ax & WiFi 6/6E & 2.4/5/6 GHz & 14 Gbps & OFDMA, better dense use\\
+802.11af & White-Fi & TV whitespace & varies & Long range\\
+802.11ah & HaLow & sub-1 GHz & varies & IoT, long range, low power\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{All 802.11 standards use CSMA/CA for multiple access.}\\
+All operate in \textbf{BSS (Basic Service Set)} infrastructure mode or IBSS (ad hoc/independent BSS).
+\end{keybox}
+
+\subsection{BSS Architecture and Association}
+
+\begin{keybox}[BSS Architecture -- Basic Service Set]
+\begin{itemize}[noitemsep]
+    \item \textbf{BSS:} A group of wireless stations and one \textbf{Access Point (AP)}. The AP connects the BSS to the wired distribution system (router/Internet).
+    \item \textbf{SSID (Service Set Identifier):} The human-readable network name (e.g., ``NTNU-WiFi'').
+    \item \textbf{Channel:} 802.11 operates on channels within the frequency band. In 2.4 GHz there are 11 overlapping channels (only 1, 6, 11 are non-overlapping). Adjacent APs should use non-overlapping channels.
+    \item \textbf{AP beacon frames:} AP periodically broadcasts beacon frames (typically every 100 ms) containing its SSID and MAC address.
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[Passive vs.\ Active Scanning]
+To associate with an AP, a host uses one of two scanning methods:
+
+\medskip
+\textbf{Passive scanning:}
+\begin{enumerate}[noitemsep]
+    \item Host listens on each channel for beacon frames from APs.
+    \item Selects AP with best signal (or user preference).
+    \item Sends association request frame to chosen AP.
+    \item AP sends association response frame.
+\end{enumerate}
+
+\medskip
+\textbf{Active scanning:}
+\begin{enumerate}[noitemsep]
+    \item Host broadcasts \textbf{probe request frame} on each channel.
+    \item APs that hear it reply with \textbf{probe response frame} (SSID, rates, etc.).
+    \item Host selects AP and sends association request.
+    \item AP sends association response.
+\end{enumerate}
+
+\textbf{After association:} Host typically runs DHCP to obtain IP address; DHCP server often co-located with AP/router.
+\end{keybox}
+
+\subsection{CSMA/CA -- Multiple Access in 802.11}
+
+\begin{warnbox}[Why Not CSMA/CD in Wireless?]
+Wired Ethernet uses \textbf{CSMA/CD} (Collision Detection): transmit, detect collision, abort, backoff, retry.
+
+\medskip
+In wireless, collision \emph{detection} is impractical:
+\begin{itemize}[noitemsep]
+    \item To detect a collision, the transmitter must compare its own transmitted signal with what it receives simultaneously. In wireless, the transmitted signal is much stronger than any incoming signal -- the transmitter would drown out the received signal.
+    \item Hidden terminal: two senders may be transmitting to the same receiver but cannot hear each other.
+\end{itemize}
+Therefore, 802.11 uses \textbf{CSMA/CA} (Collision \emph{Avoidance}) -- try to \emph{avoid} collisions rather than detect them.
+\end{warnbox}
+
+\begin{keybox}[CSMA/CA Protocol -- Step by Step]
+\textbf{Sender:}
+\begin{enumerate}[noitemsep]
+    \item Sense channel. If channel idle for \textbf{DIFS} (Distributed Inter-Frame Space) duration, transmit entire frame.
+    \item If channel busy, wait until channel becomes idle. Then wait DIFS. Then choose random backoff (binary exponential backoff). Countdown the backoff timer \emph{only} while channel is idle (freeze timer when channel is busy).
+    \item When backoff reaches 0, transmit entire frame.
+    \item \textbf{No collision detection} -- must transmit the \emph{entire} frame.
+\end{enumerate}
+
+\medskip
+\textbf{Receiver:}
+\begin{enumerate}[noitemsep]
+    \item If frame received correctly, wait \textbf{SIFS} (Short Inter-Frame Space -- shorter than DIFS) and send \textbf{ACK}.
+\end{enumerate}
+
+\medskip
+\textbf{Sender:}
+\begin{enumerate}[noitemsep,resume]
+    \item If no ACK received within timeout $\rightarrow$ collision assumed $\rightarrow$ binary exponential backoff and retransmit.
+\end{enumerate}
+
+\medskip
+\textbf{Key timing:} SIFS $<$ DIFS. ACK uses SIFS so it gets priority access before any new transmission (which must wait DIFS).
+\end{keybox}
+
+\begin{formulabox}[Inter-Frame Spacing Summary]
+\begin{itemize}[noitemsep]
+    \item \textbf{SIFS (Short IFS):} Used for ACK, CTS (high priority). Shortest wait.
+    \item \textbf{DIFS (Distributed IFS):} Used for data frames and RTS. Longer than SIFS -- ensures ACK/CTS sent before new data.
+    \item \textbf{EIFS (Extended IFS):} Used after a reception error (frame not decoded). Longest.
+\end{itemize}
+Priority: SIFS $<$ DIFS $<$ EIFS. Shorter IFS $\rightarrow$ higher access priority.
+\end{formulabox}
+
+\subsection{RTS/CTS Mechanism}
+\label{sec:rtscst}
+
+\begin{keybox}[RTS/CTS -- Request to Send / Clear to Send]
+\textbf{Problem solved:} Hidden terminal problem. Even with CSMA/CA, two hidden terminals can both sense the channel as idle and transmit simultaneously, causing a collision at the AP.
+
+\medskip
+\textbf{RTS/CTS mechanism (optional in 802.11):}
+\begin{enumerate}[noitemsep]
+    \item Sender waits DIFS, then sends a short \textbf{RTS (Request to Send)} frame to the AP. RTS includes: duration of intended data transmission.
+    \item AP broadcasts \textbf{CTS (Clear to Send)} frame (after SIFS). CTS is heard by \emph{all} stations in AP's range (including hidden terminals).
+    \item CTS reserves the channel: all stations that hear CTS defer for the duration specified.
+    \item Sender transmits data frame (after SIFS).
+    \item AP sends ACK (after SIFS).
+\end{enumerate}
+
+\medskip
+\textbf{Why it helps:} Even if A and C are hidden from each other, both hear the CTS from the AP and know to defer. The overhead of RTS/CTS is small compared to large data frames.
+
+\medskip
+\textbf{Trade-off:} RTS/CTS adds overhead (extra frames). Worth it for large frames; typically enabled with a threshold (e.g., RTS/CTS only for frames $>$ 500 bytes).
+
+\medskip
+\textbf{Important:} RTS/CTS \emph{reduces} but does \emph{not} eliminate hidden terminal collisions (two senders can still collide on the RTS itself).
+\end{keybox}
+
+\begin{exambox}[Exam -- CSMA/CA and RTS/CTS - V23 Q1.4.4 and V24 Q1.4.4]
+\textbf{V23 Q1.4.4 -- Which are elements of 802.11 MAC?}
+\begin{itemize}[noitemsep]
+    \item \textbf{a) CSMA/CA.} \checkmark\ \textbf{TRUE} -- the core MAC protocol.
+    \item b) CSMA/CD. \texttimes\ FALSE -- that is Ethernet.
+    \item \textbf{c) ACK for every frame.} \checkmark\ \textbf{TRUE} -- receiver sends ACK after every successfully received frame (SIFS wait).
+    \item \textbf{d) RTS/CTS mechanism.} \checkmark\ \textbf{TRUE} -- optional but part of the standard.
+    \item \textbf{e) DIFS wait before transmission.} \checkmark\ \textbf{TRUE} -- mandatory part of CSMA/CA.
+    \item f) Collision detection. \texttimes\ FALSE -- no collision detection in 802.11.
+\end{itemize}
+
+\medskip
+\textbf{V24 Q1.4.4 -- CSMA/CA and RTS/CTS statements:}
+\begin{itemize}[noitemsep]
+    \item \textbf{a) Hidden terminal problem can still occur even with CSMA/CA.} \checkmark\ \textbf{TRUE} -- CSMA/CA alone does not solve hidden terminal; RTS/CTS is needed.
+    \item b) In RTS/CTS, the sender broadcasts CTS to reserve the channel. \texttimes\ FALSE -- the \emph{AP} broadcasts CTS, not the sender.
+    \item \textbf{b) In RTS/CTS, sender sends RTS to AP and AP responds with CTS.} \checkmark\ \textbf{TRUE} -- correct description of RTS/CTS.
+    \item c) CSMA/CA detects collisions and retransmits. \texttimes\ FALSE -- it \emph{avoids} collisions; no detection.
+    \item d) Backoff timer counts down while channel is busy. \texttimes\ FALSE -- timer is \emph{frozen} when channel is busy.
+    \item \textbf{e) RTS/CTS improves channel access for large frames.} \checkmark\ \textbf{TRUE} -- reduces wasted bandwidth from large-frame collisions.
+\end{itemize}
+
+\medskip
+\textbf{Key distinctions to remember:}
+\begin{itemize}[noitemsep]
+    \item \textbf{CA not CD:} Avoid, not detect.
+    \item \textbf{AP broadcasts CTS}, not the sender.
+    \item \textbf{Backoff timer freezes} when channel is busy (counts down only during idle).
+    \item \textbf{SIFS $<$ DIFS}: ACK/CTS use SIFS for priority access.
+\end{itemize}
+\end{exambox}
+
+\begin{exambox}[Exam -- S2025 Part II Q7 -- CSMA/CA Analysis]
+\textbf{Scenario:} Six wireless nodes share an AP. At time $t=0$, each node has one packet queued to transmit. Analyze the transmission order and timing under 802.11 CSMA/CA.
+
+\medskip
+\textbf{Key points for solving such problems:}
+\begin{enumerate}[noitemsep]
+    \item At $t=0$ all nodes sense channel idle. All wait DIFS, then each draws a random backoff counter (uniformly from $[0, CW-1]$, initial contention window CW = 15 or 31 depending on standard).
+    \item The node with the \emph{smallest} backoff counter transmits first.
+    \item All other nodes freeze their timers when they detect the channel is busy (ongoing transmission).
+    \item After transmission + ACK + DIFS, remaining nodes resume counting down from where they froze.
+    \item If two nodes had the same backoff, they collide: both do not receive ACK, double the contention window, draw new random backoff.
+\end{enumerate}
+
+\medskip
+\textbf{Typical exam questions:}
+\begin{itemize}[noitemsep]
+    \item Who transmits first given specific backoff values?
+    \item When does a given node finish transmitting (add DIFS + transmission time + SIFS + ACK time)?
+    \item What happens if two nodes draw the same backoff?
+\end{itemize}
+
+\medskip
+\textbf{Formula for channel occupancy:}
+\[ T_\text{total} = \text{DIFS} + \text{backoff} \cdot T_\text{slot} + T_\text{frame} + \text{SIFS} + T_\text{ACK} \]
+\end{exambox}
+
+\subsection{802.11 Frame Structure}
+
+\begin{keybox}[802.11 Frame -- Four MAC Addresses]
+Unlike Ethernet (2 MAC addresses), an 802.11 frame has \textbf{4 address fields}:
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Field} & \textbf{In Infrastructure Mode} & \textbf{Direction} \\
+\hline
+Address 1 & MAC of receiver & Destination of this wireless hop \\
+Address 2 & MAC of transmitter & Source of this wireless hop \\
+Address 3 & MAC of router interface & Gateway router to/from wired network \\
+Address 4 & Used only in ad hoc mode & -- \\
+\hline
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{Example -- host H1 sending to server S1 via AP:}
+\begin{itemize}[noitemsep]
+    \item H1 $\rightarrow$ AP (wireless frame): Addr1 = AP MAC, Addr2 = H1 MAC, Addr3 = Router MAC
+    \item AP $\rightarrow$ Router (Ethernet frame): Dest = Router MAC, Src = AP MAC
+    \item (The IP datagram inside always has IP src = H1 IP, IP dst = S1 IP)
+\end{itemize}
+
+\textbf{Why Address 3?} The AP acts as a link-layer relay. It strips the 802.11 frame and creates an Ethernet frame for the wired LAN. Address 3 tells the AP \emph{where to forward} the packet on the wired side.
+\end{keybox}
+
+\begin{keybox}[802.11 Frame Control Field]
+The \textbf{Frame Control} field (2 bytes) contains:
+\begin{itemize}[noitemsep]
+    \item \textbf{Protocol version} (2 bits): Always 0 for current 802.11.
+    \item \textbf{Type} (2 bits): Management (00), Control (01), Data (10).
+    \item \textbf{Subtype} (4 bits): E.g., beacon, probe request, RTS, CTS, ACK, data.
+    \item \textbf{To DS / From DS} (1 bit each): Indicate direction relative to distribution system (infrastructure).
+    \item \textbf{More fragments} (1 bit): Whether more fragments follow.
+    \item \textbf{Retry} (1 bit): Whether this is a retransmission.
+    \item \textbf{Power management} (1 bit): Sender going to sleep after this frame.
+    \item \textbf{More data} (1 bit): AP has more frames buffered for this station.
+    \item \textbf{WEP/Protected} (1 bit): Frame body is encrypted.
+    \item \textbf{Order} (1 bit): Frames must be delivered in order.
+\end{itemize}
+\end{keybox}
+
+\subsection{Mobility Within the Same Subnet}
+
+\begin{keybox}[Mobility Within Same IP Subnet]
+\textbf{Scenario:} Host H1 moves from BSS1 (AP1) to BSS2 (AP2). Both APs are in the \emph{same} IP subnet.
+
+\medskip
+\textbf{What changes and what doesn't:}
+\begin{itemize}[noitemsep]
+    \item \textbf{IP address stays the same} -- same subnet, no need for new DHCP (short timescale).
+    \item \textbf{Association changes:} H1 disassociates from AP1 and associates with AP2.
+    \item \textbf{Switch self-learning:} The Ethernet switch between AP1 and AP2 updates its forwarding table via self-learning when H1 sends a frame through AP2. 802.11 may also send a broadcast frame to ``wake up'' switch learning.
+    \item \textbf{No routing change required.}
+\end{itemize}
+
+\textbf{Cross-subnet mobility} (different IP subnet) requires IP-level mobility support (Mobile IP, not covered in 7th ed. detail).
+\end{keybox}
+
+\subsection{Rate Adaptation and Power Management}
+
+\begin{keybox}[Rate Adaptation]
+802.11 dynamically adjusts the modulation/coding scheme based on channel quality:
+\begin{itemize}[noitemsep]
+    \item Good channel (high SNR) $\rightarrow$ use high-rate modulation (e.g., QAM-64 5/6 coding) $\rightarrow$ higher throughput.
+    \item Poor channel (low SNR, edge of coverage) $\rightarrow$ fall back to low-rate, robust modulation (e.g., BPSK 1/2) $\rightarrow$ maintain connection at lower rate.
+    \item Feedback: receiver sends SNR estimates (or implicit: lack of ACK $\Rightarrow$ reduce rate).
+\end{itemize}
+This is the same AMC concept as in LTE (see Section~\ref{sec:4g}).
+\end{keybox}
+
+\begin{keybox}[802.11 Power Management]
+Mobile devices want to save battery. 802.11 has a sleep/wake mechanism:
+\begin{itemize}[noitemsep]
+    \item Host sets \textbf{Power Management} bit in frame control = 1 to tell AP it will sleep.
+    \item AP buffers frames destined for sleeping host.
+    \item AP's \textbf{beacon frame} includes a list of APs with buffered frames (TIM -- Traffic Indication Map).
+    \item Host wakes up before every beacon (every ~100 ms), checks TIM, stays awake if it has buffered frames, goes back to sleep otherwise.
+    \item Result: host can sleep for $\sim$99\% of time if no traffic (significant power savings).
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Cellular Networks -- 4G and 5G (7.4)}
+%=============================================================================
+\label{sec:4g}
+
+\subsection{4G LTE Architecture}
+
+\begin{keybox}[4G LTE Network Architecture]
+4G LTE (Long-Term Evolution) architecture separates the \textbf{user plane} (data) and \textbf{control plane} (signaling):
+
+\medskip
+\textbf{Radio Access Network (RAN):}
+\begin{itemize}[noitemsep]
+    \item \textbf{UE (User Equipment):} The mobile device (phone, tablet). Contains a SIM card with a 64-bit \textbf{IMSI (International Mobile Subscriber Identity)} that uniquely identifies the subscriber.
+    \item \textbf{eNode-B (eNB):} The 4G base station. Handles radio access (scheduling, modulation, etc.) and some control functions. In 5G, called \textbf{gNode-B (gNB)}.
+\end{itemize}
+
+\medskip
+\textbf{Evolved Packet Core (EPC):}
+\begin{itemize}[noitemsep]
+    \item \textbf{MME (Mobility Management Entity):} Control plane. Handles authentication, UE tracking, paging, handover decisions. Contacts HSS to verify IMSI.
+    \item \textbf{HSS (Home Subscriber Service):} Database of subscriber information (IMSI, service profile, authentication keys).
+    \item \textbf{S-GW (Serving Gateway):} User-plane gateway in the visited network. Forwards data between eNB and P-GW. Handles mobility across eNBs.
+    \item \textbf{P-GW (PDN Gateway):} User-plane gateway to the Internet (Packet Data Network). Performs NAT, allocates UE IP address, enforces QoS.
+\end{itemize}
+\end{keybox}
+
+\begin{tikzpicture}[
+    node distance=1.4cm and 2cm,
+    box/.style={draw, rounded corners, minimum width=2.2cm, minimum height=0.8cm, align=center, font=\small},
+    arr/.style={-Stealth, thick}
+]
+\node[box, fill=lightblue] (UE) {UE\\(Phone)};
+\node[box, fill=lightblue, right=of UE] (eNB) {eNode-B\\(Base Station)};
+\node[box, fill=lightyellow, right=of eNB] (SGW) {S-GW};
+\node[box, fill=lightyellow, right=of SGW] (PGW) {P-GW};
+\node[box, fill=lightred, above=of SGW] (MME) {MME};
+\node[box, fill=lightred, above=of PGW] (HSS) {HSS};
+\node[box, fill=lightgreen, right=of PGW] (Internet) {Internet};
+
+\draw[arr] (UE) -- node[above,font=\tiny]{radio} (eNB);
+\draw[arr, <->] (eNB) -- node[above,font=\tiny]{S1-U} (SGW);
+\draw[arr, <->] (SGW) -- node[above,font=\tiny]{S5} (PGW);
+\draw[arr, <->] (PGW) -- (Internet);
+\draw[arr, <->] (MME) -- node[right,font=\tiny]{S11} (SGW);
+\draw[arr, <->] (MME) -- (HSS);
+\draw[arr, <->] (MME) -- node[left,font=\tiny]{S1-MME} (eNB);
+
+\node[font=\tiny, below=0.1cm of UE] {User plane};
+\node[font=\tiny, below=0.1cm of SGW] {User plane};
+\end{tikzpicture}
+
+\subsection{LTE Data Plane -- Tunneling}
+
+\begin{keybox}[LTE Tunneling -- GTP-U Protocol]
+In LTE, user data is \textbf{tunneled} from eNode-B all the way to P-GW using \textbf{GTP-U (GPRS Tunneling Protocol -- User plane)}:
+
+\medskip
+\textbf{Tunnel path:} UE $\leftrightarrow$ eNB $\xrightarrow{\text{GTP tunnel}}$ S-GW $\xrightarrow{\text{GTP tunnel}}$ P-GW $\leftrightarrow$ Internet
+
+\begin{itemize}[noitemsep]
+    \item Each user datagram is encapsulated in a GTP-U header (which adds a Tunnel Endpoint ID -- TEID).
+    \item eNB $\rightarrow$ S-GW: one GTP tunnel per UE.
+    \item S-GW $\rightarrow$ P-GW: another GTP tunnel per UE.
+    \item The tunnels allow user traffic to flow transparently regardless of which eNB the UE is attached to.
+\end{itemize}
+
+\medskip
+\textbf{Why tunneling?} Hides radio-network mobility from the IP core. When a UE moves between eNBs (handover), only the tunnel endpoints change -- the P-GW IP and the UE's allocated IP remain constant.
+\end{keybox}
+
+\subsection{LTE Link Layer}
+
+\begin{keybox}[LTE Radio Access -- OFDM and Link-Layer Protocols]
+\textbf{Physical layer:} LTE uses \textbf{OFDM (Orthogonal Frequency Division Multiplexing)}:
+\begin{itemize}[noitemsep]
+    \item Frequency band divided into many narrow orthogonal subcarriers.
+    \item Combined FDM (across subcarriers) + TDM (time slots) = \textbf{OFDMA} in downlink.
+    \item Each 1 ms subframe is divided into resource blocks (time $\times$ frequency) allocated to UEs by the base station scheduler.
+    \item Each UE's resource block can use a different modulation/coding scheme (adaptive modulation per UE).
+\end{itemize}
+
+\medskip
+\textbf{LTE link layer sub-layers} (between UE and eNB):
+\begin{enumerate}[noitemsep]
+    \item \textbf{PDCP (Packet Data Convergence Protocol):} IP header compression, ciphering (encryption).
+    \item \textbf{RLC (Radio Link Control):} Fragmentation and reassembly of large packets. Reliable data transfer (ARQ -- Automatic Repeat reQuest).
+    \item \textbf{MAC (Medium Access Control):} Scheduling, HARQ (Hybrid ARQ -- combines FEC + ARQ).
+\end{enumerate}
+\end{keybox}
+
+\subsection{BS Association and Sleep Modes}
+
+\begin{keybox}[BS Association in LTE]
+How a UE connects to an eNB:
+\begin{enumerate}[noitemsep]
+    \item eNBs broadcast \textbf{synchronization signals} every 5 ms on a set of well-known frequencies.
+    \item UE scans frequencies, detects synch signals, measures signal strength from multiple eNBs.
+    \item UE selects the best eNB (strongest signal / highest SINR).
+    \item UE sends \textbf{Random Access} message to eNB (contention-based RACH or contention-free).
+    \item eNB responds with timing alignment and temporary ID.
+    \item Authentication via MME and HSS: IMSI sent, HSS verifies subscriber, session established.
+    \item P-GW assigns UE an IP address (via MME $\rightarrow$ S-GW $\rightarrow$ P-GW signaling).
+\end{enumerate}
+\end{keybox}
+
+\begin{keybox}[LTE Sleep Modes -- DRX]
+To save battery, LTE uses \textbf{DRX (Discontinuous Reception)} with two sleep modes:
+\begin{itemize}[noitemsep]
+    \item \textbf{Light sleep:} Wake up every 100s of milliseconds to check for downlink activity. Used when device is active but idle momentarily.
+    \item \textbf{Deep sleep:} Sleep for 5--10 seconds. Used for longer idle periods (e.g., app in background). Device must re-establish connection more fully on wakeup.
+\end{itemize}
+\textbf{Tradeoff:} Deeper sleep $\rightarrow$ more battery savings, but longer latency to resume data transfer.
+\end{keybox}
+
+\subsection{4G vs.\ 5G}
+
+\begin{keybox}[4G vs.\ 5G -- Key Differences]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Feature} & \textbf{4G LTE} & \textbf{5G NR} \\
+\midrule
+Peak downlink rate & $\sim$1 Gbps & Up to 20 Gbps \\
+Latency & $\sim$30--50 ms & $<$1 ms (target) \\
+Frequency bands & Sub-6 GHz & Sub-6 GHz + mmWave \\
+Mobility & Full support & Full support \\
+Architecture & Partial C/U-plane separation & Complete C/U-plane separation \\
+Base station & eNode-B & gNode-B (gNB) \\
+Core network & EPC & 5GC (5G Core) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{Key facts for exams:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Both 4G and 5G support mobility / handover.}
+    \item \textbf{5G has higher peak bitrate} than 4G.
+    \item 5G is designed for \emph{complete} control/user-plane separation (4G has partial separation).
+    \item 5G mmWave (millimeter wave, 24--100 GHz) offers very high rates but short range and limited penetration.
+    \item 5G sub-6 GHz offers better range and coverage.
+\end{itemize}
+\end{keybox}
+
+\begin{exambox}[Exam -- 4G/5G Statements - V23 Q1.4.5]
+\textbf{V23 Q1.4.5 -- Which statements about 4G and 5G are true?}
+\begin{itemize}[noitemsep]
+    \item \textbf{a) 5G has higher peak bitrate than 4G.} \checkmark\ \textbf{TRUE} -- up to 20 Gbps vs.\ $\sim$1 Gbps.
+    \item b) Only 5G supports mobility/handover; 4G does not. \texttimes\ FALSE -- both support mobility.
+    \item \textbf{c) Both 4G and 5G support host mobility.} \checkmark\ \textbf{TRUE}
+    \item d) 4G uses complete control/user-plane separation but 5G does not. \texttimes\ FALSE -- 5G is the one designed for \emph{complete} separation.
+    \item e) 5G uses CSMA/CA for medium access. \texttimes\ FALSE -- that is 802.11 WiFi. LTE/5G use OFDMA and scheduled access.
+\end{itemize}
+
+\medskip
+\textbf{Remember:} 5G = higher rate + lower latency + complete C/U-plane separation + both support mobility.
+\end{exambox}
+
+%=============================================================================
+\section{Putting It All Together -- Wireless Summary}
+%=============================================================================
+
+\begin{keybox}[Chapter 7 -- Big Picture Summary]
+\textbf{Why is wireless hard?} Three challenges: path loss, interference, multipath. These cause higher and variable BER compared to wired links.
+
+\medskip
+\textbf{SNR/BER tradeoff:} Higher SNR $\Rightarrow$ lower BER. Higher-order modulation $\Rightarrow$ higher BER at same SNR but higher throughput. Rate adaptation dynamically picks the best modulation for current channel conditions.
+
+\medskip
+\textbf{802.11 MAC:} CSMA/CA (not CD). DIFS before transmission. Random backoff (timer freezes during busy channel). Full-frame transmission. ACK after SIFS. RTS/CTS for hidden terminal mitigation.
+
+\medskip
+\textbf{802.11 frames:} 4 MAC addresses (Addr1=receiver, Addr2=transmitter, Addr3=router, Addr4=ad hoc). Frame control field encodes type, subtype, power management, WEP, To/From DS bits.
+
+\medskip
+\textbf{4G LTE:} UE $\leftrightarrow$ eNB (radio) $\leftrightarrow$ S-GW $\leftrightarrow$ P-GW $\leftrightarrow$ Internet (data plane). MME handles control (auth, mobility). HSS stores subscriber data. IMSI identifies subscriber on SIM. GTP-U tunneling end-to-end. OFDM/OFDMA radio access.
+
+\medskip
+\textbf{5G vs.\ 4G:} Higher peak rate, lower latency, complete C/U-plane separation. Both support mobility.
+\end{keybox}
+
+\begin{warnbox}[Common Exam Traps -- Chapter 7]
+\begin{itemize}[noitemsep]
+    \item \textbf{CSMA/CD vs.\ CSMA/CA:} 802.11 uses CA (avoidance), \emph{not} CD (detection). Wired Ethernet uses CD.
+    \item \textbf{Who sends CTS?} The \emph{AP} sends CTS in response to sender's RTS -- not the sender.
+    \item \textbf{Backoff timer behavior:} Timer counts down only when channel is \emph{idle}. It \emph{freezes} (not resets) when channel goes busy.
+    \item \textbf{Higher SNR = better:} Do not confuse direction. Lower SNR $\Rightarrow$ higher BER $\Rightarrow$ worse performance.
+    \item \textbf{Higher modulation = more fragile:} QAM-256 is faster but needs good channel. BPSK is slow but robust.
+    \item \textbf{Both 4G and 5G have mobility:} A common distractor says only 5G supports mobility -- false.
+    \item \textbf{5G does not use CSMA/CA:} CSMA/CA is 802.11 WiFi. LTE and 5G use OFDMA with base-station scheduling.
+    \item \textbf{RTS/CTS reduces but doesn't eliminate hidden terminal:} Two nodes can still collide on their RTS frames.
+\end{itemize}
+\end{warnbox}
+
+\begin{formulabox}[Quick Reference -- Key Numbers]
+\begin{itemize}[noitemsep]
+    \item 802.11b: 2.4 GHz, 11 Mbps
+    \item 802.11g: 2.4 GHz, 54 Mbps
+    \item 802.11n (WiFi 4): 2.4/5 GHz, 600 Mbps (MIMO)
+    \item 802.11ac (WiFi 5): 5 GHz, 3.47 Gbps (MU-MIMO)
+    \item 802.11ax (WiFi 6): 2.4/5/6 GHz, 14 Gbps (OFDMA)
+    \item 802.11 beacon interval: $\sim$100 ms
+    \item LTE synch signal: every 5 ms
+    \item LTE light sleep: 100s of ms; deep sleep: 5--10 s
+    \item LTE IMSI: 64 bits on SIM card
+    \item 4G peak: $\sim$1 Gbps; 5G peak: $\sim$20 Gbps
+\end{itemize}
+\end{formulabox}

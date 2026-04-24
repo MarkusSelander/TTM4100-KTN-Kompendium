@@ -1,0 +1,629 @@
+\section{What Is Network Security?}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[keybox, title=Four Desirable Properties of Secure Communication]
+\begin{enumerate}[noitemsep]
+  \item \textbf{Confidentiality} -- only sender and intended receiver should understand message contents (message encrypted)
+  \item \textbf{Authentication} -- sender and receiver can confirm each other's identity
+  \item \textbf{Message integrity} -- message not altered in transit (without detection)
+  \item \textbf{Access and availability} -- services must be accessible and available to authorised users (operational security)
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{The Language of Cryptography}
+
+The standard model uses three actors:
+\begin{itemize}[noitemsep]
+  \item \textbf{Alice} -- legitimate sender
+  \item \textbf{Bob} -- legitimate receiver
+  \item \textbf{Trudy} -- the intruder
+\end{itemize}
+
+\begin{tcolorbox}[warnbox, title=What Trudy Can Do]
+\begin{itemize}[noitemsep]
+  \item \textbf{Eavesdrop} -- intercept/record messages (sniff control and data messages)
+  \item \textbf{Insert} -- insert messages into the connection
+  \item \textbf{Impersonate} -- fake source address in packet (IP spoofing)
+  \item \textbf{Hijack} -- take over an ongoing connection by removing sender or receiver
+  \item \textbf{Denial of Service} -- prevent service from being used (e.g., SYN flooding)
+  \item \textbf{Modify or delete} -- alter or remove message content
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[keybox, title=Cryptography Notation]
+\begin{itemize}[noitemsep]
+  \item Plaintext message: $m$
+  \item Encryption algorithm: $K_A(\cdot)$ using key $K_A$
+  \item Ciphertext: $c = K_A(m)$
+  \item Decryption: $m = K_B(K_A(m))$
+  \item \textbf{Symmetric key:} $K_A = K_B$ (same shared secret key)
+  \item \textbf{Public key pair:} $K_B^+$ (Bob's public key), $K_B^-$ (Bob's private key)
+  \item Key property: $K_B^-(K_B^+(m)) = m$ \quad and \quad $K_B^+(K_B^-(m)) = m$
+\end{itemize}
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Symmetric Key Cryptography}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+Both parties share the same secret key. Key problem: how do two parties agree on a key in the first place?
+
+\subsection{Substitution Ciphers}
+
+\begin{tcolorbox}[keybox, title=Caesar Cipher -- Simple Substitution]
+\begin{itemize}[noitemsep]
+  \item Replace each letter by a letter $k$ positions later in alphabet (wrapping around)
+  \item Encode: shift letter by $+k$; Decode: shift by $-k$
+  \item Example ($k=3$): ``abc'' $\rightarrow$ ``def''; ``xyz'' $\rightarrow$ ``abc''
+  \item Only 25 possible keys -- trivially brute-forced
+  \item \textbf{Monoalphabetic cipher:} substitute letter for letter (26! possible mappings). Breakable by frequency analysis
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[formulabox, title=Caesar Cipher Example -- k=7]
+Encode ``Protect'' with $k=7$:\\
+P$\to$W, r$\to$y, o$\to$v, t$\to$a, e$\to$l, c$\to$j, t$\to$a $\Rightarrow$ \texttt{Wyvaljapvu}\\[4pt]
+Decode ``Jhlzhy'' with $k=7$ (subtract 7):\\
+J$\to$C, h$\to$a, l$\to$e, z$\to$s, h$\to$a, y$\to$r $\Rightarrow$ \texttt{Caesar}
+\end{tcolorbox}
+
+\subsection{DES -- Data Encryption Standard}
+
+\begin{tcolorbox}[keybox, title=DES]
+\begin{itemize}[noitemsep]
+  \item 56-bit key, 64-bit block encryption
+  \item 16 rounds of permutation/substitution using subkeys derived from main key
+  \item \textbf{CBC -- Cipher Block Chaining:} each plaintext block XOR-ed with previous ciphertext block before encryption; prevents identical plaintext blocks producing identical ciphertext
+  \item \textbf{Security:} Brute-forceable in under 1 day with today's hardware (too weak)
+  \item \textbf{3DES:} encrypt with $K_1$, decrypt with $K_2$, encrypt with $K_3$ -- effectively 168-bit key
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{AES -- Advanced Encryption Standard}
+
+\begin{tcolorbox}[keybox, title=AES]
+\begin{itemize}[noitemsep]
+  \item 128-bit blocks; key length: 128, 192, or 256 bits
+  \item At 1 billion DES keys/second: $2^{128}$ AES combinations $\approx$ \textbf{149 trillion years} to brute-force
+  \item Replaced DES as US standard (NIST 2001)
+  \item Used in TLS, 802.11 WPA2/WPA3, 4G LTE (AES on the radio link)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[warnbox, title=Symmetric Key Problem]
+$n$ people wanting to communicate privately with each other all require \textbf{unique pairwise keys}:
+\[ \text{Number of keys} = \frac{n(n-1)}{2} \]
+Example: 10 people need $\frac{10 \times 9}{2} = 45$ keys. Scales poorly for large groups.
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Public Key Cryptography}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[keybox, title=Public Key Cryptography -- Key Idea]
+\begin{itemize}[noitemsep]
+  \item Everyone has a \textbf{public key} $K^+$ (known to all) and a \textbf{private key} $K^-$ (secret)
+  \item Anyone can encrypt with public key; only owner can decrypt with private key
+  \item \textbf{Solves} the symmetric key distribution problem -- no shared secret needed upfront
+  \item Mathematical requirement: $K^-(K^+(m)) = m$ and $K^+(K^-(m)) = m$
+  \item Computationally infeasible to derive $K^-$ from $K^+$
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[warnbox, title=Key Difference -- Symmetric vs.\ Public Key]
+\begin{tabular}{lll}
+\toprule
+\textbf{Property} & \textbf{Symmetric} & \textbf{Public Key} \\
+\midrule
+Keys needed & $n(n-1)/2$ & $2n$ -- one pair per person \\
+Key distribution & Requires secure channel & Public key openly shared \\
+Speed & Very fast & Computationally expensive \\
+Use in practice & Bulk data encryption & Key exchange, signatures \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\subsection{RSA -- Rivest, Shamir, Adleman}
+
+\begin{tcolorbox}[formulabox, title=RSA -- How It Works]
+\textbf{Key generation:}
+\begin{enumerate}[noitemsep]
+  \item Choose two large primes $p$ and $q$ (1024 bits each)
+  \item Compute $n = p \cdot q$ and $z = (p-1)(q-1)$
+  \item Choose $e$ such that $e < n$ and $\gcd(e,z) = 1$
+  \item Find $d$ such that $ed \equiv 1 \pmod{z}$
+  \item Public key: $(n, e)$; Private key: $(n, d)$
+\end{enumerate}
+\textbf{Encrypt:} $c = m^e \bmod n$ \quad \textbf{Decrypt:} $m = c^d \bmod n$\\[4pt]
+\textbf{Security basis:} factoring a large number $n$ into $p \cdot q$ is computationally infeasible.\\[4pt]
+\textbf{Important property:} $K_B^-(K_B^+(m)) = m$ \textit{and} $K_B^+(K_B^-(m)) = m$ -- can apply in either order.
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Authentication and Message Integrity}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Message Integrity and Hash Functions}
+
+\begin{tcolorbox}[keybox, title=Cryptographic Hash Functions]
+A hash function $H(m)$ produces a fixed-length \textbf{message digest}. Properties required:
+\begin{itemize}[noitemsep]
+  \item Many-to-one: maps arbitrary-length $m$ to fixed-length digest
+  \item \textbf{Computationally infeasible} to find two messages with the same hash
+  \item \textbf{Computationally infeasible} to find $m$ given $H(m)$
+  \item A small change in $m$ produces a completely different hash
+\end{itemize}
+\textbf{Common hash algorithms:}
+\begin{itemize}[noitemsep]
+  \item \textbf{MD5:} 128-bit digest (RFC 1321) -- now considered weak
+  \item \textbf{SHA-1:} 160-bit digest -- widely used
+  \item \textbf{SHA-256:} 256-bit digest -- current standard
+\end{itemize}
+\textbf{Note:} Internet checksum is NOT a cryptographic hash -- too easy to find collisions. Hash is strictly better than checksum for integrity.
+\end{tcolorbox}
+
+\subsection{Message Authentication Code -- HMAC}
+
+\begin{tcolorbox}[keybox, title=HMAC -- Hash-based Message Authentication Code]
+\textbf{Problem:} A plain hash $H(m)$ doesn't prove who created the message -- Trudy can modify $m$ and recompute $H(m)$.\\[4pt]
+\textbf{Solution -- HMAC:} combine message with a shared secret $s$:
+\[ \text{MAC} = H(m + s) \]
+\begin{itemize}[noitemsep]
+  \item Only parties who know secret $s$ can compute or verify the MAC
+  \item Receiver checks: recompute $H(m+s)$ and compare with received MAC
+  \item Used in TLS, 802.11 WPA2, 4G LTE
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{Digital Signatures}
+
+\begin{tcolorbox}[keybox, title=Digital Signatures]
+\textbf{Goal:} verifiable, non-repudiable -- Bob can prove to others that Alice sent this exact message.\\[4pt]
+\textbf{How Bob signs message $m$:}
+\begin{enumerate}[noitemsep]
+  \item Compute hash: $H(m)$
+  \item Encrypt hash with his private key: $K_B^-(H(m))$ -- this is the \textbf{digital signature}
+  \item Send $m$ and $K_B^-(H(m))$ together
+\end{enumerate}
+\textbf{Verification by receiver:}
+\begin{enumerate}[noitemsep]
+  \item Decrypt signature with Bob's public key: $K_B^+(K_B^-(H(m))) = H(m)$
+  \item Independently compute $H(m)$ from the received message
+  \item If they match $\Rightarrow$ message is authentic and unaltered
+\end{enumerate}
+\textbf{Properties:}
+\begin{itemize}[noitemsep]
+  \item \textbf{Non-repudiation:} only Bob could have produced $K_B^-(H(m))$
+  \item Protects against both alteration and false authorship claims
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{Certification Authorities -- CAs}
+
+\begin{tcolorbox}[keybox, title=Public Key Infrastructure and CAs]
+\textbf{Problem:} How do you know a public key really belongs to who claims it?\\[4pt]
+\textbf{Solution:} Certification Authority (CA) binds a public key to a specific entity.
+\begin{enumerate}[noitemsep]
+  \item Entity provides their public key to CA along with proof of identity
+  \item CA creates a \textbf{certificate} containing the entity's public key, signed with CA's private key
+  \item Anyone who trusts the CA can verify the certificate using the CA's public key
+\end{enumerate}
+\textbf{Browser trust:} Web browsers come pre-installed with certificates from well-known CAs (e.g., VeriSign, Comodo). This forms the \textbf{chain of trust}.\\[4pt]
+\textbf{Certificate contents:} entity name, public key, valid date range, CA name, CA digital signature
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Secure E-mail}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[keybox, title=Secure E-mail -- All Three Goals]
+Secure e-mail combines public key, symmetric key, and hashing to provide confidentiality, authentication, and integrity.\\[6pt]
+\textbf{Alice wants to send confidential, authenticated, integrity-protected message to Bob:}
+\begin{enumerate}[noitemsep]
+  \item Generate random \textbf{symmetric session key} $K_S$
+  \item Encrypt message: $K_S(m)$ -- fast symmetric encryption for the bulk data
+  \item Encrypt session key with Bob's public key: $K_B^+(K_S)$ -- only Bob can recover $K_S$
+  \item Compute hash $H(m)$ and sign with Alice's private key: $K_A^-(H(m))$ -- authentication + integrity
+  \item Send: $K_S(m)$, $K_B^+(K_S)$, $K_A^-(H(m))$
+\end{enumerate}
+\textbf{Three keys used:} $K_S$ (session), $K_B^+$ (Bob's public), $K_A^-$ (Alice's private)\\[4pt]
+\textbf{Bob's decryption:}
+\begin{enumerate}[noitemsep]
+  \item Use $K_B^-$ to decrypt $K_B^+(K_S)$ $\Rightarrow$ recover $K_S$
+  \item Use $K_S$ to decrypt $K_S(m)$ $\Rightarrow$ recover $m$
+  \item Use Alice's $K_A^+$ to verify signature $\Rightarrow$ confirm integrity and authenticity
+\end{enumerate}
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{TLS -- Transport Layer Security}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[keybox, title=TLS Overview]
+\begin{itemize}[noitemsep]
+  \item \textbf{HTTPS} = HTTP over TLS; port \textbf{443}
+  \item TLS sits between the application layer and TCP -- a ``sublayer'' of the transport layer
+  \item Provides: \textbf{confidentiality} via symmetric encryption, \textbf{integrity} via MAC/hashing, \textbf{authentication} via certificates (public key)
+  \item Successor to SSL (Secure Sockets Layer)
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{TLS Handshake}
+
+\begin{tcolorbox}[keybox, title=TLS Handshake Steps]
+\begin{enumerate}[noitemsep]
+  \item \textbf{TCP 3-way handshake} -- establish TCP connection
+  \item \textbf{TLS Hello} -- client sends list of supported cipher suites and a \textbf{nonce} (random number)
+  \item \textbf{Server responds} with: chosen cipher suite, server \textbf{certificate} (containing public key), server nonce
+  \item \textbf{Client verifies} certificate against trusted CAs
+  \item \textbf{Client sends} Pre-Master Secret (PMS) encrypted with server's public key: $K_S^+(PMS)$
+  \item Both sides independently derive the same \textbf{4 session keys} from PMS and nonces:
+    \begin{itemize}[noitemsep]
+      \item $E_A$ -- client-to-server encryption key
+      \item $M_A$ -- client-to-server MAC key
+      \item $E_B$ -- server-to-client encryption key
+      \item $M_B$ -- server-to-client MAC key
+    \end{itemize}
+  \item \textbf{Encrypted Handshake Message} -- each side sends MAC of entire handshake to confirm agreement
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{TLS Records and TLS 1.3}
+
+\begin{tcolorbox}[keybox, title=TLS Records]
+Each TLS record contains:
+\begin{itemize}[noitemsep]
+  \item Type, version, length fields
+  \item Encrypted data
+  \item \textbf{MAC} (Message Authentication Code) -- computed over data + sequence number, using key $M_A$ or $M_B$
+\end{itemize}
+Sequence numbers prevent \textbf{replay attacks} -- an attacker cannot re-send an old TLS record.
+\end{tcolorbox}
+
+\begin{tcolorbox}[warnbox, title=TLS 1.3 Changes]
+TLS 1.3 (current version) tightens the cipher suite to only 5 choices:
+\begin{itemize}[noitemsep]
+  \item Requires \textbf{Diffie-Hellman} for key exchange (provides forward secrecy)
+  \item Requires \textbf{HMAC-SHA} for integrity
+  \item Removes weak options (RSA key exchange, CBC-mode ciphers, MD5)
+  \item Faster handshake (1-RTT instead of 2-RTT)
+\end{itemize}
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Network Layer Security -- IPsec and VPNs}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{VPN -- Virtual Private Network}
+
+\begin{tcolorbox}[keybox, title=VPN]
+\begin{itemize}[noitemsep]
+  \item Institution's traffic sent over the public Internet but \textbf{encrypted} end-to-end
+  \item Creates an encrypted ``tunnel'' so external traffic appears as normal IP packets
+  \item Implemented using \textbf{IPsec} at the network layer
+  \item Remote employees can securely access institutional resources over the public Internet
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{IPsec}
+
+\begin{tcolorbox}[keybox, title=IPsec Services]
+IPsec provides network-layer security with four services:
+\begin{enumerate}[noitemsep]
+  \item \textbf{Data integrity} -- receiver can detect any modification of datagram in transit
+  \item \textbf{Origin authentication} -- receiver can verify source of IPsec datagram
+  \item \textbf{Replay attack prevention} -- sequence numbers prevent old packets being replayed
+  \item \textbf{Confidentiality} -- payload encrypted (in ESP mode)
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[keybox, title=IPsec Modes and Protocols]
+\textbf{Transport mode:} only the IP payload is encrypted/authenticated; original IP header untouched\\
+\textbf{Tunnel mode:} entire IP datagram is encrypted + authenticated and encapsulated in a new IP datagram (used in VPNs)\\[6pt]
+\textbf{Two IPsec protocols:}
+\begin{itemize}[noitemsep]
+  \item \textbf{AH -- Authentication Header:} provides integrity and authentication but \textit{no} confidentiality
+  \item \textbf{ESP -- Encapsulating Security Payload:} provides integrity, authentication, \textit{and} confidentiality -- far more commonly used
+\end{itemize}
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Security in Wireless and Mobile Networks}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\subsection{802.11 WiFi Security -- WPA2/WPA3}
+
+\begin{tcolorbox}[keybox, title=802.11 Security -- 4-Step Process]
+\begin{enumerate}[noitemsep]
+  \item \textbf{Discovery:} AP advertises its presence and security capabilities (encryption/authentication suites)
+  \item \textbf{Mutual authentication and key derivation:} using WPA2/WPA3 and an Authentication Server (AS); shared master key established; uses \textbf{nonces} (random numbers) to generate session key
+  \item \textbf{Shared session key distribution:} pairwise transient key derived from master key; AP installs key for communicating with this device
+  \item \textbf{Encrypted communication:} data encrypted using the derived session key (AES-based in WPA2)
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[formulabox, title=WPA2 Key Derivation Using Nonces]
+\begin{enumerate}[noitemsep]
+  \item AS sends nonce $N_{AS}$ to mobile
+  \item Mobile sends nonce $N_M$ to AS
+  \item Both sides derive the same \textbf{Pairwise Master Key} from shared master key + nonces using HMAC
+  \item Session key derived from PMK -- protects mobile-to-AP communication
+\end{enumerate}
+Nonces prevent replay attacks: even if Trudy captures the exchange, she cannot reuse it.
+\end{tcolorbox}
+
+\subsection{4G LTE Authentication and Encryption}
+
+\begin{tcolorbox}[keybox, title=4G LTE Authentication -- 5 Steps]
+\textbf{Actors:} Mobile device (SIM with shared key $K_{HSS-M}$), Base Station (BS), Mobility Management Entity (MME), Home Subscriber Service (HSS)\\[6pt]
+\begin{enumerate}[noitemsep]
+  \item[\textbf{a}] \textbf{Mobile attaches} -- sends IMSI (identity) to BS $\to$ MME; MME sends \texttt{AUTH\_REQ(IMSI, VN info)} to HSS
+  \item[\textbf{b}] \textbf{HSS responds} -- HSS derives authentication token + expected response $xres_{HSS}$ from $K_{HSS-M}$; sends \texttt{AUTH\_RESP(auth\_token, xres\_{HSS}, keys)} back to MME
+  \item[\textbf{c}] \textbf{Mobile authenticates network} -- mobile receives auth token, verifies it using its $K_{HSS-M}$ (proves HSS is legitimate); mobile computes $res_M$ using same crypto as HSS
+  \item[\textbf{d}] \textbf{Network authenticates mobile} -- mobile sends $res_M$ to MME; MME compares $res_M$ with $xres_{HSS}$; if match $\Rightarrow$ mobile authenticated; MME generates keys for BS
+  \item[\textbf{e}] \textbf{Key derivation} -- mobile and BS determine session keys for encrypting data and control frames; \textbf{AES} can be used on the 4G radio link
+\end{enumerate}
+\textbf{Note:} MME + HSS together play the role of the Authentication Server (analogous to WiFi AS).
+\end{tcolorbox}
+
+\begin{tcolorbox}[warnbox, title=4G LTE Key Insight]
+The SIM card stores the shared secret $K_{HSS-M}$ which is also stored at the HSS. Authentication is \textbf{mutual}: the mobile verifies the network (prevents fake BS attacks), and the network verifies the mobile. The session key $K_{BS-M}$ used for radio link encryption is derived fresh each session.
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Operational Security -- Firewalls}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[keybox, title=Firewall Definition]
+A \textbf{firewall} isolates an organisation's internal network from the larger Internet, allowing some packets to pass and blocking others. It sits between the trusted internal network and the untrusted public Internet.
+\end{tcolorbox}
+
+\subsection{Three Goals of Firewalls}
+
+\begin{tcolorbox}[keybox, title=Why Firewalls -- Three Goals]
+\begin{enumerate}[noitemsep]
+  \item \textbf{Prevent denial-of-service attacks} -- e.g., SYN flooding: attacker establishes many bogus TCP connections, consuming resources so no capacity remains for legitimate connections
+  \item \textbf{Prevent illegal modification/access of internal data} -- e.g., attacker replaces a web page with malicious content
+  \item \textbf{Allow only authorised access to inside network} -- authenticate users/hosts; block all other access
+\end{enumerate}
+\textbf{Three types of firewalls:} stateless packet filters, stateful packet filters, application gateways
+\end{tcolorbox}
+
+\subsection{Stateless Packet Filtering}
+
+\begin{tcolorbox}[keybox, title=Stateless Packet Filtering]
+\begin{itemize}[noitemsep]
+  \item Internal network connected to Internet via a \textbf{router firewall}
+  \item Filters \textbf{packet-by-packet}; decision to forward or drop based on:
+    \begin{itemize}[noitemsep]
+      \item Source/destination IP address
+      \item TCP/UDP source and destination port numbers
+      \item ICMP message type
+      \item TCP SYN and ACK bits
+    \end{itemize}
+  \item Uses an \textbf{ACL -- Access Control List}: table of (action, condition) pairs applied top to bottom
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[formulabox, title=ACL Examples -- Policy to Firewall Setting]
+\begin{tabular}{p{5.5cm}p{6.5cm}}
+\toprule
+\textbf{Policy} & \textbf{Firewall Setting} \\
+\midrule
+No outside Web access & Drop all outgoing packets to any IP, port 80 \\
+No incoming TCP connections except to institution's public Web server & Drop all incoming TCP SYN to any IP except 130.207.244.203, port 80 \\
+Prevent Web-radios eating bandwidth & Drop all incoming UDP -- except DNS and router broadcasts \\
+Prevent smurf DoS attacks & Drop all ICMP to broadcast addresses \\
+Prevent traceroute scanning & Drop all outgoing ICMP TTL-expired traffic \\
+Block all incoming UDP + telnet & Block protocol=17, port=23; also block ACK=0 inbound TCP \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\begin{tcolorbox}[warnbox, title=Stateless Packet Filter Weakness]
+A stateless filter is a ``heavy-handed tool'' -- it can admit packets that \textbf{make no sense} given the conversation state. For example, allowing inbound TCP ACK packets even when no TCP connection to that destination was ever initiated. An attacker can craft such packets to exploit this.
+\end{tcolorbox}
+
+\subsection{Stateful Packet Filtering}
+
+\begin{tcolorbox}[keybox, title=Stateful Packet Filtering]
+\begin{itemize}[noitemsep]
+  \item Tracks the \textbf{state of every TCP connection} -- SYN, SYN-ACK, ACK, FIN
+  \item Determines whether incoming/outgoing packets ``\textbf{make sense}'' given connection state
+  \item ACL augmented with a ``check connection state table'' column
+  \item Timeouts inactive connections -- stops admitting packets after connection ends
+\end{itemize}
+\textbf{Example:} A packet with ACK=1, destination port=80 is only admitted if there is an established TCP connection to port 80 in the state table. Without state tracking, this packet would pass even if no connection exists.
+\end{tcolorbox}
+
+\subsection{Application Gateways}
+
+\begin{tcolorbox}[keybox, title=Application Gateways]
+\begin{itemize}[noitemsep]
+  \item Filter packets on \textbf{application-layer data} as well as IP/TCP/UDP fields
+  \item Example: allow only selected internal users to telnet outside:
+    \begin{enumerate}[noitemsep]
+      \item All telnet users must connect to the gateway
+      \item Gateway authenticates user; if authorised, sets up second telnet connection to destination
+      \item Gateway relays data between the two connections
+      \item Router filter blocks all telnet connections not originating from gateway
+    \end{enumerate}
+  \item Each application requires its own gateway (HTTP gateway, FTP gateway, etc.)
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{Limitations of Firewalls and Gateways}
+
+\begin{tcolorbox}[warnbox, title=Firewall Limitations]
+\begin{itemize}[noitemsep]
+  \item \textbf{IP spoofing:} router cannot verify data ``really'' comes from claimed source
+  \item \textbf{Multiple app gateways needed:} each application requiring special treatment needs its own gateway
+  \item \textbf{Client software must know gateway address} (e.g., proxy settings in browser)
+  \item \textbf{UDP all-or-nothing:} filters often use all-or-nothing policy for UDP traffic
+  \item \textbf{Tradeoff:} degree of communication with outside world vs.\ level of security
+  \item \textbf{Not foolproof:} many highly protected sites still suffer attacks
+\end{itemize}
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Summary -- Where Security Is Applied}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[keybox, title=Security Techniques Applied Across Layers]
+\begin{tabular}{lll}
+\toprule
+\textbf{Scenario} & \textbf{Layer} & \textbf{Mechanisms Used} \\
+\midrule
+Secure e-mail & Application & Public key + symmetric + hash \\
+HTTPS / TLS & Transport & Symmetric key + hash + certificates \\
+VPN & Network & IPsec -- AH or ESP \\
+IPsec & Network & AH or ESP (transport or tunnel mode) \\
+802.11 WiFi & Link & WPA2/WPA3, HMAC, AES \\
+4G LTE & Link/Physical & HMAC, AES over radio link \\
+Firewalls & Network & Packet filtering, ACLs, state tables \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\section{Exam Questions}
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[exambox, title=V23 Q1.5.1 -- Properties of Secure Communication]
+\textbf{Which of the following are desirable properties of secure communication?}
+\begin{itemize}[noitemsep]
+  \item[a)] Network reliability
+  \item[b)] \textbf{Confidentiality} \checkmark
+  \item[c)] Message integrity \checkmark
+  \item[d)] Authentication \checkmark
+  \item[e)] Operational security \checkmark
+  \item[f)] High bandwidth to transmit quickly
+\end{itemize}
+\textbf{Answer: b, c, d, e.} The four properties are confidentiality, authentication, message integrity, and operational security. Network reliability and bandwidth are not security properties.
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=V23/V24 Q1.5.2 -- Number of Symmetric Keys]
+\textbf{N people want to communicate privately using symmetric key encryption. How many keys are needed?}
+\begin{itemize}[noitemsep]
+  \item[a)] $N \times N$
+  \item[b)] $2N - 1$
+  \item[c)] $N(N-1)$
+  \item[\textbf{d)}] $\mathbf{N(N-1)/2}$ \checkmark
+  \item[e)] None of the above
+\end{itemize}
+\textbf{Answer: d.} Each pair of communicating parties needs a unique shared key. The number of unique pairs from $N$ people is $\binom{N}{2} = \frac{N(N-1)}{2}$.\\
+\textbf{Example:} 10 people: $\frac{10 \times 9}{2} = 45$ keys.
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=V23/V24 Q1.5.3 -- Message Integrity]
+\textbf{For message integrity, which statements are correct?}
+\begin{itemize}[noitemsep]
+  \item[a)] Message integrity means confirming the identity of the sender
+  \item[\textbf{b)}] \textbf{Message integrity means the receiver can detect whether the message was altered in transit} \checkmark
+  \item[\textbf{c)}] \textbf{Both checksumming and hashing techniques may be used} \checkmark
+  \item[\textbf{d)}] \textbf{Generally, a hash provides a better integrity check than a checksum} \checkmark
+  \item[e)] To ensure message integrity, TCP must be used
+\end{itemize}
+\textbf{Answer: b, c, d.} Option a describes authentication, not integrity. Option e is false -- integrity can be ensured at any layer and does not require TCP.
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=V24 Q1.5.4 -- HTTP Streaming vs.\ UDP Streaming]
+\textbf{HTTP streaming over TCP is more popular than UDP streaming. Major reasons include:}
+\begin{itemize}[noitemsep]
+  \item[a)] UDP is connectionless
+  \item[\textbf{b)}] \textbf{UDP lacks retransmission, ordering, and error-checking -- results in higher error rate} \checkmark
+  \item[c)] UDP streaming has lower latency due to no handshakes
+  \item[\textbf{d)}] \textbf{Many firewalls block UDP traffic but allow HTTP traffic} \checkmark
+  \item[e)] None of the above
+\end{itemize}
+\textbf{Answer: b, d.} HTTP/TCP streaming benefits from reliability and passes through firewalls easily. Although UDP has lower latency, this is not a reason for HTTP being more popular; it is a reason in UDP's favour.
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=V24 Q1.5.5 -- What Trudy Can Do -- Alice-Bob Model]
+\textbf{Trudy is an intruder in the Alice-Bob model. Which actions can she take?}
+\begin{itemize}[noitemsep]
+  \item[\textbf{a)}] \textbf{Sniffing and recording control messages on the channel} \checkmark
+  \item[\textbf{b)}] \textbf{Recording data messages on the channel} \checkmark
+  \item[\textbf{c)}] \textbf{Modifying or insertion of messages} \checkmark
+  \item[\textbf{d)}] \textbf{Deletion of message or message content} \checkmark
+  \item[e)] None of the above
+\end{itemize}
+\textbf{Answer: a, b, c, d.} Trudy has full access to the channel and can eavesdrop, record, modify, insert, and delete. Security mechanisms must protect against all of these threats.
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=V24 Q3 -- SSL/TLS Wireshark Analysis]
+\textbf{Q3.1 Was Wireshark packet 112 sent by the client or server?}\\
+Packet 112 source is 128.238.38.162 with destination port \texttt{https} -- this is the \textbf{client} sending to the server.
+
+\textbf{Q3.2 What is the server's IP address and port number?}\\
+Server IP: \textbf{216.75.194.220}, port: \textbf{443} (https)
+
+\textbf{Q3.3 What will be the sequence number of the next TCP segment sent by the client?}\\
+Current segment: Seq=79, Len=204. Next sequence number = $79 + 204 = \mathbf{283}$
+
+\textbf{Q3.4 How many SSL records does packet 112 contain?}\\
+Packet 112 contains \textbf{3} SSL records: Client Key Exchange, Change Cipher Spec, Encrypted Handshake Message.
+
+\textbf{Q3.5 Does packet 112 contain a Master Secret or Encrypted Master Secret or neither?}\\
+Packet 112 contains a \textbf{Pre-Master Secret encrypted with the server's public key} (``Client Key Exchange''). The actual Master Secret is derived from the PMS -- it is not transmitted. So the answer is \textbf{neither} (neither a plaintext Master Secret nor the Encrypted Master Secret).
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=S2025 Q14 -- Primary Purpose of a Firewall]
+\textbf{What is the primary purpose of a firewall in network security?}
+\begin{itemize}[noitemsep]
+  \item[a)] To encrypt data
+  \item[\textbf{b)}] \textbf{To block unauthorised access} \checkmark
+  \item[c)] To manage network traffic
+  \item[d)] To provide VPN services
+  \item[e)] To monitor network performance
+\end{itemize}
+\textbf{Answer: b.} A firewall's primary purpose is to isolate the internal network and block unauthorised access, not to encrypt data (that is TLS/IPsec) or provide VPN services.
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=S2025 Q5 -- Caesar Cipher -- Symmetric Key Cryptography]
+\textbf{Q5.3 Describe how the Caesar cipher works:}\\
+Caesar cipher shifts each letter in the plaintext by a fixed offset $k$ positions forward in the alphabet (wrapping from Z back to A). Encryption: shift $+k$. Decryption: shift $-k$.
+
+\textbf{Q5.4 Encode ``Protect your information'' with $k=7$:}\\
+P$\to$W, r$\to$y, o$\to$v, t$\to$a, e$\to$l, c$\to$j, t$\to$a, (space), y$\to$f, o$\to$v, u$\to$b, r$\to$y, (space), i$\to$p, n$\to$u, f$\to$m, o$\to$v, r$\to$y, m$\to$t, a$\to$h, t$\to$a, i$\to$p, o$\to$v, n$\to$u\\
+Result: \texttt{Wyvaljaw fvby pumvythapvu}
+
+\textbf{Q5.5 Decode ``Jhlzhy jpwoly'' with $k=7$ (subtract 7):}\\
+J$\to$C, h$\to$a, l$\to$e, z$\to$s, h$\to$a, y$\to$r, (space), j$\to$c, p$\to$i, w$\to$p, o$\to$h, l$\to$e, y$\to$r\\
+Result: \texttt{Caesar cipher}
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=S2025 Q6 -- Symmetric vs.\ Public Key Systems]
+\textbf{Key difference between symmetric key and public key cryptography:}
+
+\begin{tabular}{p{5cm}p{6cm}}
+\toprule
+\textbf{Symmetric Key} & \textbf{Public Key} \\
+\midrule
+Both parties share the \textbf{same secret key} & Each party has a \textbf{public/private key pair} \\
+Key must be secretly distributed in advance & Public key is openly shared; private key secret \\
+$N(N-1)/2$ keys for $N$ users & Only $2N$ keys for $N$ users \\
+Fast -- used for bulk data (AES, DES) & Slow -- used for key exchange, signatures (RSA) \\
+Symmetric: $K_A = K_B$ & $K^+(K^-(m))=m$ and $K^-(K^+(m))=m$ \\
+\bottomrule
+\end{tabular}
+
+\textbf{In practice:} combine both -- use public key to securely exchange a symmetric session key, then use symmetric encryption for data (hybrid approach, as in TLS and secure e-mail).
+\end{tcolorbox}
+
+\begin{tcolorbox}[exambox, title=V23 Q6 -- Firewalls -- Three Goals and Types]
+\textbf{Three goals of a firewall:}
+\begin{enumerate}[noitemsep]
+  \item Prevent denial-of-service attacks (e.g., SYN flooding)
+  \item Prevent illegal modification or access of internal data
+  \item Allow only authorised access to the inside network
+\end{enumerate}
+
+\textbf{Stateless vs.\ stateful packet filtering:}
+\begin{itemize}[noitemsep]
+  \item \textbf{Stateless:} examines each packet independently based on header fields (src/dst IP, ports, flags); cannot detect ``nonsense'' packets that violate connection state
+  \item \textbf{Stateful:} tracks the state of every TCP connection; only admits packets that make sense in context of existing connections; times out inactive connections; more secure but requires state storage
+\end{itemize}
+
+\textbf{Application gateway:} filters on application-layer content in addition to IP/TCP/UDP fields; most fine-grained control; requires separate gateway per application.
+\end{tcolorbox}

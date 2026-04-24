@@ -1,0 +1,625 @@
+\section{Introduction to the Control Plane (5.1)}
+%=============================================================================
+
+\subsection{Network-Layer Functions Recap}
+
+\begin{keybox}[Forwarding vs.\ Routing -- Two Key Functions]
+The network layer has two fundamental functions:
+\begin{itemize}[noitemsep]
+    \item \textbf{Forwarding:} Move packets from a router's input port to the appropriate output port. This is a \emph{local}, per-router action belonging to the \textbf{data plane}.
+    \item \textbf{Routing:} Determine the route (path) that packets take from source to destination. This is a \emph{network-wide}, global action belonging to the \textbf{control plane}.
+\end{itemize}
+
+\medskip
+\textbf{Analogy:} Forwarding = taking the correct exit at a roundabout. Routing = planning the entire trip from city A to city B.
+\end{keybox}
+
+\subsection{Two Approaches to the Control Plane}
+
+\begin{keybox}[Per-Router Control vs.\ SDN]
+There are two main approaches to structuring the network control plane:
+
+\textbf{1. Per-Router Control (Traditional):}
+\begin{itemize}[noitemsep]
+    \item Individual routing algorithm components run in \emph{each and every router}
+    \item Routers interact with each other in the control plane to compute forwarding tables
+    \item Each router independently runs a routing algorithm (e.g., OSPF, BGP)
+\end{itemize}
+
+\textbf{2. Logically Centralized Control (SDN):}
+\begin{itemize}[noitemsep]
+    \item A remote controller computes and distributes forwarding tables to routers
+    \item Routers/switches receive their flow tables from the central controller
+    \item Physically separates the control plane from the data plane
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Routing Algorithms (5.2)}
+%=============================================================================
+
+\subsection{Goal and Overview}
+
+\begin{keybox}[Routing Protocol Goal]
+The goal of a routing protocol is to determine ``good'' paths (routes) from sending hosts to receiving hosts through the network of routers.
+\begin{itemize}[noitemsep]
+    \item A \textbf{path} is a sequence of routers that packets traverse from source to destination
+    \item ``Good'' typically means: least cost, fastest, or least congested
+    \item Routing is considered a ``top-10'' networking challenge
+\end{itemize}
+\end{keybox}
+
+\subsection{Graph Abstraction}
+
+\begin{keybox}[Network as a Graph]
+A network can be modelled as a graph $G = (N, E)$:
+\begin{itemize}[noitemsep]
+    \item $N$ = set of routers (nodes): $\{u, v, w, x, y, z\}$
+    \item $E$ = set of links (edges): $\{(u,v), (u,x), (v,x), \ldots\}$
+    \item Each edge has a \textbf{cost} $c(x,y)$ (e.g., bandwidth, delay, monetary cost, congestion)
+    \item $c(x,y) = \infty$ if $(x,y)$ is not a direct link
+    \item The cost of a path $(x_1, x_2, \ldots, x_p) = c(x_1,x_2) + c(x_2,x_3) + \cdots + c(x_{p-1},x_p)$
+\end{itemize}
+
+\textbf{Key question:} What is the least-cost path between two nodes?
+\end{keybox}
+
+\subsection{Routing Algorithm Classification}
+
+\begin{exambox}[Exam-relevant: Classification of Routing Algorithms]
+Routing algorithms can be classified along two axes:
+
+\textbf{Axis 1 -- Information scope:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Global (link state):} All routers have \emph{complete} topology and link cost information. Each router computes shortest paths independently using global knowledge.
+    \item \textbf{Decentralized (distance vector):} Iterative process of computation and exchange of information with neighbors. Routers initially only know link costs to their directly attached neighbors.
+\end{itemize}
+
+\textbf{Axis 2 -- How fast do routes change?}
+\begin{itemize}[noitemsep]
+    \item \textbf{Static:} Routes change slowly over time (manual configuration)
+    \item \textbf{Dynamic:} Routes change more quickly -- periodic updates or in response to link cost changes
+\end{itemize}
+\end{exambox}
+
+%=============================================================================
+\section{Link-State Routing Algorithm: Dijkstra's Algorithm (5.2.1)}
+%=============================================================================
+
+\subsection{Overview}
+
+\begin{keybox}[Link-State Algorithm -- Key Properties]
+In a \textbf{link-state} algorithm:
+\begin{itemize}[noitemsep]
+    \item All routers have \emph{complete} knowledge of the network topology and all link costs
+    \item This is achieved by \textbf{link-state broadcast} -- each router broadcasts its link information to \emph{all} other routers in the network (flooding)
+    \item Each router then independently runs \textbf{Dijkstra's algorithm} to compute shortest paths from itself to all other nodes
+    \item The result is a \textbf{shortest-path tree} rooted at the computing router, which determines the forwarding table
+\end{itemize}
+\end{keybox}
+
+\subsection{Dijkstra's Algorithm}
+
+\begin{formulabox}[Dijkstra's Algorithm -- Notation and Procedure]
+\textbf{Notation:}
+\begin{itemize}[noitemsep]
+    \item $c(x,y)$: direct link cost from node $x$ to node $y$; $= \infty$ if not direct neighbors
+    \item $D(v)$: current estimate of the least-cost path from source to $v$
+    \item $p(v)$: predecessor node along the current least-cost path to $v$
+    \item $N'$: set of nodes whose least-cost path is definitively known
+\end{itemize}
+
+\textbf{Algorithm:}
+\begin{enumerate}[noitemsep]
+    \item \textbf{Initialize:} $N' = \{u\}$ (source node). For all neighbors $v$ of $u$: $D(v) = c(u,v)$. For all non-neighbors: $D(v) = \infty$.
+    \item \textbf{Loop:} Find node $w \notin N'$ such that $D(w)$ is minimum. Add $w$ to $N'$.
+    \item \textbf{Update:} For each neighbor $v$ of $w$ that is not in $N'$:
+    \[
+    D(v) = \min\big(D(v),\; D(w) + c(w,v)\big)
+    \]
+    If the path through $w$ is better, update $p(v) = w$.
+    \item \textbf{Repeat} step 2--3 until all nodes are in $N'$.
+\end{enumerate}
+
+\textbf{Complexity:} $O(n^2)$ for $n$ nodes (can be improved to $O(n \log n)$ with a priority queue).
+\end{formulabox}
+
+\begin{exambox}[Exam-relevant: Dijkstra's Algorithm Walkthrough]
+\textbf{Example:} Given the following network (from textbook Figure 5.3):
+
+\begin{center}
+\begin{tabular}{cccccccc}
+\toprule
+\textbf{Step} & $N'$ & $D(v),p(v)$ & $D(w),p(w)$ & $D(x),p(x)$ & $D(y),p(y)$ & $D(z),p(z)$ \\
+\midrule
+0 & $\{u\}$ & $2,u$ & $5,u$ & $1,u$ & $\infty$ & $\infty$ \\
+1 & $\{u,x\}$ & $2,u$ & $4,x$ & -- & $2,x$ & $\infty$ \\
+2 & $\{u,x,v\}$ & -- & $4,x$ & -- & $2,x$ & $\infty$ \\
+3 & $\{u,x,v,y\}$ & -- & $4,x$ & -- & -- & $4,y$ \\
+4 & $\{u,x,v,y,w\}$ & -- & -- & -- & -- & $4,y$ \\
+5 & $\{u,x,v,y,w,z\}$ & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+At each step, the node with the smallest $D(\cdot)$ not yet in $N'$ is added, and all neighbor distances are updated.
+
+\medskip
+\textbf{Tip:} On the exam, you may be asked to run Dijkstra's algorithm on a given graph. Practice filling out a table like the one above step by step.
+\end{exambox}
+
+\subsection{Oscillations in Link-State Routing}
+
+\begin{warnbox}[Oscillation Problem]
+When link costs are \textbf{traffic-dependent} (e.g., proportional to the traffic load on a link), Dijkstra's algorithm can cause \textbf{oscillations}:
+\begin{itemize}[noitemsep]
+    \item All routers compute new routes based on current traffic
+    \item Traffic shifts to the new ``best'' path, making it congested
+    \item In the next iteration, the old path becomes least-cost again
+    \item Routes keep oscillating back and forth
+\end{itemize}
+
+\textbf{Mitigation:} Routers can randomize the timing of their link-state broadcasts so they don't all recompute routes simultaneously.
+\end{warnbox}
+
+%=============================================================================
+\section{Distance Vector Routing Algorithm (5.2.2)}
+%=============================================================================
+
+\subsection{Bellman-Ford Equation}
+
+\begin{formulabox}[Bellman-Ford Equation (Dynamic Programming)]
+The Bellman-Ford equation defines the least-cost path recursively:
+\[
+d_x(y) = \min_v \big\{ c(x,v) + d_v(y) \big\}
+\]
+where:
+\begin{itemize}[noitemsep]
+    \item $d_x(y)$: cost of the least-cost path from $x$ to $y$
+    \item $\min_v$: minimum taken over all neighbors $v$ of $x$
+    \item $c(x,v)$: cost of the direct link from $x$ to neighbor $v$
+    \item $d_v(y)$: cost of the least-cost path from $v$ to $y$ (as reported by neighbor $v$)
+\end{itemize}
+
+The neighbor $v^*$ that achieves the minimum becomes the \textbf{next hop} in the forwarding table for destination $y$.
+\end{formulabox}
+
+\subsection{Distance Vector Algorithm}
+
+\begin{keybox}[DV Algorithm -- How It Works]
+The distance vector algorithm is:
+\begin{itemize}[noitemsep]
+    \item \textbf{Iterative:} Continues until no more information is exchanged
+    \item \textbf{Asynchronous:} Nodes do not need to operate in lockstep
+    \item \textbf{Distributed:} Each node only communicates with its direct neighbors
+\end{itemize}
+
+\textbf{Process:}
+\begin{enumerate}[noitemsep]
+    \item Each node $x$ maintains a \textbf{distance vector} $\mathbf{D}_x = [D_x(y) : y \in N]$ -- its estimate of the least cost to every other node
+    \item Each node $x$ maintains its neighbors' distance vectors: $\mathbf{D}_v$ for each neighbor $v$
+    \item Periodically, or when its local DV changes, each node sends its DV to its neighbors
+    \item When node $x$ receives a new DV from a neighbor $v$, it updates its own DV using Bellman-Ford:
+    \[
+    D_x(y) = \min_v \big\{ c(x,v) + D_v(y) \big\} \quad \text{for each node } y
+    \]
+    \item If $D_x(y)$ changes, $x$ notifies its neighbors
+\end{enumerate}
+
+The algorithm converges to the correct least-cost paths. Each node only needs to know its own link costs and its neighbors' distance vectors.
+\end{keybox}
+
+\subsection{Count-to-Infinity Problem}
+
+\begin{exambox}[Exam-relevant: Count-to-Infinity Problem]
+A major issue with distance vector routing is the \textbf{count-to-infinity problem}:
+
+\textbf{Scenario:} Suppose a link cost increases dramatically (e.g., $y$--$x$ cost goes from 4 to 60):
+\begin{itemize}[noitemsep]
+    \item Node $y$ sees the cost to $x$ via direct link is now 60
+    \item But $y$ thinks it can reach $x$ via $z$ for cost $5$ (because $z$'s old DV says $D_z(x) = 5$)
+    \item So $y$ sets $D_y(x) = c(y,z) + D_z(x) = 1 + 5 = 6$
+    \item When $z$ gets $y$'s update, $z$ updates $D_z(x) = c(z,y) + D_y(x) = 1 + 6 = 7$
+    \item This continues: $D_y(x) = 8$, $D_z(x) = 9$, $D_y(x) = 10$, \ldots
+    \item It takes \textbf{44 iterations} to converge to the correct value of 60!
+\end{itemize}
+
+This is called ``bad news travels slowly.'' Good news (a cost decrease) propagates in one iteration.
+
+\medskip
+\textbf{Mitigation -- Poisoned Reverse:}
+\begin{itemize}[noitemsep]
+    \item If $z$ routes to $x$ through $y$, then $z$ tells $y$ that $D_z(x) = \infty$
+    \item This prevents $y$ from routing to $x$ through $z$ (avoiding the loop)
+    \item \textbf{Limitation:} Poisoned reverse only solves loops involving two nodes. Loops involving three or more nodes are \emph{not} detected.
+\end{itemize}
+\end{exambox}
+
+%=============================================================================
+\section{Comparison: Link State vs.\ Distance Vector (5.2.3)}
+%=============================================================================
+
+\begin{exambox}[Exam-relevant: LS vs.\ DV Comparison]
+\begin{center}
+\begin{tabular}{p{3.5cm}p{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Property} & \textbf{Link State (LS)} & \textbf{Distance Vector (DV)} \\
+\midrule
+\textbf{Message complexity} & $O(n \cdot E)$ messages sent (each of $n$ nodes broadcasts to $E$ neighbors) & Exchange only between neighbors; convergence time varies \\
+\midrule
+\textbf{Speed of convergence} & $O(n^2)$ algorithm; may have oscillations with traffic-dependent costs & Convergence time varies; count-to-infinity problem; routing loops possible \\
+\midrule
+\textbf{Robustness (what if a router malfunctions?)} & A router can advertise \emph{incorrect link cost}; each node computes its own table -- errors are somewhat contained & A router can advertise \emph{incorrect path cost}; errors propagate through the network (``rumors'') \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{Key takeaway:}
+\begin{itemize}[noitemsep]
+    \item LS: each node computes independently based on global information -- errors are localized
+    \item DV: nodes rely on neighbors' information -- a single incorrect value can propagate everywhere
+\end{itemize}
+\end{exambox}
+
+%=============================================================================
+\section{Intra-AS Routing: OSPF (5.3)}
+%=============================================================================
+
+\subsection{Autonomous Systems and Scalability}
+
+\begin{keybox}[Why Hierarchical Routing?]
+A flat routing scheme where all routers run the same algorithm does not scale because:
+\begin{itemize}[noitemsep]
+    \item \textbf{Scale:} Billions of destinations -- storing all destinations in routing tables is infeasible; routing message exchange would overwhelm links
+    \item \textbf{Administrative autonomy:} Each network admin wants to control routing within their own network
+\end{itemize}
+
+\textbf{Solution: Autonomous Systems (AS)}
+\begin{itemize}[noitemsep]
+    \item The Internet is divided into \textbf{autonomous systems} (ASes)
+    \item An AS is a collection of routers under the \emph{same administrative control} (e.g., an ISP, a university, a company)
+    \item \textbf{Intra-AS routing:} Routing \emph{within} an AS (all routers run the same intra-AS protocol)
+    \item \textbf{Inter-AS routing:} Routing \emph{between} ASes (handled by a separate protocol -- BGP)
+    \item \textbf{Gateway routers:} Routers at the ``edge'' of an AS that connect to routers in other ASes
+\end{itemize}
+\end{keybox}
+
+\subsection{OSPF -- Open Shortest Path First}
+
+\begin{keybox}[OSPF -- Overview]
+OSPF is the most widely used \textbf{intra-AS} (interior gateway) routing protocol. It uses a \textbf{link-state} algorithm.
+
+\textbf{Key characteristics:}
+\begin{itemize}[noitemsep]
+    \item Uses \textbf{Dijkstra's algorithm} to compute shortest-path tree
+    \item Each router floods \textbf{link-state advertisements (LSAs)} to \emph{all} other routers in the AS
+    \item LSAs contain: one entry per directly attached neighbor, with the link cost
+    \item OSPF messages are carried directly over \textbf{IP} (protocol number 89) -- not TCP or UDP
+    \item ``Open'' means the protocol specification is publicly available
+\end{itemize}
+
+\textbf{Advanced features of OSPF:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Security:} All OSPF messages can be authenticated (prevents malicious intrusion)
+    \item \textbf{Multiple same-cost paths:} When multiple paths have equal cost, OSPF allows traffic to be spread across them (ECMP -- Equal-Cost Multi-Path)
+    \item \textbf{Integrated unicast and multicast:} Multicast OSPF (MOSPF) uses the same topology database
+    \item \textbf{Hierarchical OSPF:} Support for large ASes through \emph{areas}
+\end{itemize}
+\end{keybox}
+
+\subsection{Hierarchical OSPF}
+
+\begin{keybox}[Two-Level Hierarchy in OSPF]
+For large ASes, OSPF supports a two-level hierarchy:
+\begin{itemize}[noitemsep]
+    \item \textbf{Local areas:} Each area runs its own OSPF link-state algorithm. Routers only flood LSAs \emph{within} their area.
+    \item \textbf{Backbone area (Area 0):} Connects all local areas. Used to route traffic \emph{between} areas.
+    \item \textbf{Area border routers:} Belong to both a local area and the backbone. They summarize routing information from their area and advertise it to the backbone.
+    \item \textbf{Backbone routers:} Run OSPF routing limited to the backbone area.
+    \item \textbf{Boundary routers:} Connect to other ASes (run inter-AS routing as well).
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Inter-AS Routing: BGP (5.4)}
+%=============================================================================
+
+\subsection{BGP Overview}
+
+\begin{keybox}[BGP -- Border Gateway Protocol]
+BGP is the \textbf{inter-AS} (inter-domain) routing protocol -- the ``glue that holds the Internet together.''
+
+\textbf{BGP provides each AS with a means to:}
+\begin{itemize}[noitemsep]
+    \item \textbf{eBGP} (external BGP): Obtain subnet reachability information from neighboring ASes
+    \item \textbf{iBGP} (internal BGP): Propagate reachability information to all routers \emph{within} the AS
+    \item Determine ``good'' routes to other networks based on reachability information and \textbf{policy}
+\end{itemize}
+
+\textbf{Key facts:}
+\begin{itemize}[noitemsep]
+    \item BGP allows each subnet to advertise its existence to the rest of the Internet: ``I am here, and here is how to reach me''
+    \item BGP runs over \textbf{TCP} (port 179) -- reliable message exchange
+    \item BGP sessions are called \textbf{BGP connections} (semi-permanent TCP connections)
+\end{itemize}
+\end{keybox}
+
+\subsection{BGP Basics: Path Attributes and Routes}
+
+\begin{keybox}[BGP Route Advertisements]
+When a router advertises a prefix via BGP, it includes \textbf{BGP attributes}. A prefix together with its attributes is called a \textbf{route}.
+
+\textbf{Two important attributes:}
+\begin{itemize}[noitemsep]
+    \item \textbf{AS-PATH:} The list of ASes through which the advertisement has passed. Example: AS2 AS17 AS67. Used for loop detection -- if a router sees its own AS in the path, it rejects the advertisement.
+    \item \textbf{NEXT-HOP:} The IP address of the router interface that begins the AS-PATH. Indicates the next-hop router to reach the destination.
+\end{itemize}
+
+\textbf{Policy-based routing:}
+\begin{itemize}[noitemsep]
+    \item A gateway receiving a route advertisement uses its \textbf{import policy} to decide whether to accept or filter the route
+    \item An AS uses its \textbf{export policy} to decide whether to advertise routes to neighboring ASes
+\end{itemize}
+\end{keybox}
+
+\subsection{BGP Route Selection}
+
+\begin{exambox}[Exam-relevant: BGP Route Selection Rules]
+When a router learns about multiple routes to the same prefix, it selects the best route using the following criteria (in order of priority):
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Local preference value} (policy decision): Highest local preference wins. Set by the AS administrator.
+    \item \textbf{Shortest AS-PATH:} Fewest number of ASes traversed.
+    \item \textbf{Closest NEXT-HOP router} (hot potato routing): Choose the route whose NEXT-HOP router has the lowest intra-AS cost from the current router.
+    \item \textbf{Additional criteria:} BGP identifiers and other tie-breakers.
+\end{enumerate}
+
+\medskip
+\textbf{Hot Potato Routing:} The router chooses the gateway that has the \emph{smallest least cost} (determined by the intra-AS algorithm) to reach, regardless of the inter-AS cost. The idea: ``get rid of the packet as quickly as possible'' (within the AS).
+\end{exambox}
+
+\subsection{Why Different Intra-AS and Inter-AS Routing?}
+
+\begin{keybox}[Intra-AS vs.\ Inter-AS: Different Goals]
+\textbf{Policy:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Inter-AS (BGP):} Policy is dominant. An admin wants control over how traffic is routed and who routes through their network. BGP carries path attributes and allows filtering.
+    \item \textbf{Intra-AS (OSPF):} Single admin, so policy is less of an issue. Focus on performance.
+\end{itemize}
+
+\textbf{Scale:}
+\begin{itemize}[noitemsep]
+    \item Hierarchical routing saves table size and reduces update traffic
+    \item Intra-AS can focus on performance; inter-AS may sacrifice performance for policy
+\end{itemize}
+
+\textbf{Performance:}
+\begin{itemize}[noitemsep]
+    \item Intra-AS routing can focus on finding optimal paths
+    \item Inter-AS routing is constrained by policies (may not use shortest path)
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{ICMP -- Internet Control Message Protocol (5.6)}
+%=============================================================================
+
+\subsection{ICMP Overview}
+
+\begin{keybox}[ICMP -- Purpose and Position]
+ICMP is used by hosts and routers to communicate \textbf{network-level information}:
+\begin{itemize}[noitemsep]
+    \item \textbf{Error reporting:} Unreachable host, network, port, or protocol
+    \item \textbf{Echo request/reply:} Used by \texttt{ping}
+    \item ICMP is a network-layer protocol but sits ``above'' IP:
+    \begin{itemize}[noitemsep]
+        \item ICMP messages are carried as the \textbf{payload} of IP datagrams
+    \end{itemize}
+    \item Each ICMP message has a \textbf{type} and a \textbf{code} field, plus the first 8 bytes of the IP datagram that caused the error
+\end{itemize}
+\end{keybox}
+
+\subsection{ICMP Message Types}
+
+\begin{exambox}[Exam-relevant: ICMP Message Types and Codes]
+\begin{center}
+\begin{tabular}{ccl}
+\toprule
+\textbf{Type} & \textbf{Code} & \textbf{Description} \\
+\midrule
+0 & 0 & Echo reply (ping response) \\
+3 & 0 & Destination network unreachable \\
+3 & 1 & Destination host unreachable \\
+3 & 2 & Destination protocol unreachable \\
+3 & 3 & Destination port unreachable \\
+3 & 6 & Destination network unknown \\
+3 & 7 & Destination host unknown \\
+4 & 0 & Source quench (congestion control -- not used) \\
+8 & 0 & Echo request (ping) \\
+9 & 0 & Route advertisement \\
+10 & 0 & Router discovery \\
+11 & 0 & TTL expired \\
+12 & 0 & Bad IP header \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Key types to remember:}
+\begin{itemize}[noitemsep]
+    \item Type 8/0: Echo request and reply (\texttt{ping})
+    \item Type 11: TTL expired (used by \texttt{traceroute})
+    \item Type 3: Destination unreachable (various codes for network, host, port, protocol)
+\end{itemize}
+\end{exambox}
+
+\subsection{Traceroute and ICMP}
+
+\begin{exambox}[Exam-relevant: How Traceroute Works]
+\texttt{Traceroute} uses ICMP to discover the path packets take through the network:
+
+\textbf{How it works:}
+\begin{enumerate}[noitemsep]
+    \item The source sends sets of \textbf{UDP segments} to the destination
+    \item The 1st set has \textbf{TTL = 1}, the 2nd set has \textbf{TTL = 2}, etc. (typically 3 probes per TTL value)
+    \item When a datagram arrives at the $n$th router, its TTL expires (reaches 0)
+    \item The router \textbf{discards} the datagram and sends back an \textbf{ICMP ``TTL expired'' message} (type 11, code 0) to the source
+    \item The ICMP message includes the router's name and IP address
+    \item When the ICMP message arrives at the source, it records the \textbf{RTT} (round-trip time)
+\end{enumerate}
+
+\textbf{Stopping criteria:}
+\begin{itemize}[noitemsep]
+    \item Eventually a UDP segment reaches the destination host
+    \item The destination returns an ICMP \textbf{``port unreachable''} message (type 3, code 3) because the destination port is unlikely to be in use
+    \item The source receives this message and knows the destination has been reached -- it stops
+\end{itemize}
+
+\medskip
+\textbf{Output:} For each TTL value, traceroute displays the router IP address and three RTT measurements.
+\end{exambox}
+
+%=============================================================================
+\section{SDN -- Software-Defined Networking (5.5)}
+%=============================================================================
+
+\subsection{SDN Overview}
+
+\begin{keybox}[SDN Control Plane]
+In Software-Defined Networking, the control plane is \textbf{logically centralized}:
+\begin{itemize}[noitemsep]
+    \item A remote \textbf{SDN controller} computes and installs forwarding tables (flow tables) in each router/switch
+    \item The controller has a \textbf{global view} of the network (topology, traffic, link states)
+    \item Routers/switches become simple forwarding devices (``dumb'' data plane)
+    \item The controller is implemented as a distributed system for reliability and scalability
+\end{itemize}
+
+\textbf{Why SDN?}
+\begin{itemize}[noitemsep]
+    \item Easier network management -- one central point of configuration
+    \item Table-based forwarding allows ``programming'' of routers via an open API (e.g., OpenFlow)
+    \item Enables new routing algorithms without changing router hardware/software
+    \item Centralized control makes it easier to implement complex policies, load balancing, and traffic engineering
+\end{itemize}
+\end{keybox}
+
+\subsection{SDN Architecture}
+
+\begin{keybox}[SDN Layers]
+The SDN architecture has three main layers:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Data plane (SDN-controlled switches):}
+    \begin{itemize}[noitemsep]
+        \item Fast, simple forwarding devices
+        \item Flow table computed and installed by the controller
+        \item API for communication with controller (e.g., OpenFlow)
+    \end{itemize}
+    \item \textbf{SDN Controller (network OS):}
+    \begin{itemize}[noitemsep]
+        \item Maintains network state information
+        \item Interacts with switches below (southbound API) and applications above (northbound API)
+        \item Implemented as a distributed system (e.g., ONOS, OpenDaylight)
+    \end{itemize}
+    \item \textbf{Network-control applications:}
+    \begin{itemize}[noitemsep]
+        \item ``Brain'' of the control -- routing, access control, load balancing
+        \item Implemented as programs on top of the controller using the northbound API
+        \item Can be provided by third parties (separate from controller and switches)
+    \end{itemize}
+\end{enumerate}
+\end{keybox}
+
+\subsection{OpenFlow Protocol}
+
+\begin{keybox}[OpenFlow -- Controller-to-Switch Communication]
+OpenFlow is the protocol used between the SDN controller and the switches:
+\begin{itemize}[noitemsep]
+    \item Operates over \textbf{TCP} (with optional encryption)
+    \item \textbf{Controller-to-switch messages:} configure, modify-state (flow table entries), read-state (statistics), send-packet
+    \item \textbf{Switch-to-controller messages:} packet-in (forward a packet to controller), flow-removed (flow table entry removed), port-status (port change notification)
+\end{itemize}
+
+\textbf{Generalized forwarding:} OpenFlow flow table entries have the form:
+\[
+\text{match} + \text{action} + \text{priority} + \text{counters}
+\]
+\begin{itemize}[noitemsep]
+    \item \textbf{Match:} Pattern on packet header fields (source/dest IP, port, protocol, VLAN, etc.)
+    \item \textbf{Action:} Forward to port(s), drop, modify fields, send to controller
+    \item This generalizes traditional destination-based forwarding
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Network Management and SNMP (5.7)}
+%=============================================================================
+
+\subsection{Network Management Overview}
+
+\begin{keybox}[What is Network Management?]
+An autonomous system (``network'') consists of 1000s of interacting hardware/software components. Network management involves:
+\begin{itemize}[noitemsep]
+    \item \textbf{Deployment, integration, and coordination} of hardware, software, and human elements
+    \item \textbf{Monitor, test, poll, configure, analyze, evaluate, and control} the network
+    \item Goal: meet real-time operational performance and Quality of Service requirements at a reasonable cost
+\end{itemize}
+\end{keybox}
+
+\subsection{SNMP -- Simple Network Management Protocol}
+
+\begin{keybox}[SNMP]
+SNMP is the protocol used for network management:
+\begin{itemize}[noitemsep]
+    \item \textbf{Management server} (managing entity) queries and controls managed devices
+    \item \textbf{Managed devices} (routers, switches, hosts) contain a \textbf{Management Information Base (MIB)} -- a collection of objects/variables representing the device's state
+    \item SNMP has two modes:
+    \begin{itemize}[noitemsep]
+        \item \textbf{Request/response:} Manager queries or sets MIB values on a managed device
+        \item \textbf{Trap messages:} Managed device sends an unsolicited notification to the manager (e.g., link failure, threshold exceeded)
+    \end{itemize}
+    \item SNMP runs over \textbf{UDP}
+    \item SNMP message types: GetRequest, SetRequest, GetBulkRequest, InformRequest, Response, Trap
+\end{itemize}
+\end{keybox}
+
+%=============================================================================
+\section{Summary and Exam Tips}
+%=============================================================================
+
+\begin{exambox}[Frequently Tested Topics -- Chapter 5]
+Based on past exams and lecture emphasis:
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Dijkstra's algorithm:} Be able to run it step-by-step on a given graph and fill in the table. Know the formula: $D(v) = \min(D(v), D(w) + c(w,v))$.
+    \item \textbf{Bellman-Ford equation:} $d_x(y) = \min_v \{c(x,v) + d_v(y)\}$. Understand what each term means.
+    \item \textbf{LS vs.\ DV:} Know the differences in message complexity, convergence speed, and robustness.
+    \item \textbf{Count-to-infinity:} Understand why it happens, how poisoned reverse helps, and its limitation.
+    \item \textbf{OSPF:} Link-state protocol, runs Dijkstra's, floods LSAs, runs directly over IP (protocol 89), supports hierarchical areas.
+    \item \textbf{BGP:} Inter-AS routing, uses TCP port 179, eBGP vs.\ iBGP, AS-PATH and NEXT-HOP attributes, route selection rules, hot potato routing.
+    \item \textbf{ICMP:} Know the main message types (echo request/reply, TTL expired, dest unreachable). Understand how \texttt{traceroute} uses ICMP.
+    \item \textbf{SDN:} Logically centralized control plane, OpenFlow, match+action paradigm, three-layer architecture.
+    \item \textbf{Intra-AS vs.\ Inter-AS:} Why they are different (policy, scale, performance).
+\end{enumerate}
+\end{exambox}
+
+\begin{warnbox}[Common Exam Pitfalls]
+\begin{itemize}[noitemsep]
+    \item \textbf{Link State $\neq$ Distance Vector} -- Don't confuse which algorithm uses global vs.\ local information. LS = global/Dijkstra, DV = local/Bellman-Ford.
+    \item \textbf{OSPF runs over IP}, not TCP or UDP. BGP runs over \textbf{TCP}.
+    \item \textbf{Traceroute uses UDP segments}, not ICMP echo requests. The ICMP messages (TTL expired, port unreachable) are the \emph{responses}.
+    \item \textbf{Poisoned reverse does not solve all loops} -- only prevents two-node loops. Three-or-more-node loops can still occur.
+    \item \textbf{BGP is policy-based}, not purely shortest-path. Local preference can override shortest AS-PATH.
+    \item \textbf{Hot potato routing} minimizes \emph{intra-AS} cost to the exit point, not the total end-to-end cost.
+    \item \textbf{ICMP messages are carried inside IP datagrams} -- ICMP is ``above'' IP but is considered a network-layer protocol.
+    \item \textbf{eBGP vs.\ iBGP:} eBGP is between routers in \emph{different} ASes; iBGP is between routers in the \emph{same} AS. Don't mix them up.
+\end{itemize}
+\end{warnbox}
+
+\begin{formulabox}[Key Formulas and Equations -- Chapter 5]
+\begin{align}
+\text{Dijkstra's update:} \quad D(v) &= \min\big(D(v),\; D(w) + c(w,v)\big) \\
+\text{Bellman-Ford:} \quad d_x(y) &= \min_v \big\{ c(x,v) + d_v(y) \big\} \\
+\text{Dijkstra complexity:} \quad &O(n^2) \text{ (or } O(n \log n) \text{ with priority queue)} \\
+\text{LS message complexity:} \quad &O(n \cdot E) \text{ messages}
+\end{align}
+\end{formulabox}

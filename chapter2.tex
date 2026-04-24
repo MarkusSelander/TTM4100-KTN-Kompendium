@@ -1,0 +1,1251 @@
+\section{Prinsipper for nettverksapplikasjoner (2.1)}
+%=============================================================================
+
+\subsection{Applikasjonsarkitekturer}
+
+To dominerende arkitekturer for nettverksapplikasjoner:
+
+\begin{keybox}[Klient-server vs. Peer-to-Peer (P2P)]
+\textbf{Klient-server:}
+\begin{itemize}[noitemsep]
+    \item Serveren er \textbf{alltid p\aa} (always-on) med fast (permanent) IP-adresse
+    \item Klienter kontakter serveren, kan ha dynamisk IP
+    \item Klienter kommuniserer \textbf{ikke direkte} med hverandre
+    \item Eksempler: HTTP, IMAP, FTP
+    \item Skalering: flere servere i datasentre
+\end{itemize}
+
+\textbf{Peer-to-Peer (P2P):}
+\begin{itemize}[noitemsep]
+    \item \textbf{Ingen} dedikert server -- endesystemer kommuniserer direkte
+    \item Peers tilbyr tjenester til hverandre
+    \item \textbf{Selvskaler\-ende}: nye peers bringer b\aa de kapasitet og ettersp\o rsel
+    \item Utfordring: peers er intermittent tilkoblet, endrer IP
+    \item Eksempler: BitTorrent, Skype, KanKan
+\end{itemize}
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    server/.style={rectangle, draw, fill=blue!20, minimum width=1.2cm, minimum height=1.5cm, font=\footnotesize},
+    client/.style={rectangle, draw, fill=green!15, minimum width=1cm, minimum height=0.7cm, font=\footnotesize},
+    peer/.style={circle, draw, fill=orange!20, minimum size=0.9cm, font=\footnotesize},
+    >=Stealth, thick
+]
+    % Client-Server
+    \node[font=\bfseries] at (-3.5,2.5) {Klient-Server};
+    \node[server] (srv) at (-3.5,1.2) {Server};
+    \node[client] (c1) at (-5.5,-0.3) {Klient};
+    \node[client] (c2) at (-3.5,-0.3) {Klient};
+    \node[client] (c3) at (-1.5,-0.3) {Klient};
+    \draw[->] (c1) -- (srv);
+    \draw[->] (c2) -- (srv);
+    \draw[->] (c3) -- (srv);
+
+    % P2P
+    \node[font=\bfseries] at (3.5,2.5) {Peer-to-Peer};
+    \node[peer] (p1) at (2,1) {P};
+    \node[peer] (p2) at (5,1) {P};
+    \node[peer] (p3) at (2,-0.5) {P};
+    \node[peer] (p4) at (5,-0.5) {P};
+    \node[peer] (p5) at (3.5,0.3) {P};
+    \draw[<->] (p1) -- (p2);
+    \draw[<->] (p1) -- (p3);
+    \draw[<->] (p2) -- (p4);
+    \draw[<->] (p3) -- (p4);
+    \draw[<->] (p1) -- (p5);
+    \draw[<->] (p5) -- (p4);
+\end{tikzpicture}
+\end{center}
+
+\subsection{Prosesser og socketer}
+
+\begin{keybox}[Prosesser og kommunikasjon]
+\begin{itemize}[noitemsep]
+    \item En \textbf{prosess} er et program som kj\o rer p\aa\ en vert (host)
+    \item P\aa\ \textbf{samme} vert: inter-prosess kommunikasjon (IPC)
+    \item P\aa\ \textbf{ulike} verter: utveksling av \textbf{meldinger}
+    \item \textbf{Klientprosess}: initierer kommunikasjon
+    \item \textbf{Serverprosess}: venter p\aa\ \aa\ bli kontaktet
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[Socket -- ``D\o ren'' mellom applikasjon og transport]
+En \textbf{socket} er grensesnittet mellom applikasjonslaget og transportlaget. Prosessen sender/mottar meldinger gjennom sin socket.
+\begin{itemize}[noitemsep]
+    \item To socketer involvert: en p\aa\ hver side
+    \item Applikasjonsutvikler kontrollerer alt \textbf{over} socketen
+    \item OS kontrollerer alt \textbf{under} socketen (transport, nettverk, link, fysisk)
+\end{itemize}
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, minimum width=2.5cm, minimum height=0.5cm, font=\footnotesize},
+    >=Stealth
+]
+    % Left host
+    \node[layer, fill=blue!20] (app1) at (0,2.5) {Applikasjon};
+    \node[layer, fill=orange!15] (sock1) at (0,1.8) {\textbf{Socket}};
+    \node[layer, fill=gray!15] (trans1) at (0,1.1) {Transport};
+    \node[layer, fill=gray!10] (net1) at (0,0.4) {Nettverk};
+    \node[layer, fill=gray!5] (link1) at (0,-0.3) {Link};
+    \node[font=\footnotesize\bfseries] at (0,3.1) {Prosess A};
+
+    % Right host
+    \node[layer, fill=blue!20] (app2) at (6,2.5) {Applikasjon};
+    \node[layer, fill=orange!15] (sock2) at (6,1.8) {\textbf{Socket}};
+    \node[layer, fill=gray!15] (trans2) at (6,1.1) {Transport};
+    \node[layer, fill=gray!10] (net2) at (6,0.4) {Nettverk};
+    \node[layer, fill=gray!5] (link2) at (6,-0.3) {Link};
+    \node[font=\footnotesize\bfseries] at (6,3.1) {Prosess B};
+
+    % Internet
+    \node[ellipse, draw, fill=cyan!10, minimum width=2.5cm, minimum height=0.8cm, font=\footnotesize] (inet) at (3,-0.3) {Internett};
+    \draw[thick] (link1.east) -- (inet.west);
+    \draw[thick] (inet.east) -- (link2.west);
+
+    % Message arrow
+    \draw[->, thick, red, dashed] (sock1.east) -- node[above, font=\footnotesize, text=red] {melding} (sock2.west);
+
+    % Braces
+    \draw[decorate, decoration={brace, amplitude=5pt}] (-1.7,2.8) -- (-1.7,1.6) node[midway, left=6pt, font=\tiny, align=center] {App-\\utvikler};
+    \draw[decorate, decoration={brace, amplitude=5pt}] (-1.7,1.4) -- (-1.7,-0.6) node[midway, left=6pt, font=\tiny, align=center] {OS};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Adressering av prosesser}
+
+\begin{warnbox}[IP-adresse alene er ikke nok!]
+En prosess identifiseres unikt med \textbf{IP-adresse + portnummer}.
+\begin{itemize}[noitemsep]
+    \item IP-adressen identifiserer \textbf{verten}
+    \item Portnummeret identifiserer \textbf{prosessen} p\aa\ verten
+    \item Velkjente porter: HTTP = \textbf{80}, Mail (SMTP) = \textbf{25}, DNS = \textbf{53}
+\end{itemize}
+\end{warnbox}
+
+\subsection{Applikasjonslagsprotokoller}
+
+En applikasjonslagsprotokoll definerer:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Meldingstyper}: request og response
+    \item \textbf{Syntaks}: feltene i meldingen og deres format
+    \item \textbf{Semantikk}: betydningen av feltene
+    \item \textbf{Regler}: n\aa r prosesser sender/responderer
+\end{enumerate}
+
+\textbf{\AA pne protokoller}: definert i RFCer, tilgjengelig for alle (HTTP, SMTP).\\
+\textbf{Propriet\ae re protokoller}: private (Skype, Zoom).
+
+\subsection{Transporttjenestekrav}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, fill=blue!10, minimum width=3cm, minimum height=0.7cm, font=\footnotesize, rounded corners},
+    >=Stealth
+]
+    \node[box] (rel) at (0,0) {Datas\aa kerhet (reliability)};
+    \node[box] (tim) at (5,0) {Tidskrav (timing)};
+    \node[box] (thr) at (0,-1.2) {Gjennomstr\o mning (throughput)};
+    \node[box] (sec) at (5,-1.2) {Sikkerhet (security)};
+    \node[font=\bfseries, text=ntnu] at (2.5,1) {Fire dimensjoner av transporttjeneste};
+\end{tikzpicture}
+\end{center}
+
+\begin{keybox}[TCP vs. UDP -- Hva tilbyr de?]
+\begin{tabular}{lcc}
+\toprule
+\textbf{Egenskap} & \textbf{TCP} & \textbf{UDP} \\
+\midrule
+P\aa litelig dataoverf\o ring & \checkmark & $\times$ \\
+Flytkontroll & \checkmark & $\times$ \\
+Metningskontroll & \checkmark & $\times$ \\
+Tilkoblingsoppsett & \checkmark & $\times$ \\
+Tidskrav (timing) & $\times$ & $\times$ \\
+Min. gjennomstr\o mning & $\times$ & $\times$ \\
+Sikkerhet (innebygd) & $\times$ & $\times$ \\
+\bottomrule
+\end{tabular}
+\vspace{0.3em}
+
+\textbf{TLS} gir kryptert TCP-tilkobling, dataintegritet og autentisering.
+\end{keybox}
+
+%--- Exam questions 2.1 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.1 Prinsipper]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+What is a server in the client-server paradigm? & An always-on host with a permanent IP, often in data centers. \\
+\midrule
+What is a client in the client-server paradigm? & A device that contacts servers, may be intermittently connected and have dynamic IPs. \\
+\midrule
+Can clients communicate directly in client-server? & No. \\
+\midrule
+What is peer-to-peer architecture? & A model where end systems (peers) communicate directly without a central server. \\
+\midrule
+What is a socket? & An interface for sending and receiving process messages, connecting an app on one computer to an app on another. \\
+\midrule
+Why is an IP address alone not enough? & Because multiple processes can run on the same host. \\
+\midrule
+What does an application-layer protocol define? & Message types, syntax, semantics, and communication rules. \\
+\midrule
+What does TCP provide? & Reliable transport, flow control, congestion control, connection setup. \\
+\midrule
+What does UDP provide? & Unreliable data transfer with no added features. \\
+\midrule
+What does TLS provide? & Encrypted TCP connections, data integrity, and end-point authentication. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{Web og HTTP (2.2)}
+%=============================================================================
+
+\subsection{Grunnleggende om HTTP}
+
+\begin{keybox}[HTTP -- HyperText Transfer Protocol]
+\begin{itemize}[noitemsep]
+    \item En \textbf{webside} best\aa r av en base-HTML-fil og refererte objekter (bilder, skript, etc.)
+    \item HTTP f\o lger \textbf{klient-server}-modellen
+    \item Bruker \textbf{TCP} (port \textbf{80})
+    \item HTTP er \textbf{stateless} -- serveren lagrer ikke informasjon om tidligere foresp\o rsler
+\end{itemize}
+\end{keybox}
+
+\subsection{Persistent vs. Non-persistent HTTP}
+
+\begin{center}
+\begin{tikzpicture}[
+    >=Stealth, thick,
+    box/.style={rectangle, draw, fill=blue!10, minimum width=2.5cm, minimum height=0.8cm, font=\small}
+]
+    % Non-persistent
+    \node[font=\bfseries] at (-3,4) {Non-persistent HTTP};
+    \draw[thick] (-4.5,3.5) -- (-4.5,-2) node[below, font=\footnotesize] {Klient};
+    \draw[thick] (-1.5,3.5) -- (-1.5,-2) node[below, font=\footnotesize] {Server};
+
+    % Connection 1
+    \draw[->, blue] (-4.5,3) -- (-1.5,2.5) node[midway, above, font=\tiny] {TCP SYN};
+    \draw[<-, blue] (-4.5,2.3) -- (-1.5,2.3) node[midway, above, font=\tiny] {TCP ACK};
+    \draw[->, red] (-4.5,1.8) -- (-1.5,1.3) node[midway, above, font=\tiny] {GET obj1};
+    \draw[<-, red] (-4.5,0.8) -- (-1.5,0.8) node[midway, above, font=\tiny] {response};
+    \node[font=\tiny, text=blue] at (-3,-0.0) {TCP lukkes};
+
+    % Connection 2
+    \draw[->, blue, dashed] (-4.5,-0.5) -- (-1.5,-1) node[midway, above, font=\tiny] {ny TCP};
+    \draw[<-, red, dashed] (-4.5,-1.5) -- (-1.5,-1.5) node[midway, above, font=\tiny] {obj2};
+
+    % Persistent
+    \node[font=\bfseries] at (3,4) {Persistent HTTP};
+    \draw[thick] (1.5,3.5) -- (1.5,-2) node[below, font=\footnotesize] {Klient};
+    \draw[thick] (4.5,3.5) -- (4.5,-2) node[below, font=\footnotesize] {Server};
+
+    \draw[->, blue] (1.5,3) -- (4.5,2.5) node[midway, above, font=\tiny] {TCP SYN};
+    \draw[<-, blue] (1.5,2.3) -- (4.5,2.3) node[midway, above, font=\tiny] {TCP ACK};
+    \draw[->, red] (1.5,1.8) -- (4.5,1.3) node[midway, above, font=\tiny] {GET obj1};
+    \draw[<-, red] (1.5,0.8) -- (4.5,0.8) node[midway, above, font=\tiny] {response};
+    \draw[->, red] (1.5,0.2) -- (4.5,-0.3) node[midway, above, font=\tiny] {GET obj2};
+    \draw[<-, red] (1.5,-0.8) -- (4.5,-0.8) node[midway, above, font=\tiny] {response};
+    \node[font=\tiny, text=blue] at (3,-1.5) {samme TCP-tilkobling};
+\end{tikzpicture}
+\end{center}
+
+\begin{warnbox}[Non-persistent HTTP: Tid per objekt]
+Hvert objekt krever: \textbf{2 RTT + filoverf\o ringstid}
+\begin{itemize}[noitemsep]
+    \item 1 RTT for TCP-tilkobling
+    \item 1 RTT for HTTP request/response
+    \item Problemer: h\o y RTT-kostnad, OS-overhead for mange TCP-tilkoblinger
+\end{itemize}
+\end{warnbox}
+
+\begin{formulabox}[Response-tid for Non-persistent HTTP]
+$$T_{\text{non-pers}} = 2 \cdot RTT + T_{\text{fil}}$$
+For en webside med base-HTML + $n$ objekter:
+$$T_{\text{total}} = (n+1) \times (2 \cdot RTT + T_{\text{fil}})$$
+\end{formulabox}
+
+\subsection{HTTP-meldinger}
+
+\textbf{To typer:} Request og Response.
+
+\begin{keybox}[HTTP Request -- viktige metoder]
+\begin{tabular}{ll}
+\toprule
+\textbf{Metode} & \textbf{Beskrivelse} \\
+\midrule
+\texttt{GET} & Henter ressurs; data i URL etter ``?'' \\
+\texttt{POST} & Sender data i meldingskroppen (entity body) \\
+\texttt{HEAD} & Som GET, men returnerer kun headers \\
+\texttt{PUT} & Laster opp / erstatter en fil p\aa\ serveren \\
+\bottomrule
+\end{tabular}
+\end{keybox}
+
+\begin{keybox}[HTTP Response -- statuskoder]
+\begin{tabular}{ll}
+\toprule
+\textbf{Kode} & \textbf{Betydning} \\
+\midrule
+\texttt{200 OK} & Foresp\o rselen var vellykket \\
+\texttt{301 Moved Permanently} & Objektet har ny permanent URL \\
+\texttt{400 Bad Request} & Serveren forsto ikke meldingen \\
+\texttt{404 Not Found} & Dokumentet finnes ikke p\aa\ serveren \\
+\bottomrule
+\end{tabular}
+\end{keybox}
+
+\subsection{Cookies}
+
+\begin{keybox}[Cookies -- Tilstandsinformasjon i stateless HTTP]
+Cookies brukes for \aa\ holde tilstand p\aa\ tvers av HTTP-foresp\o rsler.
+
+\textbf{Fire komponenter:}
+\begin{enumerate}[noitemsep]
+    \item Cookie-header i HTTP \textbf{response} (Set-Cookie)
+    \item Cookie-header i HTTP \textbf{request} (Cookie)
+    \item Cookie-fil p\aa\ \textbf{klienten} (lagret av nettleseren)
+    \item \textbf{Database} p\aa\ serveren
+\end{enumerate}
+
+Bruksomr\aa der: autorisasjon, handlekurver, anbefalinger, sesjonstilstand.
+\end{keybox}
+
+\subsection{Web Caching (Proxy Server)}
+
+\begin{keybox}[Web Cache -- M\aa l: tilfredsstille foresp\o rsler uten origin server]
+\begin{itemize}[noitemsep]
+    \item Nettleseren sender \textbf{alle} HTTP-foresp\o rsler til cachen
+    \item Finnes objektet? $\rightarrow$ cache returnerer det direkte
+    \item Finnes det ikke? $\rightarrow$ cache henter fra origin server, cacher det, returnerer
+    \item Cachen fungerer b\aa de som \textbf{server} (for klienten) og \textbf{klient} (for origin server)
+\end{itemize}
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, fill=blue!10, minimum width=1.8cm, minimum height=0.8cm, font=\footnotesize},
+    >=Stealth, thick
+]
+    \node[box] (client) at (0,0) {Klient};
+    \node[box, fill=orange!20] (cache) at (4,0) {Web Cache};
+    \node[box, fill=green!15] (origin) at (8,0) {Origin Server};
+
+    \draw[->] (client) -- node[above, font=\tiny] {HTTP req} (cache);
+    \draw[->] (cache) -- node[above, font=\tiny] {Hvis miss} (origin);
+    \draw[<-, below] (cache) -- node[below, font=\tiny] {Objekt} (origin);
+    \draw[<-] (client) -- node[below, font=\tiny] {Objekt} (cache);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Fordeler med caching:}
+\begin{enumerate}[noitemsep]
+    \item Reduserer responstid for klienten
+    \item Reduserer trafikk p\aa\ institusjonens aksesslink
+    \item Billigere enn \aa\ oppgradere aksesslinken
+\end{enumerate}
+
+\begin{keybox}[Conditional GET -- Unng\aa\ un\o dvendig overf\o ring]
+\begin{itemize}[noitemsep]
+    \item Request-header: \texttt{If-Modified-Since: <dato>}
+    \item Svar hvis uendret: \texttt{304 Not Modified} (ingen data sendes)
+    \item Svar hvis endret: \texttt{200 OK} + oppdatert objekt
+\end{itemize}
+\end{keybox}
+
+\subsection{HTTP/2 og HTTP/3}
+
+\begin{keybox}[HTTP/2 -- Redusere forsinkelse]
+\begin{itemize}[noitemsep]
+    \item M\aa l: redusere delay i multi-objekt foresp\o rsler
+    \item \textbf{Prioritetsbasert overf\o ring}: viktige objekter f\o rst
+    \item \textbf{Server push}: serveren kan sende objekter klienten ikke har bedt om
+    \item \textbf{Framing}: objekter deles i frames som \textbf{interleaves} $\rightarrow$ reduserer HOL-blocking
+\end{itemize}
+\end{keybox}
+
+\begin{warnbox}[HOL-blocking (Head-of-Line)]
+I HTTP/1.1 m\aa\ objekter sendes sekvensielt. Et stort objekt blokkerer sm\aa\ objekter bak i k\o en. HTTP/2 l\o ser dette med frame-interleaving.
+\end{warnbox}
+
+\begin{keybox}[HTTP/3 -- L\o ser TCP-begrensninger]
+\begin{itemize}[noitemsep]
+    \item Bruker \textbf{UDP} (via QUIC) i stedet for TCP
+    \item Per-objekt feil- og metningskontroll
+    \item Innebygd sikkerhet
+    \item L\o ser problemet med at \textit{pakketap p\aa\ TCP p\aa virker alle objekter}
+\end{itemize}
+\end{keybox}
+
+%--- Exam questions 2.2 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.2 Web og HTTP]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+What is HTTP? & The application layer protocol used by the web to transfer data. \\
+\midrule
+Which protocol does HTTP use underneath? & TCP. \\
+\midrule
+Is HTTP stateful or stateless? & Stateless -- the server does not store past requests. \\
+\midrule
+How many RTTs per object in non-persistent HTTP? & 2 RTTs + file transmission time. \\
+\midrule
+What does the POST method do? & Sends user input in the entity body of the request. \\
+\midrule
+What does 404 mean? & Not Found -- the requested document doesn't exist. \\
+\midrule
+What are the four components of cookies? & 1) Cookie in response, 2) Cookie in request, 3) File on client, 4) Database on server. \\
+\midrule
+What is the goal of web caching? & To satisfy client requests without involving the origin server. \\
+\midrule
+What is a Conditional GET used for? & To avoid sending an object if the cached version is still up-to-date. \\
+\midrule
+What is the main goal of HTTP/2? & To decrease delay in multi-object HTTP requests. \\
+\midrule
+How does HTTP/2 reduce HOL blocking? & By dividing objects into frames and interleaving their transmission. \\
+\midrule
+How does HTTP/3 address HTTP/2 limitations? & Uses UDP for per-object error and congestion control, includes security. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{E-post: SMTP og IMAP (2.3)}
+%=============================================================================
+
+\subsection{E-postsystemets komponenter}
+
+\begin{keybox}[Tre hovedkomponenter i e-postsystemet]
+\begin{enumerate}[noitemsep]
+    \item \textbf{User agent (UA)}: skrive, redigere og lese e-post
+    \item \textbf{Mailserver}: lagrer innkommende meldinger (mailbox) og utg\aa ende meldinger (message queue)
+    \item \textbf{SMTP}: protokollen for \aa\ sende e-post mellom mailservere
+\end{enumerate}
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    ua/.style={rectangle, draw, fill=green!15, minimum width=1.3cm, minimum height=0.7cm, font=\footnotesize},
+    ms/.style={rectangle, draw, fill=blue!15, minimum width=1.5cm, minimum height=1cm, font=\footnotesize},
+    >=Stealth, thick
+]
+    % Sender side
+    \node[ua] (ua1) at (0,0) {UA (A)};
+    \node[ms] (ms1) at (3,0) {\shortstack{Mail-\\server A}};
+    \node[ms] (ms2) at (7,0) {\shortstack{Mail-\\server B}};
+    \node[ua] (ua2) at (10,0) {UA (B)};
+
+    \draw[->] (ua1) -- node[above, font=\tiny] {SMTP} (ms1);
+    \draw[->, red, very thick] (ms1) -- node[above, font=\tiny] {SMTP (TCP port 25)} (ms2);
+    \draw[<-] (ua2) -- node[above, font=\tiny] {IMAP} (ms2);
+
+    % Labels
+    \node[font=\tiny, text=gray] at (0,-0.8) {Sender};
+    \node[font=\tiny, text=gray] at (10,-0.8) {Mottaker};
+\end{tikzpicture}
+\end{center}
+
+\subsection{SMTP-protokollen}
+
+\begin{keybox}[SMTP -- Simple Mail Transfer Protocol]
+\begin{itemize}[noitemsep]
+    \item Port \textbf{25}, bruker \textbf{TCP}
+    \item \textbf{Push}-basert (sender presser data til mottaker)
+    \item Tre faser: \textbf{handshaking}, \textbf{overf\o ring}, \textbf{lukking}
+    \item Kommando/respons-interaksjon (ASCII tekst + statuskoder)
+    \item Krever \textbf{7-bit ASCII} for meldingskroppen
+    \item Slutt p\aa\ melding: \texttt{CRLF.CRLF}
+\end{itemize}
+\end{keybox}
+
+\begin{warnbox}[Forskjeller mellom SMTP og HTTP]
+\begin{tabular}{lll}
+\toprule
+& \textbf{SMTP} & \textbf{HTTP} \\
+\midrule
+Retning & \textbf{Push} (sender initierer) & \textbf{Pull} (mottaker initierer) \\
+Objekter & Multipart i \textit{en} melding & Hvert objekt separat \\
+Koding & 7-bit ASCII & Bin\ae re data tillatt \\
+Port & 25 & 80 \\
+\bottomrule
+\end{tabular}
+\end{warnbox}
+
+\subsection{E-postformat og IMAP}
+
+\begin{keybox}[Meldingsformat]
+\begin{itemize}[noitemsep]
+    \item \textbf{Header}: To, From, Subject (del av meldingsinnholdet)
+    \item \textbf{Body}: selve meldingsteksten
+    \item Ikke forveksle med SMTP-kommandoer (MAIL FROM, RCPT TO) -- de er del av protokollen, ikke meldingen
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[IMAP -- Internet Message Access Protocol]
+\begin{itemize}[noitemsep]
+    \item Brukes for \aa\ \textbf{hente, organisere og slette} meldinger lagret p\aa\ serveren
+    \item Gmail/Hotmail bruker webgrensesnitt med SMTP (sending) og IMAP (henting)
+\end{itemize}
+\end{keybox}
+
+\textbf{Stegene n\aa r A sender e-post til B:}
+\begin{enumerate}[noitemsep]
+    \item A skriver e-post i sin UA
+    \item UA sender til As mailserver
+    \item As mailserver \aa pner TCP (port 25) til Bs mailserver
+    \item Meldingen sendes via SMTP
+    \item Meldingen lagres i Bs mailbox
+    \item B leser meldingen via sin UA (IMAP)
+\end{enumerate}
+
+%--- Exam questions 2.3 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.3 E-post]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+What are the three major components of email systems? & User agents, mail servers, and SMTP. \\
+\midrule
+What is SMTP used for? & To send email messages between mail servers. \\
+\midrule
+Which port does SMTP use? & Port 25. \\
+\midrule
+What are the three phases of SMTP transfer? & Handshaking, transfer of messages, and closure. \\
+\midrule
+List two differences between SMTP and HTTP. & SMTP is push-based; HTTP is pull-based. SMTP sends multipart messages; HTTP sends each object separately. \\
+\midrule
+What encoding does SMTP require? & 7-bit ASCII. \\
+\midrule
+What is the difference between email headers and SMTP commands? & Headers are part of the message content; commands like MAIL FROM and RCPT TO are part of the SMTP protocol. \\
+\midrule
+What is IMAP used for? & Retrieving, organizing, and deleting messages stored on the server. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{DNS -- Domain Name System (2.4)}
+%=============================================================================
+
+\subsection{Hva er DNS?}
+
+\begin{keybox}[DNS -- Internetts katalog]
+\begin{itemize}[noitemsep]
+    \item Oversetter \textbf{vertsnavn} (f.eks. \texttt{www.google.com}) til \textbf{IP-adresser}
+    \item Implementert som en \textbf{distribuert, hierarkisk database}
+    \item Er en \textbf{applikasjonslagsprotokoll} -- verter og DNS-servere kommuniserer direkte for \aa\ l\o se navn
+\end{itemize}
+\end{keybox}
+
+\textbf{DNS-tjenester:}
+\begin{enumerate}[noitemsep]
+    \item Hostname $\rightarrow$ IP-oversettelse
+    \item Host aliasing (kanonisk navn vs. alias)
+    \item Mail server aliasing
+    \item Lastfordeling (load distribution)
+\end{enumerate}
+
+\begin{warnbox}[Hvorfor er DNS distribuert?]
+En sentralisert DNS ville skape: enkelt feilpunkt, for mye trafikk, lang avstand, vedlikeholdsproblemer. DNS er ``highly distributed'' -- millioner av organisasjoner administrerer sine egne DNS-oppf\o ringer.
+\end{warnbox}
+
+\subsection{DNS-hierarkiet}
+
+\begin{center}
+\begin{tikzpicture}[
+    dns/.style={rectangle, draw, rounded corners, minimum width=2.5cm, minimum height=0.7cm, font=\footnotesize},
+    >=Stealth, thick
+]
+    \node[dns, fill=red!20] (root) at (0,3) {Root DNS-servere};
+    \node[dns, fill=orange!20] (tld1) at (-3,1.5) {.com TLD};
+    \node[dns, fill=orange!20] (tld2) at (0,1.5) {.org TLD};
+    \node[dns, fill=orange!20] (tld3) at (3,1.5) {.no TLD};
+    \node[dns, fill=green!20] (auth1) at (-4,0) {amazon.com};
+    \node[dns, fill=green!20] (auth2) at (-1.5,0) {google.com};
+    \node[dns, fill=green!20] (auth3) at (1.5,0) {wikipedia.org};
+    \node[dns, fill=green!20] (auth4) at (4,0) {ntnu.no};
+
+    \draw[->] (root) -- (tld1);
+    \draw[->] (root) -- (tld2);
+    \draw[->] (root) -- (tld3);
+    \draw[->] (tld1) -- (auth1);
+    \draw[->] (tld1) -- (auth2);
+    \draw[->] (tld2) -- (auth3);
+    \draw[->] (tld3) -- (auth4);
+
+    % Labels
+    \node[font=\tiny, text=red!70!black] at (4,3) {Administrert av ICANN};
+    \node[font=\tiny, text=orange!70!black] at (5.5,1.5) {Toppniv\aa domener};
+    \node[font=\tiny, text=green!50!black] at (6.5,0) {Autoritative servere};
+\end{tikzpicture}
+\end{center}
+
+\begin{keybox}[DNS-servertyper]
+\begin{itemize}[noitemsep]
+    \item \textbf{Root}: siste instans n\aa r andre servere ikke kan l\o se; administrert av ICANN
+    \item \textbf{TLD (Top-Level Domain)}: h\aa ndterer .com, .org, .net, landdomener (.no)
+    \item \textbf{Autoritativ}: gir offisielle hostname$\rightarrow$IP-mappinger for en organisasjon
+    \item \textbf{Lokal DNS-server}: ikke del av hierarkiet; f\o rste stopp for DNS-sp\o rringer, svarer fra cache eller videresender
+\end{itemize}
+\end{keybox}
+
+\subsection{DNS-sp\o rringer: Iterativ vs. Rekursiv}
+
+\begin{center}
+\begin{tikzpicture}[
+    dns/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=1.5cm, minimum height=0.6cm, font=\tiny},
+    >=Stealth
+]
+    % Iterative
+    \node[font=\bfseries\small] at (-3.5,4.5) {Iterativ};
+    \node[dns] (host1) at (-5.5,0) {Klient};
+    \node[dns, fill=yellow!20] (local1) at (-5.5,2) {Lokal DNS};
+    \node[dns, fill=red!15] (root1) at (-3.5,4) {Root};
+    \node[dns, fill=orange!15] (tld1r) at (-1.5,3) {TLD};
+    \node[dns, fill=green!15] (auth1r) at (-1.5,1.5) {Autoritativ};
+
+    \draw[->, thick] (host1) -- (local1);
+    \draw[->, blue] (local1) -- (root1) node[midway, left, font=\tiny] {1};
+    \draw[<-, blue] (local1) -- ++(0.3,2) -- (root1) node[midway, right, font=\tiny] {2};
+    \draw[->, red] (local1) -- (tld1r) node[midway, above, font=\tiny] {3};
+    \draw[<-, red] (local1) -- ++(-0.2,1.2) -- (tld1r) node[midway, below, font=\tiny] {4};
+    \draw[->, green!50!black] (local1) -- (auth1r) node[midway, right, font=\tiny] {5};
+    \draw[<-, green!50!black] (local1) -- ++(1.5,0) -- (auth1r) node[midway, right, font=\tiny] {6};
+    \draw[<-, thick] (host1) -- ++(-0.3,0) -- ++(0,-0.5) -- ++(0.3,0) -- (host1);
+
+    % Recursive
+    \node[font=\bfseries\small] at (4,4.5) {Rekursiv};
+    \node[dns] (host2) at (2,0) {Klient};
+    \node[dns, fill=yellow!20] (local2) at (2,2) {Lokal DNS};
+    \node[dns, fill=red!15] (root2) at (4,4) {Root};
+    \node[dns, fill=orange!15] (tld2r) at (6,3) {TLD};
+    \node[dns, fill=green!15] (auth2r) at (6,1.5) {Autoritativ};
+
+    \draw[->, thick] (host2) -- (local2);
+    \draw[->, blue] (local2) -- (root2) node[midway, left, font=\tiny] {1};
+    \draw[->, blue] (root2) -- (tld2r) node[midway, above, font=\tiny] {2};
+    \draw[->, blue] (tld2r) -- (auth2r) node[midway, right, font=\tiny] {3};
+    \draw[<-, red] (tld2r) -- ++(0.3,-1.5) -- (auth2r) node[midway, right, font=\tiny] {4};
+    \draw[<-, red] (root2) -- ++(0.3,-0.5) -- ++(1.7,0) node[midway, above, font=\tiny] {5};
+    \draw[<-, red] (local2) -- ++(0.3,2) -- (root2) node[midway, right, font=\tiny] {6};
+
+    \node[font=\tiny, text=red!70!black, align=center] at (4,0) {Rekursiv legger tung\\last p\aa\ \o vre niv\aa er\\-- brukes sjelden};
+\end{tikzpicture}
+\end{center}
+
+\subsection{DNS-caching og records}
+
+\begin{keybox}[DNS Caching]
+\begin{itemize}[noitemsep]
+    \item Servere \textbf{cacher} svar for \aa\ f\aa\ raskere oppslag
+    \item Oppf\o ringer har en \textbf{TTL} (Time To Live) -- utl\o per etter en viss tid
+    \item Ulempe: cachede oppf\o ringer kan v\ae re \textbf{utdaterte} f\o r TTL utl\o per
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[DNS Resource Records (RR)]
+Format: \texttt{(name, value, type, TTL)}
+
+\begin{tabular}{llll}
+\toprule
+\textbf{Type} & \textbf{Name} & \textbf{Value} & \textbf{Beskrivelse} \\
+\midrule
+\textbf{A} & hostname & IP-adresse & Direkte mapping \\
+\textbf{NS} & domene & hostname for DNS-server & Navneserver \\
+\textbf{CNAME} & alias & kanonisk navn & Alias \\
+\textbf{MX} & domene & mailserver-hostname & Mailserver \\
+\bottomrule
+\end{tabular}
+\end{keybox}
+
+\begin{keybox}[DNS-sikkerhet]
+\begin{itemize}[noitemsep]
+    \item DDoS-beskyttelse: trafikkfiltrering, caching i lokale DNS-servere
+    \item \textbf{DNSSEC}: autentisering og meldingsintegritet
+\end{itemize}
+\end{keybox}
+
+%--- Exam questions 2.4 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.4 DNS]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+What does DNS stand for and what is its main role? & Domain Name System; translates hostnames to IP addresses. \\
+\midrule
+How is DNS implemented? & As a distributed, hierarchical database with many name servers. \\
+\midrule
+List the hierarchy of DNS servers. & Root $\rightarrow$ TLD $\rightarrow$ Authoritative $\rightarrow$ Local DNS server. \\
+\midrule
+What are TLD servers responsible for? & Managing top-level domains like .com, .org, .net, and country domains. \\
+\midrule
+What do authoritative DNS servers do? & They provide the official hostname-to-IP mappings for an organization. \\
+\midrule
+Explain iterated DNS query. & The contacted server replies with the next server to ask, not the final answer. \\
+\midrule
+Explain recursive DNS query. & The contacted server handles the full resolution and replies with the answer. \\
+\midrule
+What types of DNS records exist? & A (IP address), NS (name server), CNAME (alias), MX (mail server). \\
+\midrule
+How does caching improve DNS? & By storing mappings to speed up responses and reduce traffic. \\
+\midrule
+What protocol provides DNS security? & DNSSEC, which authenticates and ensures message integrity. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{P2P-fildistribusjon (2.5)}
+%=============================================================================
+
+\subsection{Client-Server vs. P2P distribusjon}
+
+\begin{keybox}[Distribusjonstid -- Kjernesp\o rsm\aa let]
+Hvor lang tid tar det \aa\ distribuere en fil (st\o rrelse $F$) fra \textit{en} server til $N$ peers?
+
+Variabler:
+\begin{itemize}[noitemsep]
+    \item $u_s$ = serverens upload-kapasitet
+    \item $d_i$ = peer $i$s download-kapasitet
+    \item $u_i$ = peer $i$s upload-kapasitet
+    \item $d_{\min}$ = minste download-rate blant alle peers
+\end{itemize}
+\end{keybox}
+
+\begin{formulabox}[Client-Server distribusjonstid]
+$$D_{CS} \geq \max\left\{\frac{NF}{u_s},\ \frac{F}{d_{\min}}\right\}$$
+\begin{itemize}[noitemsep]
+    \item $NF/u_s$: serveren m\aa\ sende $N$ kopier sekvensielt
+    \item $F/d_{\min}$: tregeste klient bestemmer minimumstiden
+    \item \textbf{\O ker line\ae rt med $N$}
+\end{itemize}
+\end{formulabox}
+
+\begin{formulabox}[P2P distribusjonstid]
+$$D_{P2P} \geq \max\left\{\frac{F}{u_s},\ \frac{F}{d_{\min}},\ \frac{NF}{u_s + \sum u_i}\right\}$$
+\begin{itemize}[noitemsep]
+    \item $F/u_s$: serveren m\aa\ laste opp \textit{minst} en kopi
+    \item $F/d_{\min}$: tregeste klient kan ikke f\aa\ filen raskere
+    \item $NF/(u_s + \sum u_i)$: total last deles av \textbf{alle} upload-kapasiteter
+    \item \textbf{Selvskaler\-ende}: $\sum u_i$ vokser med $N$!
+\end{itemize}
+\end{formulabox}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth]
+    % Axes
+    \draw[->] (0,0) -- (7.5,0) node[right, font=\small] {$N$};
+    \draw[->] (0,0) -- (0,5) node[above, font=\small] {Min. distribusjonstid};
+
+    % Client-server (linear growth)
+    \draw[thick, black, fill=black] plot[smooth, domain=0.5:7] (\x, {0.1*\x*\x/1.5 + 0.3});
+    \node[font=\footnotesize, right] at (6.5,3.5) {Client-Server};
+
+    % P2P (sub-linear, flattens)
+    \draw[thick, blue] plot[smooth, domain=0.5:7] (\x, {0.3 + 0.7*ln(\x+1)/ln(8)});
+    \node[font=\footnotesize, right, text=blue] at (6.5,1.5) {P2P};
+
+    % Labels
+    \foreach \x in {5,10,15,20,25,30} {
+        \pgfmathsetmacro{\pos}{\x/5}
+        \node[font=\tiny, below] at (\pos,0) {\x};
+    }
+\end{tikzpicture}
+\end{center}
+
+\begin{warnbox}[{Eksempel: $u_s = 10u$, $F/u = 1$ time, $d_{\min} \geq u_s$}]
+\textbf{Client-Server:} $D_{CS} = NF/u_s = NF/(10u) = N/10$ (line\ae rt)\\
+\textbf{P2P:} $D_{P2P} = NF/(u_s + Nu) = NF/((10+N)u) = N/(10+N)$ (flater ut!)
+
+N\aa r $N=30$: CS tar $3$ timer, P2P tar $0.75$ timer.
+\end{warnbox}
+
+%--- Exam questions 2.5 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.5 P2P]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+What is the main difference between P2P and client-server? & P2P relies on direct peer communication; client-server depends on always-on servers. \\
+\midrule
+What is a major drawback of client-server file distribution? & Server must send a full copy to each peer, overloading it. \\
+\midrule
+How does P2P reduce server load? & Peers redistribute parts of the file they have received. \\
+\midrule
+What makes P2P self-scalable? & As more peers join, they also contribute upload bandwidth. \\
+\midrule
+What is the most popular P2P protocol (2020)? & BitTorrent. \\
+\midrule
+List key differences between CS and P2P distribution. & CS: server sends full file to each peer. P2P: peers share parts, reducing server load and increasing scalability. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{Videostreaming og CDN (2.6)}
+%=============================================================================
+
+\subsection{Multimedia: Video}
+
+\begin{keybox}[Video og koding]
+\begin{itemize}[noitemsep]
+    \item Video = sekvens av bilder vist med konstant rate (f.eks. 24 fps)
+    \item Digitalt bilde = array av piksler, hver representert med bits
+    \item \textbf{Koding} utnytter redundans for \aa\ redusere bits:
+    \begin{itemize}[noitemsep]
+        \item \textbf{Spatial koding}: redundans \textit{innenfor} ett bilde (f.eks. mange like piksler)
+        \item \textbf{Temporal koding}: redundans \textit{mellom} bilder (send bare forskjeller)
+    \end{itemize}
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[CBR vs. VBR]
+\begin{tabular}{lll}
+\toprule
+& \textbf{CBR} & \textbf{VBR} \\
+\midrule
+Full form & Constant Bit Rate & Variable Bit Rate \\
+Koding & Fast rate & Rate endres med innhold \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+Eksempler: MPEG1 (1.5 Mbps), MPEG2 (3--6 Mbps), MPEG4 (64 Kbps -- 12 Mbps)
+\end{keybox}
+
+\subsection{Streaming av lagret video}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, fill=blue!10, minimum width=1.5cm, minimum height=0.8cm, font=\footnotesize},
+    >=Stealth, thick
+]
+    \node[box, fill=gray!20] (server) at (0,0) {Video-\\server};
+    \node[ellipse, draw, fill=cyan!15, minimum width=2.5cm, minimum height=1cm, font=\footnotesize] (inet) at (4,0) {Internett};
+    \node[box, fill=green!15] (client) at (8,0) {Klient};
+
+    \draw[->, red, very thick] (server) -- (inet);
+    \draw[->, red, very thick] (inet) -- (client);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Utfordringer:}
+\begin{itemize}[noitemsep]
+    \item B\aa ndbredde varierer over tid (congestion)
+    \item Pakketap og forsinkelse gir d\aa rlig kvalitet
+\end{itemize}
+
+\begin{warnbox}[Continuous Playout Constraint]
+N\aa r avspilling starter, m\aa\ den matche original timing. Men nettverksforsinkelser varierer (\textbf{jitter}), s\aa\ klienten trenger en \textbf{buffer} og \textbf{playout delay} for \aa\ kompensere.
+\end{warnbox}
+
+\subsection{DASH -- Dynamic Adaptive Streaming over HTTP}
+
+\begin{keybox}[DASH]
+\textbf{Server:}
+\begin{itemize}[noitemsep]
+    \item Deler video i \textbf{chunks} (segmenter)
+    \item Hvert chunk kodet i \textbf{flere kvalitetsniv\aa er} (bitrater)
+    \item \textbf{Manifest-fil}: liste over URLer for ulike chunks/kvaliteter
+\end{itemize}
+
+\textbf{Klient (``intelligence'' at client):}
+\begin{itemize}[noitemsep]
+    \item M\aa ler server-til-klient b\aa ndbredde periodisk
+    \item Bestemmer \textbf{n\aa r} chunk skal hentes (unng\aa\ buffer starvation/overflow)
+    \item Bestemmer \textbf{hvilken bitrate} (h\o yere kvalitet n\aa r mer b\aa ndbredde)
+    \item Bestemmer \textbf{hvor} chunk hentes fra (n\ae rmeste server)
+\end{itemize}
+
+\textbf{Streaming video = koding + DASH + playout buffering}
+\end{keybox}
+
+\subsection{CDN -- Content Distribution Networks}
+
+\begin{warnbox}[Hvorfor ikke en mega-server?]
+\begin{itemize}[noitemsep]
+    \item Single point of failure
+    \item Flaskehals for trafikk (congestion)
+    \item Lang avstand til fjerne klienter
+    \item Flere kopier av video over samme link
+    \item \textbf{L\o sningen skalerer ikke!}
+\end{itemize}
+\end{warnbox}
+
+\begin{keybox}[CDN -- To strategier]
+\textbf{``Enter Deep'':}
+\begin{itemize}[noitemsep]
+    \item Plasser CDN-servere \textbf{dypt inne} i aksessnettverk, n\ae r brukerne
+    \item Mange sm\aa\ serverklynger
+\end{itemize}
+
+\textbf{``Bring Home'':}
+\begin{itemize}[noitemsep]
+    \item F\ae rre, \textbf{st\o rre} CDN-klynger n\ae r aksessnettverk (ikke inne i dem)
+\end{itemize}
+
+Klienten f\aa r manifest fra CDN, henter chunks fra \textbf{best egnet server} med passende bitrate.
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    cdn/.style={circle, draw, fill=red!20, minimum size=0.7cm, font=\tiny},
+    user/.style={rectangle, draw, fill=green!15, minimum width=0.6cm, minimum height=0.4cm, font=\tiny},
+    >=Stealth
+]
+    % Origin
+    \node[rectangle, draw, fill=blue!20, minimum width=1.2cm, minimum height=0.7cm, font=\footnotesize] (origin) at (0,2) {Origin};
+
+    % CDN nodes
+    \node[cdn] (cdn1) at (-3,0) {CDN};
+    \node[cdn] (cdn2) at (0,0) {CDN};
+    \node[cdn] (cdn3) at (3,0) {CDN};
+
+    % Users
+    \node[user] (u1) at (-4,-1.5) {User};
+    \node[user] (u2) at (-2,-1.5) {User};
+    \node[user] (u3) at (-0.5,-1.5) {User};
+    \node[user] (u4) at (1,-1.5) {User};
+    \node[user] (u5) at (2.5,-1.5) {User};
+    \node[user] (u6) at (4,-1.5) {User};
+
+    \draw[dashed] (origin) -- (cdn1);
+    \draw[dashed] (origin) -- (cdn2);
+    \draw[dashed] (origin) -- (cdn3);
+    \draw[->] (u1) -- (cdn1);
+    \draw[->] (u2) -- (cdn1);
+    \draw[->] (u3) -- (cdn2);
+    \draw[->] (u4) -- (cdn2);
+    \draw[->] (u5) -- (cdn3);
+    \draw[->] (u6) -- (cdn3);
+
+    \node[font=\tiny, text=gray] at (0,-2.2) {Brukere henter innhold fra n\ae rmeste CDN-node};
+\end{tikzpicture}
+\end{center}
+
+\begin{keybox}[OTT -- Over-the-Top]
+Tjenester som Netflix, YouTube kj\o rer ``over'' den eksisterende IP-infrastrukturen. De kontrollerer ikke nettverket, men bruker CDN-er for \aa\ levere innhold effektivt.
+\end{keybox}
+
+%--- Exam questions 2.6 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.6 Video og CDN]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+How much of ISP traffic is video streaming? & About 80\%. \\
+\midrule
+What is spatial and temporal coding? & Spatial: within one image. Temporal: between images. \\
+\midrule
+What is DASH? & Dynamic Adaptive Streaming over HTTP. \\
+\midrule
+What does the server do in DASH? & Splits video into chunks, multiple qualities, provides manifest file. \\
+\midrule
+What does the client control in DASH? & When, which bitrate, and from where to request chunks. \\
+\midrule
+What is a CDN? & Content Delivery Network -- stores videos near users. \\
+\midrule
+Why not use one mega-server? & Bottleneck, single point of failure, long distance, doesn't scale. \\
+\midrule
+What is the ``Enter Deep'' strategy? & Place CDN servers deep inside access networks, close to users. \\
+\midrule
+What is the ``Bring Home'' strategy? & Fewer, larger CDN clusters near access networks. \\
+\midrule
+What is an OTT service? & Over-the-top service (e.g. Netflix), runs on top of IP infrastructure. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{Socket-programmering (2.7)}
+%=============================================================================
+
+\subsection{Grunnleggende om sockets}
+
+\begin{keybox}[Socket = ``D\o ren'' mellom applikasjon og transport]
+To typer sockets for to transporttjenester:
+\begin{itemize}[noitemsep]
+    \item \textbf{UDP socket}: up\aa litelig datagram (\texttt{SOCK\_DGRAM})
+    \item \textbf{TCP socket}: p\aa litelig, byte stream-orientert (\texttt{SOCK\_STREAM})
+\end{itemize}
+\end{keybox}
+
+\subsection{Socket-programmering med UDP}
+
+\begin{keybox}[UDP -- Ingen tilkobling]
+\begin{itemize}[noitemsep]
+    \item \textbf{Ingen handshaking} f\o r dataoverf\o ring
+    \item Sender legger til \textbf{IP-adresse og portnummer} til hvert pakke
+    \item Mottaker henter senderens IP og port fra pakken
+    \item Data kan g\aa\ \textbf{tapt} eller komme i \textbf{feil rekkef\o lge}
+\end{itemize}
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4cm, minimum height=0.5cm, font=\tiny, align=center},
+    >=Stealth, thick
+]
+    % Server side
+    \node[font=\small\bfseries] at (-3,5) {Server};
+    \node[step, fill=orange!15] (s1) at (-3,4) {Opprett socket\\(AF\_INET, SOCK\_DGRAM)};
+    \node[step, fill=orange!15] (s2) at (-3,2.8) {bind() til port};
+    \node[step, fill=orange!15] (s3) at (-3,1.5) {recvfrom() -- les datagram};
+    \node[step, fill=orange!15] (s4) at (-3,0.2) {sendto() -- svar med\\klientadresse};
+
+    \draw[->] (s1) -- (s2);
+    \draw[->] (s2) -- (s3);
+    \draw[->] (s3) -- (s4);
+
+    % Client side
+    \node[font=\small\bfseries] at (3,5) {Klient};
+    \node[step, fill=green!15] (c1) at (3,4) {Opprett socket\\(AF\_INET, SOCK\_DGRAM)};
+    \node[step, fill=green!15] (c2) at (3,2.8) {sendto() -- send med\\server IP + port};
+    \node[step, fill=green!15] (c3) at (3,1.5) {recvfrom() -- les svar};
+    \node[step, fill=green!15] (c4) at (3,0.2) {close()};
+
+    \draw[->] (c1) -- (c2);
+    \draw[->] (c2) -- (c3);
+    \draw[->] (c3) -- (c4);
+
+    % Communication arrows
+    \draw[->, red, dashed, thick] (c2.west) -- (s3.east) node[midway, above, font=\tiny] {datagram};
+    \draw[->, red, dashed, thick] (s4.east) -- (c3.west) node[midway, below, font=\tiny] {svar};
+\end{tikzpicture}
+\end{center}
+
+\textbf{Python UDP-klient:}
+\begin{lstlisting}
+from socket import *
+serverName = 'hostname'
+serverPort = 12000
+clientSocket = socket(AF_INET, SOCK_DGRAM)
+message = input('Input lowercase sentence:')
+clientSocket.sendto(message.encode(), (serverName, serverPort))
+modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
+print(modifiedMessage.decode())
+clientSocket.close()
+\end{lstlisting}
+
+\textbf{Python UDP-server:}
+\begin{lstlisting}
+from socket import *
+serverPort = 12000
+serverSocket = socket(AF_INET, SOCK_DGRAM)
+serverSocket.bind(('', serverPort))
+print("The server is ready to receive")
+while True:
+    message, clientAddress = serverSocket.recvfrom(2048)
+    modifiedMessage = message.decode().upper()
+    serverSocket.sendto(modifiedMessage.encode(), clientAddress)
+\end{lstlisting}
+
+\subsection{Socket-programmering med TCP}
+
+\begin{keybox}[TCP -- Tilkoblingsorientert]
+\begin{itemize}[noitemsep]
+    \item Serveren m\aa\ kj\o re f\o rst og ha opprettet en \textbf{``welcoming socket''}
+    \item Klienten oppretter TCP-socket med serverens IP + port $\rightarrow$ \textbf{TCP-tilkobling} opprettes
+    \item Serveren oppretter \textbf{ny socket} (\texttt{connectionSocket}) for hver klient
+    \item Bruker \textbf{source port} for \aa\ skille klienter
+    \item TCP gir p\aa litelig, ordnet \textbf{byte-stream} overf\o ring
+\end{itemize}
+\end{keybox}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4cm, minimum height=0.5cm, font=\tiny, align=center},
+    >=Stealth, thick
+]
+    % Server side
+    \node[font=\small\bfseries] at (-3,6.5) {Server};
+    \node[step, fill=orange!15] (s1) at (-3,5.7) {Opprett socket\\(AF\_INET, SOCK\_STREAM)};
+    \node[step, fill=orange!15] (s2) at (-3,4.5) {bind() + listen()};
+    \node[step, fill=orange!15] (s3) at (-3,3.3) {connectionSocket =\\accept()};
+    \node[step, fill=orange!15] (s4) at (-3,2) {recv() -- les data};
+    \node[step, fill=orange!15] (s5) at (-3,0.8) {send() -- send svar};
+    \node[step, fill=orange!15] (s6) at (-3,-0.3) {close() connectionSocket};
+
+    \draw[->] (s1) -- (s2);
+    \draw[->] (s2) -- (s3);
+    \draw[->] (s3) -- (s4);
+    \draw[->] (s4) -- (s5);
+    \draw[->] (s5) -- (s6);
+
+    % Client side
+    \node[font=\small\bfseries] at (3,6.5) {Klient};
+    \node[step, fill=green!15] (c1) at (3,5.7) {Opprett socket\\(AF\_INET, SOCK\_STREAM)};
+    \node[step, fill=green!15] (c2) at (3,4.5) {connect() til server\\IP + port};
+    \node[step, fill=green!15] (c3) at (3,3.3) {send() -- send data};
+    \node[step, fill=green!15] (c4) at (3,2) {recv() -- les svar};
+    \node[step, fill=green!15] (c5) at (3,0.8) {close()};
+
+    \draw[->] (c1) -- (c2);
+    \draw[->] (c2) -- (c3);
+    \draw[->] (c3) -- (c4);
+    \draw[->] (c4) -- (c5);
+
+    % TCP connection
+    \draw[<->, blue, dashed, very thick] (c2.west) -- (s3.east) node[midway, above, font=\tiny\bfseries] {TCP connection setup};
+    \draw[->, red, dashed] (c3.west) -- (s4.east);
+    \draw[->, red, dashed] (s5.east) -- (c4.west);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Python TCP-klient:}
+\begin{lstlisting}
+from socket import *
+serverName = 'servername'
+serverPort = 12000
+clientSocket = socket(AF_INET, SOCK_STREAM)
+clientSocket.connect((serverName, serverPort))
+sentence = input('Input lowercase sentence:')
+clientSocket.send(sentence.encode())
+modifiedSentence = clientSocket.recv(1024)
+print('From Server:', modifiedSentence.decode())
+clientSocket.close()
+\end{lstlisting}
+
+\textbf{Python TCP-server:}
+\begin{lstlisting}
+from socket import *
+serverPort = 12000
+serverSocket = socket(AF_INET, SOCK_STREAM)
+serverSocket.bind(('', serverPort))
+serverSocket.listen(1)
+print('The server is ready to receive')
+while True:
+    connectionSocket, addr = serverSocket.accept()
+    sentence = connectionSocket.recv(1024).decode()
+    capitalizedSentence = sentence.upper()
+    connectionSocket.send(capitalizedSentence.encode())
+    connectionSocket.close()
+\end{lstlisting}
+
+\subsection{Viktige forskjeller: UDP vs. TCP sockets}
+
+\begin{keybox}[Sammenligning UDP vs. TCP]
+\begin{tabular}{lll}
+\toprule
+\textbf{Egenskap} & \textbf{UDP} & \textbf{TCP} \\
+\midrule
+Socket-type & \texttt{SOCK\_DGRAM} & \texttt{SOCK\_STREAM} \\
+Tilkobling & Ingen & Connection setup \\
+P\aa litelighet & Up\aa litelig & P\aa litelig, ordnet \\
+Dataenhet & Datagram (pakke) & Byte stream \\
+Adressering & Eksplisitt per pakke & Automatisk (via connect) \\
+Send-metode & \texttt{sendto()} & \texttt{send()} \\
+Motta-metode & \texttt{recvfrom()} & \texttt{recv()} \\
+Server ny socket? & Nei & Ja (\texttt{accept()}) \\
+\bottomrule
+\end{tabular}
+\end{keybox}
+
+%--- Exam questions 2.7 ---
+\begin{exambox}[Eksamenssp\o rsm\aa l -- 2.7 Socket-programmering]
+\small
+\begin{longtable}{p{7cm}p{7cm}}
+\toprule
+\textbf{Sp\o rsm\aa l} & \textbf{Svar} \\
+\midrule
+\endhead
+What is a socket? & A door between an application process and the end-end transport protocol. \\
+\midrule
+What are the two types of sockets? & UDP: unreliable datagram. TCP: reliable, byte stream-oriented. \\
+\midrule
+How does the client send data in UDP? & It attaches IP address and port number to each packet. \\
+\midrule
+What must happen before a TCP client contacts the server? & The server must be running and have created a welcoming socket. \\
+\midrule
+Why does the server create a new socket for each client in TCP? & To allow communication with multiple clients simultaneously. \\
+\midrule
+What does TCP use to distinguish different clients? & Source port numbers. \\
+\midrule
+What does TCP provide from the app's view? & Reliable, in-order byte-stream transfer between client and server. \\
+\midrule
+Why might an app choose UDP over TCP? & When low overhead and speed are more important than reliability. \\
+\midrule
+Why might an app choose TCP over UDP? & When reliable and ordered delivery of data is needed. \\
+\bottomrule
+\end{longtable}
+\end{exambox}
+
+
+\newpage
+%=============================================================================
+\section{Oppsummering -- Kapittel 2}
+%=============================================================================
+
+\begin{keybox}[Kapittel 2: Hovedtemaer]
+\begin{itemize}[noitemsep]
+    \item \textbf{Applikasjonsarkitekturer}: klient-server og P2P
+    \item \textbf{Tjenestekrav}: p\aa litelighet, b\aa ndbredde, forsinkelse
+    \item \textbf{Transportmodell}: TCP (p\aa litelig, tilkoblingsorientert) vs. UDP (up\aa litelig, datagram)
+    \item \textbf{Protokoller}: HTTP, SMTP, IMAP, DNS, BitTorrent
+    \item \textbf{Videostreaming}: DASH, CDN
+    \item \textbf{Socket-programmering}: TCP og UDP sockets i Python
+\end{itemize}
+\end{keybox}
+
+\begin{keybox}[Viktige temaer \aa\ forst\aa]
+\begin{itemize}[noitemsep]
+    \item \textbf{Sentralisert vs. desentralisert} (DNS, CDN, P2P)
+    \item \textbf{Stateless vs. stateful} (HTTP er stateless, cookies gir tilstand)
+    \item \textbf{Skalerbarhet} (P2P vs. client-server distribusjonstid)
+    \item \textbf{P\aa litelig vs. up\aa litelig} meldingsoverf\o ring (TCP vs. UDP)
+    \item \textbf{``Complexity at the network edge''} -- intelligens i endepunktene
+\end{itemize}
+\end{keybox}
+
+\begin{formulabox}[Formelsammendrag]
+\textbf{Non-persistent HTTP responstid:}
+$$T = 2 \cdot RTT + T_{\text{fil}}$$
+
+\textbf{Client-Server distribusjonstid:}
+$$D_{CS} \geq \max\left\{\frac{NF}{u_s},\ \frac{F}{d_{\min}}\right\}$$
+
+\textbf{P2P distribusjonstid:}
+$$D_{P2P} \geq \max\left\{\frac{F}{u_s},\ \frac{F}{d_{\min}},\ \frac{NF}{u_s + \sum u_i}\right\}$$
+\end{formulabox}
+
+\begin{keybox}[Portnumre \aa\ huske]
+\begin{tabular}{ll}
+\toprule
+\textbf{Protokoll} & \textbf{Port} \\
+\midrule
+HTTP & 80 \\
+HTTPS & 443 \\
+SMTP & 25 \\
+DNS & 53 \\
+\bottomrule
+\end{tabular}
+\end{keybox}
