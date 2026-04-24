@@ -774,7 +774,7 @@ $$D_{P2P} \geq \max\left\{\frac{F}{u_s},\ \frac{F}{d_{\min}},\ \frac{NF}{u_s + \
 \end{tikzpicture}
 \end{center}
 
-\begin{warnbox}[{Eksempel: $u_s = 10u$, $F/u = 1$ time, $d_{\min} \geq u_s$}]
+\begin{warnbox}[{{Eksempel: $u_s = 10u$, $F/u = 1$ time, $d_{\min} \geq u_s$}}]
 \textbf{Client-Server:} $D_{CS} = NF/u_s = NF/(10u) = N/10$ (line\ae rt)\\
 \textbf{P2P:} $D_{P2P} = NF/(u_s + Nu) = NF/((10+N)u) = N/(10+N)$ (flater ut!)
 
@@ -1012,15 +1012,15 @@ To typer sockets for to transporttjenester:
 
 \begin{center}
 \begin{tikzpicture}[
-    step/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4cm, minimum height=0.5cm, font=\tiny, align=center},
+    flowstep/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4cm, minimum height=0.5cm, font=\tiny, align=center},
     >=Stealth, thick
 ]
     % Server side
     \node[font=\small\bfseries] at (-3,5) {Server};
-    \node[step, fill=orange!15] (s1) at (-3,4) {Opprett socket\\(AF\_INET, SOCK\_DGRAM)};
-    \node[step, fill=orange!15] (s2) at (-3,2.8) {bind() til port};
-    \node[step, fill=orange!15] (s3) at (-3,1.5) {recvfrom() -- les datagram};
-    \node[step, fill=orange!15] (s4) at (-3,0.2) {sendto() -- svar med\\klientadresse};
+    \node[flowstep, fill=orange!15] (s1) at (-3,4) {Opprett socket\\(AF\_INET, SOCK\_DGRAM)};
+    \node[flowstep, fill=orange!15] (s2) at (-3,2.8) {bind() til port};
+    \node[flowstep, fill=orange!15] (s3) at (-3,1.5) {recvfrom() -- les datagram};
+    \node[flowstep, fill=orange!15] (s4) at (-3,0.2) {sendto() -- svar med\\klientadresse};
 
     \draw[->] (s1) -- (s2);
     \draw[->] (s2) -- (s3);
@@ -1028,10 +1028,10 @@ To typer sockets for to transporttjenester:
 
     % Client side
     \node[font=\small\bfseries] at (3,5) {Klient};
-    \node[step, fill=green!15] (c1) at (3,4) {Opprett socket\\(AF\_INET, SOCK\_DGRAM)};
-    \node[step, fill=green!15] (c2) at (3,2.8) {sendto() -- send med\\server IP + port};
-    \node[step, fill=green!15] (c3) at (3,1.5) {recvfrom() -- les svar};
-    \node[step, fill=green!15] (c4) at (3,0.2) {close()};
+    \node[flowstep, fill=green!15] (c1) at (3,4) {Opprett socket\\(AF\_INET, SOCK\_DGRAM)};
+    \node[flowstep, fill=green!15] (c2) at (3,2.8) {sendto() -- send med\\server IP + port};
+    \node[flowstep, fill=green!15] (c3) at (3,1.5) {recvfrom() -- les svar};
+    \node[flowstep, fill=green!15] (c4) at (3,0.2) {close()};
 
     \draw[->] (c1) -- (c2);
     \draw[->] (c2) -- (c3);
@@ -1083,17 +1083,17 @@ while True:
 
 \begin{center}
 \begin{tikzpicture}[
-    step/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4cm, minimum height=0.5cm, font=\tiny, align=center},
+    flowstep/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4cm, minimum height=0.5cm, font=\tiny, align=center},
     >=Stealth, thick
 ]
     % Server side
     \node[font=\small\bfseries] at (-3,6.5) {Server};
-    \node[step, fill=orange!15] (s1) at (-3,5.7) {Opprett socket\\(AF\_INET, SOCK\_STREAM)};
-    \node[step, fill=orange!15] (s2) at (-3,4.5) {bind() + listen()};
-    \node[step, fill=orange!15] (s3) at (-3,3.3) {connectionSocket =\\accept()};
-    \node[step, fill=orange!15] (s4) at (-3,2) {recv() -- les data};
-    \node[step, fill=orange!15] (s5) at (-3,0.8) {send() -- send svar};
-    \node[step, fill=orange!15] (s6) at (-3,-0.3) {close() connectionSocket};
+    \node[flowstep, fill=orange!15] (s1) at (-3,5.7) {Opprett socket\\(AF\_INET, SOCK\_STREAM)};
+    \node[flowstep, fill=orange!15] (s2) at (-3,4.5) {bind() + listen()};
+    \node[flowstep, fill=orange!15] (s3) at (-3,3.3) {connectionSocket =\\accept()};
+    \node[flowstep, fill=orange!15] (s4) at (-3,2) {recv() -- les data};
+    \node[flowstep, fill=orange!15] (s5) at (-3,0.8) {send() -- send svar};
+    \node[flowstep, fill=orange!15] (s6) at (-3,-0.3) {close() connectionSocket};
 
     \draw[->] (s1) -- (s2);
     \draw[->] (s2) -- (s3);
@@ -1103,11 +1103,11 @@ while True:
 
     % Client side
     \node[font=\small\bfseries] at (3,6.5) {Klient};
-    \node[step, fill=green!15] (c1) at (3,5.7) {Opprett socket\\(AF\_INET, SOCK\_STREAM)};
-    \node[step, fill=green!15] (c2) at (3,4.5) {connect() til server\\IP + port};
-    \node[step, fill=green!15] (c3) at (3,3.3) {send() -- send data};
-    \node[step, fill=green!15] (c4) at (3,2) {recv() -- les svar};
-    \node[step, fill=green!15] (c5) at (3,0.8) {close()};
+    \node[flowstep, fill=green!15] (c1) at (3,5.7) {Opprett socket\\(AF\_INET, SOCK\_STREAM)};
+    \node[flowstep, fill=green!15] (c2) at (3,4.5) {connect() til server\\IP + port};
+    \node[flowstep, fill=green!15] (c3) at (3,3.3) {send() -- send data};
+    \node[flowstep, fill=green!15] (c4) at (3,2) {recv() -- les svar};
+    \node[flowstep, fill=green!15] (c5) at (3,0.8) {close()};
 
     \draw[->] (c1) -- (c2);
     \draw[->] (c2) -- (c3);
