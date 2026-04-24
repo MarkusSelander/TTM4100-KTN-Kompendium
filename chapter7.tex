@@ -13,6 +13,12 @@ A wireless network consists of several key elements:
 \end{itemize}
 \end{keybox}
 
+\begin{imagebox}[Elements of a Wireless Network]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 7.1\\
+\textbf{Google:} ``wireless network elements infrastructure ad-hoc base station diagram''\\
+\textit{Shows wireless hosts, base stations, wireless links, and the wired infrastructure backbone.}
+\end{imagebox}
+
 \subsection{Infrastructure Mode vs.\ Ad Hoc Mode}
 
 \begin{keybox}[Infrastructure Mode vs.\ Ad Hoc Mode]
@@ -151,6 +157,12 @@ In wireless networks, node A may be able to hear node B, but \emph{not} hear nod
 \end{itemize}
 \end{warnbox}
 
+\begin{imagebox}[Hidden Terminal Problem]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 7.3\\
+\textbf{Google:} ``hidden terminal problem wireless exposed terminal diagram''\\
+\textit{Illustrates two senders that cannot hear each other but cause collision at a shared receiver.}
+\end{imagebox}
+
 %=============================================================================
 \section{IEEE 802.11 -- WiFi Wireless LANs (7.3)}
 %=============================================================================
@@ -214,6 +226,12 @@ To associate with an AP, a host uses one of two scanning methods:
 
 \textbf{After association:} Host typically runs DHCP to obtain IP address; DHCP server often co-located with AP/router.
 \end{keybox}
+
+\begin{imagebox}[802.11 WiFi Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 7.6\\
+\textbf{Google:} ``802.11 WiFi BSS infrastructure AP architecture diagram''\\
+\textit{Shows the BSS structure with access point, associated wireless hosts, and distribution system.}
+\end{imagebox}
 
 \subsection{CSMA/CA -- Multiple Access in 802.11}
 
@@ -392,6 +410,12 @@ The \textbf{Frame Control} field (2 bytes) contains:
 \end{itemize}
 \end{keybox}
 
+\begin{imagebox}[802.11 Frame Format]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 7.10\\
+\textbf{Google:} ``802.11 WiFi frame format addresses fields diagram''\\
+\textit{Shows the 802.11 frame layout including four address fields, frame control, duration, and payload.}
+\end{imagebox}
+
 \subsection{Mobility Within the Same Subnet}
 
 \begin{keybox}[Mobility Within Same IP Subnet]
@@ -408,6 +432,12 @@ The \textbf{Frame Control} field (2 bytes) contains:
 
 \textbf{Cross-subnet mobility} (different IP subnet) requires IP-level mobility support (Mobile IP, not covered in 7th ed. detail).
 \end{keybox}
+
+\begin{imagebox}[Mobility Management]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 7.18\\
+\textbf{Google:} ``wireless mobility handoff handover base station diagram''\\
+\textit{Shows a mobile host handing off between base stations while maintaining an active connection.}
+\end{imagebox}
 
 \subsection{Rate Adaptation and Power Management}
 
@@ -458,6 +488,12 @@ Mobile devices want to save battery. 802.11 has a sleep/wake mechanism:
     \item \textbf{P-GW (PDN Gateway):} User-plane gateway to the Internet (Packet Data Network). Performs NAT, allocates UE IP address, enforces QoS.
 \end{itemize}
 \end{keybox}
+
+\begin{imagebox}[4G/LTE Network Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 7.16\\
+\textbf{Google:} ``4G LTE network architecture eNodeB MME diagram''\\
+\textit{Shows UE, eNode-B, S-GW, P-GW, MME, and HSS with control and user plane separation.}
+\end{imagebox}
 
 \begin{tikzpicture}[
     node distance=1.4cm and 2cm,

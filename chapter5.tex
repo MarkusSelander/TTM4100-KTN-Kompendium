@@ -34,6 +34,12 @@ There are two main approaches to structuring the network control plane:
 \end{itemize}
 \end{keybox}
 
+\begin{imagebox}[Per-Router Control vs.\ SDN Control Plane]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.1 / 5.2 --- ``Per-router control plane'' vs.\ ``SDN control plane''\\
+\textbf{Google:} ``per-router control vs SDN control plane diagram comparison''\\
+\textit{Side-by-side comparison showing distributed routing algorithms in each router vs.\ a centralized remote controller installing flow tables.}
+\end{imagebox}
+
 %=============================================================================
 \section{Routing Algorithms (5.2)}
 %=============================================================================
@@ -148,6 +154,12 @@ At each step, the node with the smallest $D(\cdot)$ not yet in $N'$ is added, an
 \textbf{Tip:} On the exam, you may be asked to run Dijkstra's algorithm on a given graph. Practice filling out a table like the one above step by step.
 \end{exambox}
 
+\begin{imagebox}[Dijkstra's Algorithm Example]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.3 --- ``Abstract graph model'' and Figure 5.5 --- ``Dijkstra's algorithm: example''\\
+\textbf{Google:} ``Dijkstra shortest path algorithm network routing example''\\
+\textit{Weighted graph with nodes u--z and the step-by-step shortest-path tree computed by Dijkstra's algorithm.}
+\end{imagebox}
+
 \subsection{Oscillations in Link-State Routing}
 
 \begin{warnbox}[Oscillation Problem]
@@ -208,6 +220,12 @@ The distance vector algorithm is:
 
 The algorithm converges to the correct least-cost paths. Each node only needs to know its own link costs and its neighbors' distance vectors.
 \end{keybox}
+
+\begin{imagebox}[Distance-Vector Algorithm]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.6 --- ``Distance-vector (DV) algorithm''\\
+\textbf{Google:} ``distance vector routing algorithm Bellman-Ford example diagram''\\
+\textit{Iterative exchange of distance vectors between neighboring nodes converging to least-cost paths.}
+\end{imagebox}
 
 \subsection{Count-to-Infinity Problem}
 
@@ -321,6 +339,12 @@ For large ASes, OSPF supports a two-level hierarchy:
 \end{itemize}
 \end{keybox}
 
+\begin{imagebox}[OSPF Autonomous System with Areas]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.7 --- ``An autonomous system with areas''\\
+\textbf{Google:} ``OSPF areas backbone area border router diagram''\\
+\textit{Two-level OSPF hierarchy showing backbone (Area 0), local areas, area border routers, and boundary routers.}
+\end{imagebox}
+
 %=============================================================================
 \section{Inter-AS Routing: BGP (5.4)}
 %=============================================================================
@@ -362,6 +386,12 @@ When a router advertises a prefix via BGP, it includes \textbf{BGP attributes}. 
     \item An AS uses its \textbf{export policy} to decide whether to advertise routes to neighboring ASes
 \end{itemize}
 \end{keybox}
+
+\begin{imagebox}[eBGP and iBGP Connections]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.8 --- ``eBGP and iBGP connections''\\
+\textbf{Google:} ``BGP eBGP iBGP autonomous system routing diagram''\\
+\textit{Multiple ASes with eBGP sessions between border routers and iBGP sessions distributing routes within each AS.}
+\end{imagebox}
 
 \subsection{BGP Route Selection}
 
@@ -453,6 +483,12 @@ ICMP is used by hosts and routers to communicate \textbf{network-level informati
 \end{itemize}
 \end{exambox}
 
+\begin{imagebox}[ICMP Message Types]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.19 --- ``ICMP message types''\\
+\textbf{Google:} ``ICMP message types traceroute ping diagram''\\
+\textit{Table of ICMP type/code values and illustration of how ping and traceroute use ICMP messages.}
+\end{imagebox}
+
 \subsection{Traceroute and ICMP}
 
 \begin{exambox}[Exam-relevant: How Traceroute Works]
@@ -528,6 +564,12 @@ The SDN architecture has three main layers:
     \end{itemize}
 \end{enumerate}
 \end{keybox}
+
+\begin{imagebox}[SDN Controller Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 5.14 --- ``SDN controller and network-control applications''\\
+\textbf{Google:} ``SDN architecture controller northbound southbound API diagram''\\
+\textit{Three-layer SDN stack: data-plane switches, controller with southbound/northbound APIs, and network-control applications.}
+\end{imagebox}
 
 \subsection{OpenFlow Protocol}
 

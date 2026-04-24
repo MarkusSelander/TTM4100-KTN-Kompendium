@@ -273,6 +273,12 @@ For a web page with base HTML + $n$ objects:
 $$T_{\text{total}} = (n+1) \times (2 \cdot RTT + T_{\text{fil}})$$
 \end{formulabox}
 
+\begin{imagebox}[Persistent vs.\ Non-persistent HTTP]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.6 \& 2.7\\
+\textbf{Google:} ``HTTP persistent vs non-persistent connection diagram RTT''\\
+\textit{Side-by-side comparison showing TCP connection setup and object transfers for non-persistent (new connection per object) vs.\ persistent HTTP (single connection reused).}
+\end{imagebox}
+
 \subsection{HTTP Messages}
 
 \textbf{Two types:} Request and Response.
@@ -303,6 +309,12 @@ $$T_{\text{total}} = (n+1) \times (2 \cdot RTT + T_{\text{fil}})$$
 \end{tabular}
 \end{keybox}
 
+\begin{imagebox}[HTTP Message Format]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.8\\
+\textbf{Google:} ``HTTP request response message format diagram''\\
+\textit{Structure of an HTTP request message showing request line, header lines, blank line, and entity body.}
+\end{imagebox}
+
 \subsection{Cookies}
 
 \begin{keybox}[Cookies -- State information in stateless HTTP]
@@ -318,6 +330,12 @@ Cookies are used to maintain state across HTTP requests.
 
 Use cases: authorization, shopping carts, recommendations, session state.
 \end{keybox}
+
+\begin{imagebox}[How Cookies Work]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.10\\
+\textbf{Google:} ``HTTP cookies how they work diagram client server''\\
+\textit{Interaction between client and server showing Set-Cookie in response, Cookie in subsequent requests, and backend database.}
+\end{imagebox}
 
 \subsection{Web Caching (Proxy Server)}
 
@@ -352,6 +370,12 @@ Use cases: authorization, shopping carts, recommendations, session state.
     \item Reduces traffic on the institution's access link
     \item Cheaper than upgrading the access link
 \end{enumerate}
+
+\begin{imagebox}[Web Cache Operation]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.11\\
+\textbf{Google:} ``web cache proxy server diagram HTTP''\\
+\textit{Clients requesting objects through a web cache, showing cache hit (direct return) and cache miss (fetch from origin server).}
+\end{imagebox}
 
 \begin{keybox}[Conditional GET -- Avoid unnecessary transfer]
 \begin{itemize}[noitemsep]
@@ -457,6 +481,12 @@ How does HTTP/3 address HTTP/2 limitations? & Uses UDP for per-object error and 
     \node[font=\tiny, text=gray] at (10,-0.8) {Recipient};
 \end{tikzpicture}
 \end{center}
+
+\begin{imagebox}[Email System Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.14\\
+\textbf{Google:} ``email system architecture SMTP IMAP MUA MTA diagram''\\
+\textit{High-level view of the Internet e-mail system showing user agents, mail servers, and SMTP/IMAP protocols.}
+\end{imagebox}
 
 \subsection{The SMTP Protocol}
 
@@ -606,6 +636,12 @@ A centralized DNS would create: single point of failure, too much traffic, long 
 \end{itemize}
 \end{keybox}
 
+\begin{imagebox}[DNS Server Hierarchy]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.17\\
+\textbf{Google:} ``DNS hierarchy root TLD authoritative server diagram''\\
+\textit{Tree structure showing root DNS servers at the top, TLD servers in the middle, and authoritative servers at the bottom.}
+\end{imagebox}
+
 \subsection{DNS Queries: Iterative vs. Recursive}
 
 \begin{center}
@@ -649,6 +685,12 @@ A centralized DNS would create: single point of failure, too much traffic, long 
     \node[font=\tiny, text=red!70!black, align=center] at (4,0) {Recursive puts heavy\\load on upper levels\\-- rarely used};
 \end{tikzpicture}
 \end{center}
+
+\begin{imagebox}[DNS Query Types]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.19 \& 2.20\\
+\textbf{Google:} ``DNS recursive vs iterative query diagram''\\
+\textit{Side-by-side comparison of iterative queries (local DNS contacts each server) vs.\ recursive queries (each server forwards the query up the chain).}
+\end{imagebox}
 
 \subsection{DNS Caching and Records}
 
@@ -781,6 +823,12 @@ $$D_{P2P} \geq \max\left\{\frac{F}{u_s},\ \frac{F}{d_{\min}},\ \frac{NF}{u_s + \
 When $N=30$: CS takes $3$ hours, P2P takes $0.75$ hours.
 \end{warnbox}
 
+\begin{imagebox}[Client-Server vs.\ P2P Distribution Time]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.22\\
+\textbf{Google:} ``P2P vs client server file distribution time graph''\\
+\textit{Graph showing distribution time vs.\ number of peers: client-server grows linearly while P2P flattens out due to self-scaling.}
+\end{imagebox}
+
 %--- Exam questions 2.5 ---
 \begin{exambox}[Exam Questions -- 2.5 P2P]
 \small
@@ -885,6 +933,12 @@ Once playback starts, it must match the original timing. But network delays vary
 \textbf{Streaming video = encoding + DASH + playout buffering}
 \end{keybox}
 
+\begin{imagebox}[DASH Adaptive Streaming]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.24\\
+\textbf{Google:} ``DASH adaptive streaming over HTTP diagram''\\
+\textit{How DASH works: server stores multiple quality versions of each chunk, client dynamically selects bit rate based on bandwidth.}
+\end{imagebox}
+
 \subsection{CDN -- Content Distribution Networks}
 
 \begin{warnbox}[Why not one mega-server?]
@@ -947,6 +1001,12 @@ The client gets the manifest from the CDN, fetches chunks from the \textbf{best 
     \node[font=\tiny, text=gray] at (0,-2.2) {Users fetch content from the nearest CDN node};
 \end{tikzpicture}
 \end{center}
+
+\begin{imagebox}[CDN Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 2.25\\
+\textbf{Google:} ``CDN content delivery network architecture diagram''\\
+\textit{Origin server distributing content to CDN edge servers, which serve nearby users to reduce latency and load.}
+\end{imagebox}
 
 \begin{keybox}[OTT -- Over-the-Top]
 Services like Netflix and YouTube run ``over'' the existing IP infrastructure. They do not control the network, but use CDNs to deliver content efficiently.

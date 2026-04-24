@@ -32,6 +32,12 @@ Different link protocols may be used on different links along the same path. For
 \end{enumerate}
 \end{keybox}
 
+\begin{imagebox}[Link Layer Context]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.1\\
+\textbf{Google:} ``link layer protocol stack context nodes links diagram''\\
+\textit{Shows where the link layer sits in the protocol stack and how it connects adjacent nodes over individual links.}
+\end{imagebox}
+
 \subsection{Where is the Link Layer Implemented?}
 
 \begin{keybox}[Network Interface Card (NIC)]
@@ -141,6 +147,12 @@ Given data bits $D$ and generator $G$ (of $r+1$ bits):
     \item Burst errors of length $> r+1$ are detected with probability $1 - (1/2)^r$
 \end{itemize}
 \end{formulabox}
+
+\begin{imagebox}[Error Detection and CRC]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.4 and Figure 6.6\\
+\textbf{Google:} ``CRC cyclic redundancy check calculation example diagram''\\
+\textit{Illustrates the error-detection scheme and step-by-step CRC modulo-2 division.}
+\end{imagebox}
 
 \begin{warnbox}[CRC vs.\ Checksum]
 CRC is much stronger than the Internet checksum. CRC is used at the link layer (e.g., Ethernet CRC-32), while the Internet checksum is used at higher layers. CRC can detect all burst errors up to length $r$, whereas the checksum can miss many error patterns.
@@ -313,6 +325,12 @@ After the $m$th collision (for the same frame):
 The idea: adapt the retransmission delay to the estimated number of colliding stations. More collisions $\Rightarrow$ longer expected backoff.
 \end{formulabox}
 
+\begin{imagebox}[CSMA/CD Operation]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.12\\
+\textbf{Google:} ``CSMA CD collision detection Ethernet algorithm diagram''\\
+\textit{Shows the CSMA/CD algorithm: sense, transmit, detect collision, jam, and exponential backoff.}
+\end{imagebox}
+
 \begin{formulabox}[CSMA/CD Efficiency]
 \[
 \text{Efficiency} = \frac{1}{1 + 5 \cdot t_{\text{prop}} / t_{\text{trans}}}
@@ -442,6 +460,12 @@ ARP is ``plug-and-play'': tables are built automatically, no manual configuratio
 \end{itemize}
 \end{exambox}
 
+\begin{imagebox}[ARP Operation]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.19\\
+\textbf{Google:} ``ARP address resolution protocol how it works diagram''\\
+\textit{Shows the ARP table and the broadcast query / unicast reply process for resolving IP to MAC.}
+\end{imagebox}
+
 \subsection{Routing to Another Subnet}
 
 \begin{keybox}[Sending a Datagram to Another Subnet]
@@ -507,6 +531,12 @@ Ethernet is the most widely used wired LAN technology:
     \item \textbf{CRC} (4 bytes): Cyclic Redundancy Check for error detection. If CRC check fails, the frame is \textbf{dropped} (no NAK/retransmission at link layer).
 \end{itemize}
 \end{keybox}
+
+\begin{imagebox}[Ethernet Frame Structure]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.20\\
+\textbf{Google:} ``Ethernet frame format structure fields diagram''\\
+\textit{Shows the Ethernet frame fields: preamble, destination/source MAC, type, payload, and CRC.}
+\end{imagebox}
 
 \subsection{Ethernet Properties}
 
@@ -585,6 +615,12 @@ The switch \textbf{learns} which hosts are reachable through which interfaces:
 This is completely automatic -- no configuration needed!
 \end{keybox}
 
+\begin{imagebox}[Switch Self-Learning]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.22\\
+\textbf{Google:} ``Ethernet switch self-learning forwarding table diagram''\\
+\textit{Shows an institutional network with interconnected switches and how switch tables are populated.}
+\end{imagebox}
+
 \subsection{Switch Forwarding}
 
 \begin{keybox}[Frame Forwarding/Filtering]
@@ -620,6 +656,12 @@ Scalability & Limited (flat addressing) & Hierarchical (IP subnets) \\
 \end{center}
 \end{keybox}
 
+\begin{imagebox}[Switches vs.\ Routers]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.26\\
+\textbf{Google:} ``switch vs router comparison network layers diagram''\\
+\textit{Shows how packets flow through switches (layer 2) and routers (layer 3) in a network.}
+\end{imagebox}
+
 \begin{exambox}[Exam-Type: Switches vs.\ Routers -- V24 Q1.4.1]
 \textbf{Question:} What is/are \textbf{false} when comparing between switches and routers?
 
@@ -632,6 +674,12 @@ Scalability & Limited (flat addressing) & Hierarchical (IP subnets) \\
     \item Routers rely on IP addresses; switches rely on MAC addresses \checkmark
 \end{itemize}
 \end{exambox}
+
+\begin{imagebox}[VLANs]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 6.25\\
+\textbf{Google:} ``VLAN virtual LAN trunk port switch diagram''\\
+\textit{Shows how VLANs partition a single physical switch into multiple virtual LANs with trunk links.}
+\end{imagebox}
 
 %=============================================================================
 \section{A Day in the Life of a Web Request (6.7)}

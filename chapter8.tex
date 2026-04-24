@@ -110,6 +110,12 @@ Example: 10 people need $\frac{10 \times 9}{2} = 45$ keys. Scales poorly for lar
 \end{itemize}
 \end{tcolorbox}
 
+\begin{imagebox}[Symmetric vs.\ Public Key Cryptography]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 8.2 (Symmetric key cryptography) and Figure 8.6 (Public key cryptography)\\
+\textbf{Google:} ``symmetric vs asymmetric key cryptography diagram comparison''\\
+\textit{Why: Shows how symmetric uses one shared key while public key uses a key pair for encryption/decryption.}
+\end{imagebox}
+
 \begin{tcolorbox}[warnbox, title=Key Difference -- Symmetric vs.\ Public Key]
 \begin{tabular}{lll}
 \toprule
@@ -138,6 +144,12 @@ Use in practice & Bulk data encryption & Key exchange, signatures \\
 \textbf{Security basis:} factoring a large number $n$ into $p \cdot q$ is computationally infeasible.\\[4pt]
 \textbf{Important property:} $K_B^-(K_B^+(m)) = m$ \textit{and} $K_B^+(K_B^-(m)) = m$ -- can apply in either order.
 \end{tcolorbox}
+
+\begin{imagebox}[RSA Public Key Encryption]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 8.6 (RSA public key encryption)\\
+\textbf{Google:} ``RSA encryption algorithm example key generation diagram''\\
+\textit{Why: Illustrates RSA key generation, encryption ($c = m^e \bmod n$), and decryption ($m = c^d \bmod n$) step by step.}
+\end{imagebox}
 
 % ═══════════════════════════════════════════════════════════════════════════════
 \section{Authentication and Message Integrity}
@@ -197,6 +209,12 @@ A hash function $H(m)$ produces a fixed-length \textbf{message digest}. Properti
   \item Protects against both alteration and false authorship claims
 \end{itemize}
 \end{tcolorbox}
+
+\begin{imagebox}[Digital Signatures and Message Digests]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 8.9 (Digital signatures) and Figure 8.12 (Message digests)\\
+\textbf{Google:} ``digital signature hash message authentication diagram''\\
+\textit{Why: Shows how a sender signs a hash of the message with their private key, and the receiver verifies it with the public key.}
+\end{imagebox}
 
 \subsection{Certification Authorities -- CAs}
 
@@ -280,6 +298,12 @@ Each TLS record contains:
 Sequence numbers prevent \textbf{replay attacks} -- an attacker cannot re-send an old TLS record.
 \end{tcolorbox}
 
+\begin{imagebox}[The SSL/TLS Handshake]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 8.18 (The SSL/TLS handshake)\\
+\textbf{Google:} ``TLS SSL handshake diagram client hello server hello''\\
+\textit{Why: Shows the sequence of messages (ClientHello, ServerHello, certificate, key exchange) that establish a TLS session.}
+\end{imagebox}
+
 \begin{tcolorbox}[warnbox, title=TLS 1.3 Changes]
 TLS 1.3 (current version) tightens the cipher suite to only 5 choices:
 \begin{itemize}[noitemsep]
@@ -326,6 +350,12 @@ IPsec provides network-layer security with four services:
   \item \textbf{ESP -- Encapsulating Security Payload:} provides integrity, authentication, \textit{and} confidentiality -- far more commonly used
 \end{itemize}
 \end{tcolorbox}
+
+\begin{imagebox}[IPsec Datagram Structure]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 8.22 (IPsec datagram)\\
+\textbf{Google:} ``IPsec tunnel transport mode ESP AH diagram''\\
+\textit{Why: Shows the structure of an IPsec datagram in tunnel vs.\ transport mode, with ESP/AH header placement.}
+\end{imagebox}
 
 % ═══════════════════════════════════════════════════════════════════════════════
 \section{Security in Wireless and Mobile Networks}
@@ -451,6 +481,12 @@ A stateless filter is a ``heavy-handed tool'' -- it can admit packets that \text
   \item Each application requires its own gateway (HTTP gateway, FTP gateway, etc.)
 \end{itemize}
 \end{tcolorbox}
+
+\begin{imagebox}[Firewall Placement and Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 8.28 (Firewall placement)\\
+\textbf{Google:} ``network firewall DMZ architecture stateful packet filter diagram''\\
+\textit{Why: Shows how a firewall is positioned between the internal network and the Internet, including DMZ architecture.}
+\end{imagebox}
 
 \subsection{Limitations of Firewalls and Gateways}
 

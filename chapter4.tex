@@ -53,6 +53,12 @@ The network layer transports \textbf{segments} from the sending host to the rece
 \end{itemize}
 \end{keybox}
 
+\begin{imagebox}[Data Plane vs. Control Plane]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.2\\
+\textbf{Google:} ``network layer data plane vs control plane forwarding routing diagram''\\
+\textit{Shows how forwarding (data plane) and routing (control plane) interact in the network layer.}
+\end{imagebox}
+
 \subsection{Per-router Control Plane vs. SDN}
 
 \begin{keybox}[Two control plane approaches]
@@ -70,6 +76,12 @@ The network layer transports \textbf{segments} from the sending host to the rece
     \item Physically separates the control plane from the data plane
 \end{itemize}
 \end{keybox}
+
+\begin{imagebox}[SDN and Generalized Forwarding]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.28 / Figure 4.30\\
+\textbf{Google:} ``SDN software defined networking OpenFlow match action diagram''\\
+\textit{Shows OpenFlow flow table entries with match fields, counters, and actions.}
+\end{imagebox}
 
 \subsection{The Network Service Model}
 
@@ -115,6 +127,12 @@ A router consists of four main components:
     \item Data plane (input ports, switching fabric, output ports): hardware, nanoseconds
 \end{itemize}
 \end{keybox}
+
+\begin{imagebox}[Router Architecture]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.4\\
+\textbf{Google:} ``router architecture input output ports switching fabric diagram''\\
+\textit{Shows the four key components: input ports, switching fabric, output ports, and routing processor.}
+\end{imagebox}
 
 \subsection{Input Port Functions}
 
@@ -305,6 +323,12 @@ Options (variable) & Timestamp, record route, etc. \\
 \end{center}
 \end{keybox}
 
+\begin{imagebox}[IPv4 Datagram Format]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.17\\
+\textbf{Google:} ``IPv4 datagram header format fields diagram''\\
+\textit{Shows all header fields of an IPv4 datagram with their bit sizes and positions.}
+\end{imagebox}
+
 \begin{formulabox}[Overhead]
 \textbf{Minimum overhead} for TCP over IP:
 \[
@@ -356,6 +380,12 @@ This means that small application data incurs a large relative overhead.
     \item Solution: /21 means 21 network bits, 11 host bits. Set all host bits to 1: \texttt{172.18.23.255}
 \end{itemize}
 \end{exambox}
+
+\begin{imagebox}[IP Addressing and Subnets]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.18\\
+\textbf{Google:} ``IP addressing subnets CIDR network diagram example''\\
+\textit{Shows how interfaces are assigned IP addresses and how subnets are formed.}
+\end{imagebox}
 
 \begin{warnbox}[How to calculate the broadcast address]
 \textbf{Step by step:}
@@ -473,6 +503,12 @@ DHCP is a ``plug-and-play'' protocol that lets a host automatically obtain an IP
 \end{itemize}
 \end{exambox}
 
+\begin{imagebox}[DHCP Client-Server Interaction]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.24\\
+\textbf{Google:} ``DHCP discover offer request ACK message exchange diagram''\\
+\textit{Shows the four-step DORA message exchange between DHCP client and server.}
+\end{imagebox}
+
 \subsection{NAT -- Network Address Translation}
 
 \begin{keybox}[NAT -- overview]
@@ -503,6 +539,12 @@ NAT allows multiple devices in a local network to share \emph{one} public IP add
 \end{itemize}
 \end{exambox}
 
+\begin{imagebox}[Network Address Translation]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.25\\
+\textbf{Google:} ``NAT network address translation diagram how it works''\\
+\textit{Shows how NAT translates private source addresses and ports to a single public IP.}
+\end{imagebox}
+
 \begin{warnbox}[NAT controversy]
 NAT is controversial because:
 \begin{itemize}[noitemsep]
@@ -529,6 +571,12 @@ NAT is controversial because:
     \item ICMPv6: new version of ICMP with additional message types
 \end{itemize}
 \end{keybox}
+
+\begin{imagebox}[IPv6 Datagram Format]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.26\\
+\textbf{Google:} ``IPv6 datagram header format diagram vs IPv4''\\
+\textit{Shows the simplified IPv6 header with its fixed 40-byte structure compared to IPv4.}
+\end{imagebox}
 
 \begin{exambox}[Exam-relevant: IPv4 vs. IPv6 (V2023 Q1.3.4)]
 \textbf{From exam V2023:} ``Which of these are correct about IPv4/IPv6?''

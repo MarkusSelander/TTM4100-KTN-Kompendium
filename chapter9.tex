@@ -85,6 +85,12 @@ MPEG-4 & $<$1 Mbps \\
 \end{enumerate}
 \end{tcolorbox}
 
+\begin{imagebox}[Multimedia Application Types]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 9.1\\
+\textbf{Google:} ``multimedia networking application types streaming VoIP diagram''\\
+\textit{Overview of three multimedia application categories: streaming stored, conversational, and live streaming.}
+\end{imagebox}
+
 % ===========================================================
 \section{9.2 -- Streaming Stored Video}
 % ===========================================================
@@ -281,6 +287,12 @@ where $K$ is a constant (typically 4) that determines how much jitter margin is 
 \end{itemize}
 \end{tcolorbox}
 
+\begin{imagebox}[Packet Jitter and Playout Delay]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 9.4\\
+\textbf{Google:} ``VoIP jitter playout delay buffer fixed adaptive diagram''\\
+\textit{Shows how network jitter affects packet arrival times and how fixed/adaptive playout delays compensate.}
+\end{imagebox}
+
 \begin{tcolorbox}[keybox, title=FEC -- Forward Error Correction]
 \textbf{Goal:} Recover lost packets without re-transmission (for low latency).
 
@@ -313,6 +325,12 @@ where $K$ is a constant (typically 4) that determines how much jitter margin is 
   \item No extra overhead, but introduces \textbf{more delay}
 \end{itemize}
 \end{tcolorbox}
+
+\begin{imagebox}[Forward Error Correction]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 9.5\\
+\textbf{Google:} ``VoIP forward error correction FEC interleaving diagram''\\
+\textit{Illustrates XOR-based FEC redundancy, piggyback low-quality copies, and interleaving techniques.}
+\end{imagebox}
 
 \begin{tcolorbox}[keybox, title=Skype -- P2P VoIP Architecture]
 \textbf{P2P architecture with supernodes:}
@@ -420,6 +438,12 @@ SSRC & 32 bits & Synchronization source -- identifies the source (sender) \\
   \item \textbf{Sequence number $\neq$ guarantee:} Sequence numbers allow the receiver to \emph{detect} loss, but not recover lost packets (that is FEC's job).
 \end{itemize}
 \end{tcolorbox}
+
+\begin{imagebox}[RTP Packet Format]
+\textbf{Textbook:} Kurose \& Ross 8e, Figure 9.2\\
+\textbf{Google:} ``RTP real-time transport protocol header format diagram''\\
+\textit{Shows the RTP header structure: payload type, sequence number, timestamp, and SSRC fields.}
+\end{imagebox}
 
 % ===========================================================
 \section{Summary -- Key Concepts}
