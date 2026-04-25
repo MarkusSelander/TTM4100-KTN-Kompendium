@@ -83,7 +83,7 @@ Ann and Bill work within the house -- they cannot control what happens out in th
 \end{itemize}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{tikzpicture}[scale=0.8, transform shape]
     \draw[fill=lightblue] (0,0) rectangle (8,1.5);
     \draw (2,0) -- (2,1.5);
     \draw (4,0) -- (4,1.5);
@@ -169,7 +169,7 @@ If reliable transfer is necessary over UDP, it must be added at the \textbf{appl
 \subsection{UDP Segment Format}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.85]
+\begin{tikzpicture}[scale=0.85, transform shape]
     \draw[fill=lightblue] (0,2) rectangle (3,3);
     \draw[fill=lightblue] (3,2) rectangle (6,3);
     \node at (1.5,2.5) {\small Source port \#};
@@ -377,7 +377,7 @@ U_{\text{sender}} = \frac{3 \cdot L/R}{RTT + L/R}
 \end{keybox}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.7]
+\begin{tikzpicture}[scale=0.7, transform shape]
     \foreach \i in {0,...,11} {
         \draw (\i,0) rectangle (\i+1,0.8);
         \node at (\i+0.5,0.4) {\tiny \i};
@@ -470,7 +470,7 @@ Efficiency & Lower (many retransm.) & Higher \\
 \subsection{TCP Segment Structure}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.75]
+\begin{tikzpicture}[scale=0.75, transform shape]
     % Row 1 - Source/Dest port
     \draw[fill=lightblue] (0,6) rectangle (4,7);
     \draw[fill=lightblue] (4,6) rectangle (8,7);
@@ -652,7 +652,7 @@ When the receiver advertises $\text{rwnd} = 0$, the sender still sends small \te
 \end{keybox}
 
 \begin{center}
-\begin{tikzpicture}[>=Stealth, scale=0.9]
+\begin{tikzpicture}[>=Stealth, scale=0.9, transform shape]
     \draw[thick] (0,0) -- (0,-5) node[above right, at start]{\textbf{Client}};
     \draw[thick] (7,0) -- (7,-5) node[above left, at start]{\textbf{Server}};
 
@@ -694,7 +694,7 @@ A two-way handshake fails because:
 \end{keybox}
 
 \begin{center}
-\begin{tikzpicture}[>=Stealth, scale=0.9]
+\begin{tikzpicture}[>=Stealth, scale=0.9, transform shape]
     \draw[thick] (0,0) -- (0,-7) node[above right, at start]{\textbf{Client}};
     \draw[thick] (7,0) -- (7,-7) node[above left, at start]{\textbf{Server}};
 
@@ -905,7 +905,7 @@ The variable \textbf{ssthresh} (slow start threshold) determines when to switch 
 \subsection{The Three Mechanisms in TCP Congestion Control}
 
 \begin{center}
-\begin{tikzpicture}[>=Stealth, scale=0.85,
+\begin{tikzpicture}[>=Stealth, scale=0.85, transform shape,
     state/.style={draw, rounded corners, fill=lightblue, minimum width=3cm, minimum height=1.2cm, align=center, font=\small\bfseries}]
 
     \node[state] (ss) at (0,0) {Slow\\Start};
@@ -1060,7 +1060,7 @@ Background traffic & Low-priority TCP flows \\
 \end{keybox}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{tikzpicture}[scale=0.8, transform shape]
     % HTTP/2 over TCP stack
     \node at (2, 4.5) {\textbf{HTTP/2 over TCP}};
     \draw[fill=lightblue] (0,3) rectangle (4,4);
