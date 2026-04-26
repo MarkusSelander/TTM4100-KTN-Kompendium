@@ -54,9 +54,6 @@ The network layer transports \textbf{segments} from the sending host to the rece
 \end{keybox}
 
 \begin{imagebox}[Data Plane vs. Control Plane]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.2\\
-\textbf{Google:} ``network layer data plane vs control plane forwarding routing diagram''\\
-\textit{Shows how forwarding (data plane) and routing (control plane) interact in the network layer.}
 \end{imagebox}
 
 \subsection{Per-router Control Plane vs. SDN}
@@ -78,9 +75,7 @@ The network layer transports \textbf{segments} from the sending host to the rece
 \end{keybox}
 
 \begin{imagebox}[SDN and Generalized Forwarding]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.28 / Figure 4.30\\
-\textbf{Google:} ``SDN software defined networking OpenFlow match action diagram''\\
-\textit{Shows OpenFlow flow table entries with match fields, counters, and actions.}
+\figureimgtriple{Figure 4.28.png}{Figure 4.29.png}{Figure 4.30.png}
 \end{imagebox}
 
 \subsection{The Network Service Model}
@@ -129,9 +124,6 @@ A router consists of four main components:
 \end{keybox}
 
 \begin{imagebox}[Router Architecture]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.4\\
-\textbf{Google:} ``router architecture input output ports switching fabric diagram''\\
-\textit{Shows the four key components: input ports, switching fabric, output ports, and routing processor.}
 \end{imagebox}
 
 \subsection{Input Port Functions}
@@ -324,9 +316,7 @@ Options (variable) & Timestamp, record route, etc. \\
 \end{keybox}
 
 \begin{imagebox}[IPv4 Datagram Format]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.17\\
-\textbf{Google:} ``IPv4 datagram header format fields diagram''\\
-\textit{Shows all header fields of an IPv4 datagram with their bit sizes and positions.}
+\figureimg{Figure 4.17.png}
 \end{imagebox}
 
 \begin{formulabox}[Overhead]
@@ -382,9 +372,7 @@ This means that small application data incurs a large relative overhead.
 \end{exambox}
 
 \begin{imagebox}[IP Addressing and Subnets]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.18\\
-\textbf{Google:} ``IP addressing subnets CIDR network diagram example''\\
-\textit{Shows how interfaces are assigned IP addresses and how subnets are formed.}
+\figureimg{Figure 4.18.png}
 \end{imagebox}
 
 \begin{warnbox}[How to calculate the broadcast address]
@@ -504,9 +492,7 @@ DHCP is a ``plug-and-play'' protocol that lets a host automatically obtain an IP
 \end{exambox}
 
 \begin{imagebox}[DHCP Client-Server Interaction]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.24\\
-\textbf{Google:} ``DHCP discover offer request ACK message exchange diagram''\\
-\textit{Shows the four-step DORA message exchange between DHCP client and server.}
+\figureimg{Figure 4.24.png}
 \end{imagebox}
 
 \subsection{NAT -- Network Address Translation}
@@ -540,9 +526,7 @@ NAT allows multiple devices in a local network to share \emph{one} public IP add
 \end{exambox}
 
 \begin{imagebox}[Network Address Translation]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.25\\
-\textbf{Google:} ``NAT network address translation diagram how it works''\\
-\textit{Shows how NAT translates private source addresses and ports to a single public IP.}
+\figureimg{Figure 4.25.png}
 \end{imagebox}
 
 \begin{warnbox}[NAT controversy]
@@ -573,9 +557,7 @@ NAT is controversial because:
 \end{keybox}
 
 \begin{imagebox}[IPv6 Datagram Format]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 4.26\\
-\textbf{Google:} ``IPv6 datagram header format diagram vs IPv4''\\
-\textit{Shows the simplified IPv6 header with its fixed 40-byte structure compared to IPv4.}
+\figureimg{Figure 4.26.png}
 \end{imagebox}
 
 \begin{exambox}[Exam-relevant: IPv4 vs. IPv6 (V2023 Q1.3.4)]

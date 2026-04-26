@@ -126,9 +126,7 @@ TCP socket identified by: \textbf{(source IP, source port, destination IP, desti
 \end{warnbox}
 
 \begin{imagebox}[Multiplexing and Demultiplexing]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.2\\
-\textbf{Google:} ``transport layer multiplexing demultiplexing diagram''\\
-\textit{Shows how transport layer multiplexes data from multiple sockets at the sender and demultiplexes to the correct socket at the receiver.}
+\figureimg{Figure 3.2.png}
 \end{imagebox}
 
 %=============================================================================
@@ -188,9 +186,7 @@ If reliable transfer is necessary over UDP, it must be added at the \textbf{appl
 \end{center}
 
 \begin{imagebox}[UDP Segment Structure]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.7\\
-\textbf{Google:} ``UDP segment header format diagram''\\
-\textit{Shows the four-field UDP header (source port, dest port, length, checksum) and payload.}
+\figureimg{Figure 3.7.png}
 \end{imagebox}
 
 \subsection{UDP Checksum}
@@ -312,9 +308,7 @@ rdt3.0 is correct, but performance is poor on high-capacity links!
 \end{keybox}
 
 \begin{imagebox}[rdt3.0 Protocol]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.15 (rdt3.0 sender FSM) and Figure 3.16 (rdt3.0 in action)\\
-\textbf{Google:} ``reliable data transfer rdt3.0 FSM stop and wait diagram''\\
-\textit{Shows the finite state machine for the rdt3.0 sender with timers and the stop-and-wait operation over time.}
+\figureimgpair{Figure 3.15.png}{Figure 3.16.png}
 \end{imagebox}
 
 \subsection{Performance of rdt3.0 (Stop-and-Wait)}
@@ -394,9 +388,7 @@ U_{\text{sender}} = \frac{3 \cdot L/R}{RTT + L/R}
 \end{center}
 
 \begin{imagebox}[Go-Back-N Protocol]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.19 (sender's view of sequence numbers) and Figure 3.21 (GBN in action)\\
-\textbf{Google:} ``Go-Back-N GBN sliding window protocol diagram''\\
-\textit{Shows the sliding window with sent/acknowledged/usable regions and a timeline of GBN operation with retransmissions.}
+\figureimgpair{Figure 3.19.png}{Figure 3.22.png}
 \end{imagebox}
 
 \subsection{Selective Repeat (SR)}
@@ -429,9 +421,7 @@ Otherwise the receiver cannot distinguish between new packets and retransmission
 \end{warnbox}
 
 \begin{imagebox}[Selective Repeat Protocol]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.23\\
-\textbf{Google:} ``selective repeat SR protocol sliding window diagram''\\
-\textit{Shows both sender and receiver views of sequence number space with individually acknowledged and buffered packets.}
+\figureimg{Figure 3.23.png}
 \end{imagebox}
 
 \begin{center}
@@ -516,9 +506,7 @@ Efficiency & Lower (many retransm.) & Higher \\
 \end{center}
 
 \begin{imagebox}[TCP Segment Structure]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.29\\
-\textbf{Google:} ``TCP segment header format fields diagram''\\
-\textit{Shows all TCP header fields: source/dest port, sequence and ACK numbers, flags, receive window, checksum, and options.}
+\figureimg{Figure 3.29.png}
 \end{imagebox}
 
 \begin{keybox}[Important Fields in the TCP Header]
@@ -630,9 +618,7 @@ Rationale: Duplicate ACKs indicate that a segment has been lost, but subsequent 
 \end{keybox}
 
 \begin{imagebox}[TCP Flow Control]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.38\\
-\textbf{Google:} ``TCP flow control receive window rwnd diagram''\\
-\textit{Shows the receive buffer, rwnd advertised to the sender, and how the sender limits unacknowledged data accordingly.}
+\figureimg{Figure 3.38.png}
 \end{imagebox}
 
 \begin{warnbox}[What when rwnd = 0?]
@@ -668,9 +654,7 @@ When the receiver advertises $\text{rwnd} = 0$, the sender still sends small \te
 \end{center}
 
 \begin{imagebox}[TCP Three-Way Handshake]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.39\\
-\textbf{Google:} ``TCP three-way handshake SYN SYN-ACK ACK diagram''\\
-\textit{Shows the three-step connection setup: client SYN, server SYN-ACK, client ACK with sequence number exchange.}
+\figureimg{Figure 3.39.png}
 \end{imagebox}
 
 \begin{warnbox}[Why Not a Two-Way Handshake?]
@@ -976,9 +960,7 @@ TCP CUBIC is the \textbf{default in Linux} and the most widely used TCP variant 
 \end{keybox}
 
 \begin{imagebox}[TCP Congestion Control]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.51\\
-\textbf{Google:} ``TCP congestion control slow start AIMD cwnd graph Tahoe Reno''\\
-\textit{Shows the evolution of cwnd over time for TCP Tahoe and Reno, illustrating slow start, congestion avoidance, and reactions to loss.}
+\figureimg{Figure 3.51.png}
 \end{imagebox}
 
 \subsection{TCP Fairness}
@@ -997,9 +979,7 @@ TCP CUBIC is the \textbf{default in Linux} and the most widely used TCP variant 
 \end{keybox}
 
 \begin{imagebox}[TCP Fairness]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 3.55\\
-\textbf{Google:} ``TCP fairness two connections converge equal share diagram''\\
-\textit{Shows two TCP connections sharing a bottleneck link, converging toward equal bandwidth share via AIMD.}
+\figureimg{Figure 3.53.png}
 \end{imagebox}
 
 \subsection{The Bottleneck Link}

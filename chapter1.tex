@@ -63,9 +63,7 @@ The Internet consists of billions of connected devices that communicate via \tex
 \end{itemize}
 
 \begin{imagebox}[Internet Structure Overview]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.1 --- ``A nut-and-bolts description of the Internet''\\
-\textbf{Google:} ``internet structure diagram hosts ISP network core''\\
-\textit{Shows how end systems, access networks, and the network core interconnect.}
+\figureimg[0.42\linewidth]{Figure 1.1.png}
 \end{imagebox}
 
 \begin{keybox}[Internet Standards]
@@ -147,7 +145,7 @@ The access network connects end systems to the first router (``edge router'').
 \bigskip
 \begin{center}
 \begin{tikzpicture}[
-    box/.style={rectangle, draw, fill=#1, minimum width=3cm, minimum height=1.2cm, text width=2.8cm, align=center, font=\footnotesize},
+    box/.style={rectangle, draw, fill=#1, minimum width=3.2cm, minimum height=1.2cm, text width=3cm, align=center, font=\scriptsize},
     >=Stealth
 ]
     \node[box=blue!10] (dsl) at (0,0) {\textbf{DSL}\\Telephone line\\Down: 24--52 Mbps\\Up: 3.5--16 Mbps\\\textbf{Dedicated}};
@@ -168,9 +166,7 @@ The access network connects end systems to the first router (``edge router'').
 \end{warnbox}
 
 \begin{imagebox}[Access Network Types]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.5 (DSL) and Figure 1.6 (Cable)\\
-\textbf{Google:} ``DSL vs cable vs fiber access network diagram''\\
-\textit{Compares how DSL, cable, and fiber connect homes to the ISP edge router.}
+\figureimgpair{Figure 1.5.png}{Figure 1.6.png}
 \end{imagebox}
 
 \subsection{Home Network}
@@ -313,9 +309,7 @@ Best for & Bursty traffic (web, e-mail) & Constant traffic (telephone) \\
 \end{center}
 
 \begin{imagebox}[Packet Switching vs.\ Circuit Switching]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.11 (Packet switching) and Figure 1.13 (Circuit switching)\\
-\textbf{Google:} ``packet switching vs circuit switching diagram comparison''\\
-\textit{Illustrates shared-link multiplexing (packets) versus dedicated end-to-end circuits.}
+\figureimgpair{Figure 1.11.png}{Figure 1.13.png}
 \end{imagebox}
 
 \subsubsection{FDM and TDM}
@@ -400,9 +394,6 @@ Best for & Bursty traffic (web, e-mail) & Constant traffic (telephone) \\
 \end{itemize}
 
 \begin{imagebox}[ISP Interconnection Hierarchy]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.15 --- ``Interconnection of ISPs''\\
-\textbf{Google:} ``internet ISP hierarchy tier 1 2 3 IXP diagram''\\
-\textit{Shows how access, regional, and tier-1 ISPs connect via peering and IXPs.}
 \end{imagebox}
 
 %=============================================================================
@@ -475,9 +466,7 @@ $d_{\text{trans}} = 12\,000 / 1\,000\,000\,000 = 0{,}012$ ms
 \end{warnbox}
 
 \begin{imagebox}[Nodal Delay Components]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.16 --- ``The nodal delay at router A''\\
-\textbf{Google:} ``nodal delay processing queueing transmission propagation diagram''\\
-\textit{Breaks down the four delay components a packet experiences at each router.}
+\figureimg{Figure 1.16.png}
 \end{imagebox}
 
 \subsection{Traffic intensity and queuing delay}
@@ -575,9 +564,7 @@ The Internet was originally designed \textbf{without} much security -- ``a group
 \end{center}
 
 \begin{imagebox}[Network Attack Types]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.25 (Packet sniffing) and Figure 1.26 (IP spoofing)\\
-\textbf{Google:} ``network security threats DDoS sniffing spoofing diagram''\\
-\textit{Visualizes common attack vectors: sniffing on shared media, spoofed source addresses, and DDoS floods.}
+\figureimg{Figure 1.25.png}
 \end{imagebox}
 
 \begin{keybox}[Defenses]
@@ -661,9 +648,6 @@ OSI adds \textbf{Presentation} and \textbf{Session} between application and tran
 Each layer adds its own \textbf{header} ($H$) around the data from the layer above. The receiver removes headers in reverse order.
 
 \begin{imagebox}[Protocol Stack and Encapsulation]
-\textbf{Textbook:} Kurose \& Ross 8e, Figure 1.24 --- ``The Internet protocol stack'' and ``Encapsulation''\\
-\textbf{Google:} ``OSI model vs TCP IP protocol stack encapsulation diagram''\\
-\textit{Shows the 5-layer Internet stack alongside the 7-layer OSI model, and how each layer wraps data.}
 \end{imagebox}
 
 \begin{keybox}[Why layering?]
