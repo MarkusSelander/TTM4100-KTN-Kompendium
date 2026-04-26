@@ -16,6 +16,8 @@
 
 % ── Core math & graphics ──────────────────────────────────────────────────────
 \usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{Bilder/}}
 \usepackage{amsmath,amssymb}
 
 % ── TikZ ──────────────────────────────────────────────────────────────────────
@@ -194,6 +196,31 @@
   \markboth{#2}{#2}
   \addcontentsline{toc}{section}{\protect\numberline{}{\color{ntnublue}\bfseries #2}}
   \newpage
+}
+
+% ── Figure image commands ─────────────────────────────────────────────────────
+\newcommand{\figureimg}[2][0.8\linewidth]{%
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=#1]{#2}
+  \end{figure}%
+}
+
+\newcommand{\figureimgpair}[2]{%
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\linewidth]{#1}\hfill
+    \includegraphics[width=0.48\linewidth]{#2}
+  \end{figure}%
+}
+
+\newcommand{\figureimgtriple}[3]{%
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.32\linewidth]{#1}\hfill
+    \includegraphics[width=0.32\linewidth]{#2}\hfill
+    \includegraphics[width=0.32\linewidth]{#3}
+  \end{figure}%
 }
 
 % ============================================================
