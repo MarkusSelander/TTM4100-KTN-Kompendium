@@ -146,6 +146,14 @@
 \setlength{\cftsubsubsecindent}{5em}
 \setlength{\cftbeforesubsubsecskip}{0pt}
 
+% Chapter group entries (part level) — visually distinct from sections
+\setlength{\cftbeforepartskip}{12pt}
+\setlength{\cftpartindent}{0pt}
+\setlength{\cftpartnumwidth}{0pt}
+\renewcommand{\cftpartfont}{\large\bfseries\color{ntnublue}}
+\renewcommand{\cftpartpagefont}{\large\bfseries\color{ntnublue}}
+\renewcommand{\cftpartleader}{\color{ntnublue}\cftdotfill{\cftdotsep}}
+
 % TOC depth
 \setcounter{tocdepth}{2}
 \setcounter{secnumdepth}{3}
@@ -194,7 +202,8 @@
   \end{center}
   \vspace{1cm}
   \markboth{#2}{#2}
-  \addcontentsline{toc}{section}{\protect\numberline{}{\color{ntnublue}\bfseries #2}}
+  \addtocontents{toc}{\protect\vspace{4pt}\protect\noindent\protect\textcolor{ntnublue}{\protect\rule{\linewidth}{1.5pt}}\par\protect\vspace{-4pt}}
+  \addcontentsline{toc}{part}{#2}
   \newpage
 }
 
